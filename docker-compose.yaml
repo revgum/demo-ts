@@ -1,0 +1,113 @@
+version: '3.7'
+services:
+  ############################
+  # Node app + Dapr sidecar
+  ############################
+  nodeapp:
+    build: ./app/webapp
+    ports:
+      - "50002:50002"
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - dapr-dashboard
+    environment:
+      - DAPR_LOG_LEVEL=info
+    networks:
+      - hello-dapr
+  nodeapp-dapr:
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "nodeapp",
+      "--app-port", "3000",
+      "--placement-host-address", "placement:50006",
+      "-enable-profiling" ,
+      "-profile-port", "7777",
+      "-dapr-grpc-port", "50002",
+      "-components-path", "/components",
+      "-config", "/configuration/config.yaml"
+    ]
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
+    depends_on:
+      - nodeapp
+    network_mode: "service:nodeapp"
+  ############################
+  # Python app + Dapr sidecar
+  ############################
+  pythonapp:
+    build: ./app/backend
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - dapr-dashboard
+    networks:
+      - hello-dapr
+  pythonapp-dapr:
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "pythonapp",
+      "-enable-profiling" ,
+      "-profile-port", "7777",
+      "--placement-host-address", "placement:50006",
+      "-components-path", "/components",
+      "-config", "/configuration/config.yaml"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
+    depends_on:
+      - pythonapp
+    labels:
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
+    network_mode: "service:pythonapp"
+  ############################
+  # Dapr placement service
+  ############################
+  placement:
+    image: "docker.io/daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - hello-dapr
+  ############################
+  # Redis state store
+  ############################
+  redis:
+    image: "docker.io/redis:7-bookworm"
+    ports:
+      - "6380:6379"
+    networks:
+      - hello-dapr
+  zipkin:
+    image: "docker.io/openzipkin/zipkin"
+    ports:
+      - "9411:9411"
+    networks:
+      - hello-dapr
+
+  dapr-dashboard:
+    image: "docker.io/daprio/dashboard:latest"
+    command: [ "--docker-compose=true",
+      "--components-path=/home/nonroot/components",
+      "--config-path=/home/nonroot/config",
+      "--docker-compose-path=/home/nonroot/docker-compose.yaml" ]
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./dapr/components/:/home/nonroot/components"
+      - "./dapr/config/:/home/nonroot/config"
+      - ./docker-compose.yaml:/home/nonroot/docker-compose.yaml
+    networks:
+      - hello-dapr
+
+networks:
+    hello-dapr:
+      driver: bridge

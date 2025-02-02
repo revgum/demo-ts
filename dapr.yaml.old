@@ -1,0 +1,24 @@
+version: 1
+# common: # optional section for variables shared across apps
+#   resourcesPath: ./app/components # any dapr resources to be shared across apps
+#   env:  # any environment variable shared across apps
+#     DEBUG: true
+apps:
+- appID: webapp # optional
+  appDirPath: app/webapp/ # REQUIRED
+  # resourcesPaths: .dapr/resources # comma separated resources paths. (optional) can be left to default value by convention.
+  # appChannelAddress: 127.0.0.1 # network address where the app listens on. (optional) can be left to default value by convention.
+  # configFilePath: .dapr/config.yaml # (optional) can be default by convention too, ignore if file is not found.
+  appProtocol: http
+  appPort: 8080
+  # appHealthCheckPath: "/healthz"
+  command: [ "tsx", "main.ts" ]
+  appLogDestination: console # (optional), can be file, console or fileAndConsole. default is fileAndConsole.
+  daprdLogDestination: console # (optional), can be file, console or fileAndConsole. default is file.
+- appID: backend # optional
+  appDirPath: app/backend/ # REQUIRED
+  appProtocol: http
+  appPort: 3000
+  command: [ "tsx", "main.ts" ]
+  appLogDestination: console # (optional), can be file, console or fileAndConsole. default is fileAndConsole.
+  daprdLogDestination: console # (optional), can be file, console or fileAndConsole. default is file.
