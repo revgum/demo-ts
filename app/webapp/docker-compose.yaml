@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  ############################
+  # Backend app + Dapr sidecar
+  ############################
+  backend:
+    # Build is relative to the root directory where podman-compose is ran from
+    build: ./app/webapp
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - dapr-dashboard
+    networks:
+      - demo-dapr-network
+  backend-dapr:
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "backend",
+      "-enable-profiling" ,
+      "--profile-port", "7777",
+      "--placement-host-address", "placement:50006",
+      "--components-path", "/components",
+      "--config", "/configuration/config.yaml"
+      ]
+    volumes:
+      # Volume mounts are relative from the root directory where podman-compose is run from
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
+    depends_on:
+      - backend
+    labels:
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
+    network_mode: "service:backend"
+
+networks:
+    demo-dapr-network:
+      driver: bridge

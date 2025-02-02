@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  # Dapr placement service
+  placement:
+    image: "docker.io/daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - demo-dapr-network
+  # Dapr state and pubsub provider
+  redis:
+    image: "docker.io/redis:7-bookworm"
+    ports:
+      - "6380:6379"
+    networks:
+      - demo-dapr-network
+  # Dapr metrics provider
+  zipkin:
+    image: "docker.io/openzipkin/zipkin"
+    ports:
+      - "9411:9411"
+    networks:
+      - demo-dapr-network
+  # Dapr dashboard
+  dapr-dashboard:
+    image: "docker.io/daprio/dashboard:latest"
+    command: [ "--docker-compose=true",
+      "--components-path=/home/nonroot/components",
+      "--config-path=/home/nonroot/config",
+      "--docker-compose-path=/home/nonroot/docker-compose.yaml" ]
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./dapr/components/:/home/nonroot/components"
+      - "./dapr/config/:/home/nonroot/config"
+      - ./docker-compose.dapr.yaml:/home/nonroot/docker-compose.yaml
+    networks:
+      - demo-dapr-network
+
+networks:
+    demo-dapr-network:
+      driver: bridge

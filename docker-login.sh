@@ -1,1 +1,1 @@
-podman login docker.io -u revgum -p $DOCKERHUB_ACCESS_TOKEN
+podman login docker.io -u $1 -p $DOCKERHUB_ACCESS_TOKEN

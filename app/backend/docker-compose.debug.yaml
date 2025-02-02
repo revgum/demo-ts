@@ -1,0 +1,6 @@
+version: '3.7'
+services:
+  backend:
+    command: ["npm", "run", "debug"]
+    ports:
+      - "9229:9229"

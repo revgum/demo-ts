@@ -1,6 +1,5 @@
 FROM docker.io/node:22-alpine
-WORKDIR /app
 COPY . .
-RUN npm install -g tsx
+RUN npm install
 EXPOSE 3000
-CMD [ "tsx", "main.ts" ]
+CMD [ "npm", "run", "start" ]
