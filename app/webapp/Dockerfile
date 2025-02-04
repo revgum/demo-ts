@@ -1,4 +1,4 @@
-FROM docker.io/node:22-alpine
+FROM localhost/microservice-build
 COPY . .
 RUN npm install
 EXPOSE 3000

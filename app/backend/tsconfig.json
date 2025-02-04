@@ -1,3 +1,8 @@
 {
-  "include": ["./main.ts"]
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
+  "include": [
+    "./main.ts"
+  ]
 }

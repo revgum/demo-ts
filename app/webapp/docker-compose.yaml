@@ -1,40 +1,48 @@
 version: '3.7'
 services:
   ############################
-  # Backend app + Dapr sidecar
+  # Web app + Dapr sidecar
   ############################
-  backend:
-    # Build is relative to the root directory where podman-compose is ran from
+  webapp:
+    # Build is relative to the root directory where dapr-net-compose is ran from
     build: ./app/webapp
+    ports:
+      - "3000:3000"
+    environment:
+      DAPR_HOST: 127.0.0.1
+      DAPR_PORT: 3500
+      DAPR_LOG_LEVEL: debug
+      SERVER_HOST: 127.0.0.1
+      SERVER_PORT: 3000
     depends_on:
       - redis
       - placement
       - zipkin
-      - dapr-dashboard
     networks:
-      - demo-dapr-network
-  backend-dapr:
+      - dapr-net
+  webapp-dapr:
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
-      "--app-id", "backend",
-      "-enable-profiling" ,
-      "--profile-port", "7777",
+      "--app-id", "webapp",
+      "--app-port", "3000",
+      "--config", "/configuration/config.yaml",
+      "--dapr-http-port", "3500",
+      "--enable-api-logging",
+      "--enable-profiling" ,
+      "--log-as-json", "true",
       "--placement-host-address", "placement:50006",
-      "--components-path", "/components",
-      "--config", "/configuration/config.yaml"
-      ]
+      "--profile-port", "7777",
+      "--resources-path", "/components"
+    ]
     volumes:
-      # Volume mounts are relative from the root directory where podman-compose is run from
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
       - "./dapr/components/:/components"
       - "./dapr/config/:/configuration"
     depends_on:
-      - backend
-    labels:
-      - "dapr.io/enabled=true"  # Enable Dapr for this service
-      - "dapr.io/config=configstore"
-    network_mode: "service:backend"
+      - webapp
+    network_mode: service:webapp
 
 networks:
-    demo-dapr-network:
-      driver: bridge
+  dapr-net: # here we set the network name
+    driver: bridge

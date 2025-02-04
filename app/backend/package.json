@@ -1,18 +1,19 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "tsx main.ts",
-    "debug": "tsx --inspect-brk=0.0.0.0 main.ts"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "tsx":"^4.19.2"
-  },
-  "devDependencies": {
-    "@types/node": "^22.13.0"
-  }
+	"name": "backend",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"start": "tsx main.ts",
+		"debug": "tsx --inspect-brk=0.0.0.0 main.ts"
+	},
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"@dapr/dapr": "^3.4.1",
+		"tsx": "^4.19.2"
+	},
+	"devDependencies": {
+		"@types/node": "^22.13.0"
+	}
 }

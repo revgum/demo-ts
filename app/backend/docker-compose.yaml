@@ -1,43 +1,50 @@
 version: '3.7'
 services:
   ############################
-  # Web app + Dapr sidecar
+  # backend app + Dapr sidecar
   ############################
-  webapp:
-    # Build is relative to the root directory where podman-compose is ran from
+  backend:
+    # Build is relative to the root directory where dapr-net-compose is ran from
     build: ./app/backend
     ports:
-      - "50002:50002"
+      - "3001:3001"
+    environment:
+      DAPR_HOST: 127.0.0.1
+      DAPR_PORT: 3500
+      SERVER_HOST: 127.0.0.1
+      SERVER_PORT: 3001
     depends_on:
       - redis
       - placement
       - zipkin
-      - dapr-dashboard
-    environment:
-      - DAPR_LOG_LEVEL=info
     networks:
-      - demo-dapr-network
-  webapp-dapr:
+      - dapr-net
+  backend-dapr:
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
-      "--app-id", "webapp",
-      "--app-port", "3000",
+      "--app-id", "backend",
+      "--app-port", "3001",
+      "--config", "/configuration/config.yaml",
+      "--dapr-http-port", "3500",
+      "--enable-api-logging",
+      "--enable-profiling",
+      "--log-as-json", "true",
       "--placement-host-address", "placement:50006",
-      "--enable-profiling" ,
       "--profile-port", "7777",
-      "--dapr-grpc-port", "50002",
-      "--components-path", "/components",
-      "--config", "/configuration/config.yaml"
-    ]
+      "--resources-path", "/components"
+      ]
     volumes:
-      # Volume mounts are relative from the root directory where podman-compose is run from
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
       - "./dapr/components/:/components"
       - "./dapr/config/:/configuration"
     depends_on:
-      - webapp
-    network_mode: "service:webapp"
+      - backend
+    labels:
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
+    network_mode: "service:backend"
 
 networks:
-    demo-dapr-network:
-      driver: bridge
+  dapr-net: # here we set the network name
+    driver: bridge

@@ -1,5 +1,20 @@
 version: '3.7'
+
+# Add a new microservice docker-compose to the full stack
+include:
+  - app/webapp/docker-compose.yaml
+  - app/backend/docker-compose.yaml
+
 services:
+
+  shell:
+    profiles: [debug]
+    image: alpine:latest
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    networks:
+      - dapr-net
+
   # Dapr placement service
   placement:
     image: "docker.io/daprio/dapr"
@@ -7,21 +22,24 @@ services:
     ports:
       - "50006:50006"
     networks:
-      - demo-dapr-network
+      - dapr-net
   # Dapr state and pubsub provider
   redis:
-    image: "docker.io/redis:7-bookworm"
+    image: "docker.io/redis:7-alpine"
+    hostname: redis
+    restart: always
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "no", "--maxmemory", "500mb", "--maxmemory-policy", "allkeys-lru"]
     networks:
-      - demo-dapr-network
+      - dapr-net
   # Dapr metrics provider
   zipkin:
     image: "docker.io/openzipkin/zipkin"
     ports:
       - "9411:9411"
     networks:
-      - demo-dapr-network
+      - dapr-net
   # Dapr dashboard
   dapr-dashboard:
     image: "docker.io/daprio/dashboard:latest"
@@ -34,10 +52,11 @@ services:
     volumes:
       - "./dapr/components/:/home/nonroot/components"
       - "./dapr/config/:/home/nonroot/config"
-      - ./docker-compose.dapr.yaml:/home/nonroot/docker-compose.yaml
+      - "./app/:/app/app"
+      - ./docker-compose.yaml:/home/nonroot/docker-compose.yaml
     networks:
-      - demo-dapr-network
+      - dapr-net
 
 networks:
-    demo-dapr-network:
-      driver: bridge
+  dapr-net: # here we set the network name
+    driver: bridge
