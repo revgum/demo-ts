@@ -8,15 +8,25 @@ services:
     build: ./app/backend
     ports:
       - "3001:3001"
+    command: >
+      sh -c "npm run knex -- migrate:latest && npm run start"
     environment:
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500
       SERVER_HOST: 127.0.0.1
       SERVER_PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_NAME: postgres
+      DB_PASSWORD: postgres
+      DB_DEBUG: 1
+      # DB_SSL: postgres # Production
     depends_on:
       - redis
       - placement
       - zipkin
+      - postgres
     networks:
       - dapr-net
   backend-dapr:
@@ -44,6 +54,7 @@ services:
       - "dapr.io/enabled=true"  # Enable Dapr for this service
       - "dapr.io/config=configstore"
     network_mode: "service:backend"
+
 
 networks:
   dapr-net: # here we set the network name

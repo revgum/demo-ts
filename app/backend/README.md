@@ -1,0 +1,1 @@
+- Install Knex globally to work with migrations [link](https://knexjs.org/guide/migrations.html)
