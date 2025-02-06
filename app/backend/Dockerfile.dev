@@ -1,9 +1,9 @@
 # Build
 FROM localhost/microservice-build as build
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 WORKDIR /app
 COPY package.json package-lock.json .
-RUN npm ci
+RUN npm install
 
 # Run
 FROM localhost/microservice-build

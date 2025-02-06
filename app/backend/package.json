@@ -1,15 +1,13 @@
 {
 	"name": "backend",
 	"version": "1.0.0",
+	"private": true,
 	"scripts": {
 		"compile": "tsc",
 		"start": "tsx src/main.ts",
 		"debug": "tsx --inspect-brk=0.0.0.0 src/main.ts",
 		"knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
 	},
-	"author": "",
-	"license": "ISC",
-	"description": "",
 	"dependencies": {
 		"@dapr/dapr": "^3.4.1",
 		"knex": "^3.1.0",

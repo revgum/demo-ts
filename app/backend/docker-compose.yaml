@@ -4,8 +4,9 @@ services:
   # backend app + Dapr sidecar
   ############################
   backend:
-    # Build is relative to the root directory where dapr-net-compose is ran from
-    build: ./app/backend
+    build:
+      context: ./app/backend
+      dockerfile: ./Dockerfile.dev
     ports:
       - "3001:3001"
     command: >
@@ -20,7 +21,7 @@ services:
       DB_USER: postgres
       DB_NAME: postgres
       DB_PASSWORD: postgres
-      DB_DEBUG: 1
+      # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     depends_on:
       - redis
