@@ -5,6 +5,16 @@ export const TABLE_NAME = 'test';
 
 export const getAll = async (context: Context): Promise<Test[]> => context.db<Test>(TABLE_NAME);
 
+export const getById = async (context: Context, id: Test['id']): Promise<Test> => {
+  const rows = await context.db<Test>(TABLE_NAME).where({ id });
+
+  if (!rows.length) {
+    throw new Error(`Test ${id} not found.`);
+  }
+
+  return rows[0];
+};
+
 export const create = async (context: Context, obj: Partial<Test>): Promise<Test> => {
   const rows = await context
     .db<Test>(TABLE_NAME)

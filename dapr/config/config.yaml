@@ -8,3 +8,12 @@ spec:
     samplingRate: "1"
     zipkin:
       endpointAddress: "http://zipkin:9411/api/v2/spans"
+  policies:
+    retries:
+      noRetries:
+        policy: constant
+        maxRetries: 0
+  targets:
+    apps:
+      webapp:
+        retry: noRetries
