@@ -1,7 +1,7 @@
-import type { Knex } from "knex";
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-	await knex.raw(`
+  await knex.raw(`
 		CREATE TABLE test (
 			id SERIAL PRIMARY KEY,
 			field1 VARCHAR (50) UNIQUE NOT NULL,
@@ -12,5 +12,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-	await knex.raw("DROP TABLE test;");
+  await knex.raw('DROP TABLE test;');
 }

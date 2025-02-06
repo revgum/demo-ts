@@ -1,22 +1,23 @@
 {
-	"name": "backend",
-	"version": "1.0.0",
-	"private": true,
-	"scripts": {
-		"compile": "tsc",
-		"start": "tsx src/main.ts",
-		"debug": "tsx --inspect-brk=0.0.0.0 src/main.ts",
-		"knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
-	},
-	"dependencies": {
-		"@dapr/dapr": "^3.4.1",
-		"knex": "^3.1.0",
-		"pg": "^8.13.1",
-		"tsx": "^4.19.2"
-	},
-	"devDependencies": {
-		"@types/node": "^22.13.0",
-		"ts-node": "^10.9.2",
-		"typescript": "^5.7.3"
-	}
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "compile": "tsc",
+    "ci": "biome ci",
+    "start": "tsx src/main.ts",
+    "debug": "tsx --inspect-brk=0.0.0.0 src/main.ts",
+    "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
+  },
+  "dependencies": {
+    "@dapr/dapr": "^3.4.1",
+    "knex": "^3.1.0",
+    "pg": "^8.13.1",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
 }

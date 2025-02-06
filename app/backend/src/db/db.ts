@@ -1,5 +1,5 @@
-import Knex from "knex";
-import config from "./knexfile";
-import type { Context } from "../context";
+import Knex from 'knex';
+import type { Context } from '../types';
+import config from './knexfile';
 
-export const knex = (env: Context["env"]) => Knex(config[env]);
+export const knex = (env: Context['env']) => Knex(config[env]);

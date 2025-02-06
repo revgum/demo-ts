@@ -1,14 +1,8 @@
-import type { Knex } from "knex";
-import { env } from "./config";
-import { knex } from "./db/db";
-
-export type Context = {
-	env: "development" | "staging" | "production";
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	db: Knex<any, unknown[]>;
-};
+import { env } from './config';
+import { knex } from './db/db';
+import type { Context } from './types';
 
 export const context: Context = {
-	env,
-	db: knex(env),
+  env,
+  db: knex(env),
 };

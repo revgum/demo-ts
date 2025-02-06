@@ -5,27 +5,20 @@
     "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "build",
-    // Required
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    // Recommended
-    "noEmit": true, // or `emitDeclarationOnly`
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "allowArbitraryExtensions": true,
-    "verbatimModuleSyntax": true, // or `isolatedModules`
+    "verbatimModuleSyntax": true
   },
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }

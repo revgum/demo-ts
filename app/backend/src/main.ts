@@ -1,36 +1,30 @@
-import { DaprServer, HttpMethod } from "@dapr/dapr";
-import * as config from "./config";
-import { randomUUID } from "node:crypto";
-import { handleInvocation } from "./hello";
-import { context } from "./context";
+import { DaprServer } from '@dapr/dapr';
+import * as config from './config';
+import { context } from './context';
+import { routes as testRoutes } from './handlers/test';
+import { create } from './models/test';
 
 async function start() {
-	const server = new DaprServer({
-		serverHost: config.server.host,
-		serverPort: config.server.port,
-		clientOptions: {
-			daprHost: config.dapr.host,
-			daprPort: config.dapr.port,
-		},
-	});
+  const server = new DaprServer({
+    serverHost: config.server.host,
+    serverPort: config.server.port,
+    clientOptions: {
+      daprHost: config.dapr.host,
+      daprPort: config.dapr.port,
+    },
+  });
 
-	await server.invoker.listen(
-		"hello-world",
-		(data) => handleInvocation(context, data),
-		{
-			method: HttpMethod.GET,
-		},
-	);
+  for await (const route of Object.values(testRoutes)) {
+    await server.invoker.listen(route.methodName, (d) => route.fn(context, d), route.opts);
+  }
 
-	// Add a row every time we boot, for fun
-	await context
-		.db("test")
-		.insert({ field1: randomUUID(), created_at: new Date() });
+  const record = await create(context, {});
+  console.log(`Created new Test model: ${JSON.stringify(record)}`);
 
-	await server.start();
+  await server.start();
 }
 
 start().catch((e) => {
-	console.error(e);
-	process.exit(1);
+  console.error(e);
+  process.exit(1);
 });
