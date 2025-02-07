@@ -1,8 +1,10 @@
 version: '3.7'
 
+name: demo
+
 # Add a new microservice docker-compose to the full stack
 include:
-  - app/webapp/docker-compose.yaml
+  - app/webnuxt/docker-compose.yaml
   - app/backend/docker-compose.yaml
 
 services:

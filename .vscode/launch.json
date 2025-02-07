@@ -14,13 +14,12 @@
       "type": "node"
     }
   ],
-  "inputs": [{
-    "type": "pickString",
-    "id": "appName",
-    "description": "Which app do you want to debug?",
-    "options": [
-      "backend",
-      "webapp"
-    ]
-  }]
+  "inputs": [
+    {
+      "type": "pickString",
+      "id": "appName",
+      "description": "Which app do you want to debug?",
+      "options": ["backend", "webnuxt"]
+    }
+  ]
 }

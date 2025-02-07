@@ -15,5 +15,5 @@ spec:
         maxRetries: 0
   targets:
     apps:
-      webapp:
+      webnuxt:
         retry: noRetries

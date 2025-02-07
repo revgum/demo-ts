@@ -6,7 +6,7 @@
 .PHONY: setup build up down login shell psql debug
 
 # Default target to bring up a fresh stack
-all: setup build down up
+all: setup build up
 
 # Build the microservice base image
 setup:
@@ -19,7 +19,7 @@ build: setup
 
 # Bring up the stack
 up: setup
-	podman-compose up
+	podman-compose up && podman-compose rm -fsv
 
 # Bring up the stack while debugging a service,
 # i.e. SERVICE=backend make debug
@@ -37,4 +37,4 @@ login:
 
 # Run psql to connect to local postgres, default password is "postgres"
 psql:
-	podman run -it --rm --network dapr_dapr-net postgres:17-alpine psql -h postgres -U postgres
+	podman run -it --rm --network demo_dapr-net postgres:17-alpine psql -h postgres -U postgres

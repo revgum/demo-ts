@@ -27,6 +27,6 @@ This behavior is intended to bring your service up in such a way that you can at
 # Example application details
 ## [Backend](./app/backend/README.md)
 A simple node backend microservice with postgres and dapr integration.
-## [Webapp](./app/webapp/README.md)
+## [WebNuxt](./app/webnuxt/README.md)
 A simple Nuxt server-side rendering application integrated to make API calls to the backend.
 
