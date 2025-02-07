@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+  ############################
+  # backend app + Dapr sidecar
+  ############################
+  backend-dotnet:
+    build:
+      context: ./app/backend-dotnet
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "8081:8080"
+    environment:
+      DAPR_HOST: 127.0.0.1
+      DAPR_PORT: 3500
+      SERVER_HOST: 127.0.0.1
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_NAME: postgres
+      DB_PASSWORD: postgres
+      # DB_DEBUG: 1
+      # DB_SSL: postgres # Production
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - postgres
+    networks:
+      - dapr-net
+  backend-dotnet-dapr:
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "backend-dotnet",
+      "--app-port", "8080",
+      "--config", "/configuration/config.yaml",
+      "--dapr-http-port", "3500",
+      "--enable-api-logging",
+      "--enable-profiling",
+      "--log-as-json", "true",
+      "--placement-host-address", "placement:50006",
+      "--profile-port", "7777",
+      "--resources-path", "/components"
+      ]
+    volumes:
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
+    depends_on:
+      - backend-dotnet
+    labels:
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
+    network_mode: "service:backend-dotnet"
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge

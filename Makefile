@@ -12,6 +12,7 @@ all: setup build up
 setup:
 	echo "\n\n***Building microservice base image***\n\n"
 	podman build ./shared/microservice -t microservice-build
+	podman build -f ./shared/microservice/Dockerfile.dotnet -t microservice-dotnet-build
 
 # Build the stack
 build: setup

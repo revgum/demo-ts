@@ -6,6 +6,7 @@ name: demo
 include:
   - app/webnuxt/docker-compose.yaml
   - app/backend/docker-compose.yaml
+  - app/backend-dotnet/docker-compose.yaml
 
 services:
 
