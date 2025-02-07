@@ -8,6 +8,9 @@ spec:
     samplingRate: "1"
     zipkin:
       endpointAddress: "http://zipkin:9411/api/v2/spans"
+# Testing OTEL for metrics and tracing
+#    otel:
+#      endpointAddress: "http://grafana-otel:4318"
   policies:
     retries:
       noRetries:
