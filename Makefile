@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up down login shell psql debug
+.PHONY: setup build up down login shell psql debug redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -17,15 +17,15 @@ setup:
 build: setup
 	podman-compose build
 
-# Bring up the stack
+# Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up: setup
-	podman-compose up && podman-compose rm -fsv
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up"
 
 # Bring up the stack while debugging a service,
 # i.e. SERVICE=backend make debug
 debug: setup
 	echo "\n\n***Starting $$SERVICE in debug mode***\n\n"
-	podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"
 
 # Take down the stack
 down:
@@ -38,3 +38,11 @@ login:
 # Run psql to connect to local postgres, default password is "postgres"
 psql:
 	podman run -it --rm --network demo_dapr-net postgres:17-alpine psql -h postgres -U postgres
+
+redis-cli:
+	podman run -it --rm --network demo_dapr-net redis:7-alpine redis-cli -h redis
+
+# Run an alpine shell for very basic access to the dapr-net network to use tools like nc and ping
+shell:
+	podman run -it --rm --network demo_dapr-net alpine:latest
+

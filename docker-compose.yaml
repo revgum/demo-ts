@@ -28,7 +28,6 @@ services:
   # Dapr state and pubsub provider
   redis:
     image: "docker.io/redis:7-alpine"
-    hostname: redis
     restart: always
     ports:
       - "6379:6379"

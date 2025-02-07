@@ -3,7 +3,7 @@
 ## Running the full stack
 The Makefile includes a target to launch the full stack (infrastructure, services) in `development` mode. In general, running `make` is the recommended way to build and launch a fresh stack everytime.
 
-***Note: When you `ctrl-c` to exit a running stack, the containers will still be running in podman. If launching the stack shows errors about pre-existing containers running, you can run `make down` to tear down an existing stack or run `make` to launch a completely fresh stack.***
+***Note: When you `ctrl-c` to exit a running stack, the Makefile will capture that and bring the entire stack down. If launching the stack shows errors about pre-existing containers running, you can run `make down` to tear down an existing stack or run `make` to launch a completely fresh stack.***
 
 ### Commands
 - `make` : Tear down, build and launch a fresh full stack.
