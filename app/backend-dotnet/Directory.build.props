@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Project>
+    <PropertyGroup>
+        <!-- move /obj and build files to /artifacts -->
+        <BaseOutputPath>artifacts</BaseOutputPath>
+        <BaseIntermediateOutputPath>..\Intermediate\obj</BaseIntermediateOutputPath>
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
+        <BaseIntermediateOutputPath>$(SolutionDir)artifacts\</BaseIntermediateOutputPath>
+    </PropertyGroup>
+</Project>

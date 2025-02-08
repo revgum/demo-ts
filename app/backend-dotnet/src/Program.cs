@@ -1,11 +1,11 @@
-using System.Text.Json;
-using backend_dotnet;
+using backend_dotnet.src.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
-using var dbContext = new TestContext();
+
+var connectionString = builder.Configuration.GetConnectionString("Postgres") ?? throw new Exception("Postgres connection string missing.");
+using var dbContext = new TestContext(connectionString);
 var service = new TestService(dbContext);
-var options = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
 
 app.MapPost("/test", (Test test) =>
 {

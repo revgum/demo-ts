@@ -27,7 +27,15 @@ logs
 .env.*
 !.env.example
 
-
-obj
-bin
-out
+# dotnet files
+[Oo]bj/
+[Bb]in/
+.nuget/
+_ReSharper.*
+packages/
+artifacts/
+*.user
+*.suo
+*.userprefs
+*DS_Store
+*.sln.ide

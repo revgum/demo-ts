@@ -2,16 +2,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend_dotnet
+namespace backend_dotnet.src.Common
 {
-    public class TestContext : DbContext
+    public class TestContext(string connectionString) : DbContext
     {
         public DbSet<Test> Tests { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(connectionString:
-               "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=postgres;");
+            optionsBuilder.UseNpgsql(connectionString);
             base.OnConfiguring(optionsBuilder);
         }
     }
