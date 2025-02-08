@@ -1,31 +1,17 @@
-using backend_dotnet.src.Common;
+using Microsoft.EntityFrameworkCore;
+using backend_dotnet.src.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddDbContext<TestContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres") ?? throw new Exception("Postgres connection string missing.")));
+builder.Services.AddEndpointsApiExplorer();
+
 var app = builder.Build();
 
-var connectionString = builder.Configuration.GetConnectionString("Postgres") ?? throw new Exception("Postgres connection string missing.");
-using var dbContext = new TestContext(connectionString);
-var service = new TestService(dbContext);
+// app.UseHttpsRedirection();
+// app.UseAuthorization();
 
-app.MapPost("/test", (Test test) =>
-{
-    Console.WriteLine("POST: test received : " + test);
-    return test.ToString();
-});
-
-app.MapGet("/test", () =>
-{
-    Console.WriteLine("GET: test received");
-    return "test";
-});
-
-app.MapGet("/test-get-all", async () =>
-{
-    Console.WriteLine("GET: test-get-all received");
-    var records = await service.GetAll();
-    return Results.Json(new { payload = records });
-});
+app.MapControllers();
 
 app.Run();
-
-

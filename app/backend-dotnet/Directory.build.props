@@ -3,7 +3,7 @@
     <PropertyGroup>
         <!-- move /obj and build files to /artifacts -->
         <BaseOutputPath>artifacts</BaseOutputPath>
-        <BaseIntermediateOutputPath>..\Intermediate\obj</BaseIntermediateOutputPath>
+        <BaseIntermediateOutputPath>artifacts\Intermediate\obj</BaseIntermediateOutputPath>
         <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
         <BaseIntermediateOutputPath>$(SolutionDir)artifacts\</BaseIntermediateOutputPath>
     </PropertyGroup>
