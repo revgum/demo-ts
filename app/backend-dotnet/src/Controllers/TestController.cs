@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using backend_dotnet.src.Models;
-using Microsoft.EntityFrameworkCore;
+using backend_dotnet.src.Services;
 
 namespace backend_dotnet.src.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/tests")]
 public class TestController(TestContext context) : ControllerBase
 {
     private readonly TestContext _context = context;
@@ -13,6 +13,6 @@ public class TestController(TestContext context) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Test>>> GetTests()
     {
-        return await _context.Tests.ToListAsync();
+        return await new Backend().GetTests();
     }
 }

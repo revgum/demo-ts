@@ -8,19 +8,18 @@ services:
       context: ./app/backend-dotnet
       dockerfile: ./Dockerfile.dev
     ports:
-      - "8081:8080"
+      - "3002:3002"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://*:3002"
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500
-      SERVER_HOST: 127.0.0.1
-      SERVER_PORT: 8080
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_NAME: postgres
-      DB_PASSWORD: postgres
+      # Aspnet connectionstrings environment variable convention
+      ConnectionStrings__Postgres: "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=postgres;"
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
+    volumes:
+      - ./app/backend-dotnet/src:/App/src # Mount localhost source to support hot reload
     depends_on:
       - redis
       - placement
@@ -33,7 +32,7 @@ services:
     command: [
       "./daprd",
       "--app-id", "backend-dotnet",
-      "--app-port", "8080",
+      "--app-port", "3002",
       "--config", "/configuration/config.yaml",
       "--dapr-http-port", "3500",
       "--enable-api-logging",

@@ -16,7 +16,7 @@ setup:
 
 # Build the stack
 build: setup
-	podman-compose build
+	podman-compose --parallel 3 build
 
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up: setup
