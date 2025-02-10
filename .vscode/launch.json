@@ -19,7 +19,7 @@
       "type": "pickString",
       "id": "appName",
       "description": "Which app do you want to debug?",
-      "options": ["backend", "webnuxt"]
+      "options": ["backend-ts", "web-nuxt"]
     }
   ]
 }

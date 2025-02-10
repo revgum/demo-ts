@@ -1,0 +1,53 @@
+version: '3.7'
+services:
+  ############################
+  # Web app + Dapr sidecar
+  ############################
+  web-qwikjs:
+    build:
+      context: ./app/web-qwikjs
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "3101:3000" # Dev server
+      - "24679:24679" # Vite HMR endpoint for live updates
+    environment:
+      DAPR_HOST: 127.0.0.1
+      DAPR_PORT: 3500
+      DAPR_LOG_LEVEL: debug
+      SERVER_HOST: 127.0.0.1
+      SERVER_PORT: 3000
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+    networks:
+      - dapr-net
+    volumes:
+      - ./app/web-qwikjs:/app # Mount localhost source to support HMR live updates
+      - /app/node_modules # Persist docker containers modules so that localhost are not used
+  web-qwikjs-dapr:
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "web-qwikjs",
+      "--app-port", "3000",
+      "--config", "/configuration/config.yaml",
+      "--dapr-http-port", "3500",
+      "--enable-api-logging",
+      "--enable-profiling" ,
+      "--log-as-json", "true",
+      "--placement-host-address", "placement:50006",
+      "--profile-port", "7777",
+      "--resources-path", "/components"
+    ]
+    volumes:
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
+    depends_on:
+      - web-qwikjs
+    network_mode: service:web-qwikjs
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge

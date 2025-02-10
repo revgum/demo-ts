@@ -14,21 +14,23 @@ The Makefile includes a target to launch the full stack (infrastructure, service
 The Makefile includes a target to launch a service with a docker-compose.debug.yaml by including a `SERVICE` variable to the make command:
 
 ```bash
-SERVICE=backend make debug
+SERVICE=backend-ts make debug
 
 ***Building microservice base image***
 ...output...
-***Starting backend in debug mode***
+***Starting backend-ts in debug mode***
 ...output...
 ```
 
-This behavior is intended to bring your service up in such a way that you can attach a debugger. The example in the `backend` service launches a node app with port `9229` mapped and ready to attach the VSCode debugger.
+This behavior is intended to bring your service up in such a way that you can attach a debugger. The example in the `backend-ts` service launches a node app with port `9229` mapped and ready to attach the VSCode debugger.
 
 # Example application details
-## [Backend](./app/backend/README.md)
+## [BackendTs](./app/backend-ts/README.md)
 An example Typescript/Node backend microservice with postgres and dapr integration.
 ## [BackendDotnet](./app/backend-dotnet/README.md)
 An example ASP.Net API backend microservice with postgres and dapr integration.
-## [WebNuxt](./app/webnuxt/README.md)
+## [WebNuxt](./app/web-nuxt/README.md)
 An example Nuxt server-side rendering application with dapr integration for making microservice API calls.
+## [WebQwikjs](./app/web-qwikjs/README.md)
+An example QwikJs server-side rendering application with dapr integration for making microservice API calls.
 

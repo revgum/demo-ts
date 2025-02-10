@@ -23,7 +23,7 @@ up: setup
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up"
 
 # Bring up the stack while debugging a service,
-# i.e. SERVICE=backend make debug
+# i.e. SERVICE=backend-ts make debug
 debug: setup
 	echo "\n\n***Starting $$SERVICE in debug mode***\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"

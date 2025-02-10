@@ -4,9 +4,9 @@ name: demo
 
 # Add a new microservice docker-compose to the full stack
 include:
-  - app/webnuxt/docker-compose.yaml
-  - app/webqwikjs/docker-compose.yaml
-  - app/backend/docker-compose.yaml
+  - app/web-nuxt/docker-compose.yaml
+  - app/web-qwikjs/docker-compose.yaml
+  - app/backend-ts/docker-compose.yaml
   - app/backend-dotnet/docker-compose.yaml
 
 services:

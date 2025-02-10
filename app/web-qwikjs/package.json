@@ -1,5 +1,5 @@
 {
-  "name": "webqwikjs",
+  "name": "web-qwikjs",
   "engines-annotation": "Mostly required by sharp which needs a Node-API v9 compatible runtime",
   "private": true,
   "trustedDependencies": ["sharp"],
