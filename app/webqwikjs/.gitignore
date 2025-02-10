@@ -1,7 +1,3 @@
-# Dapr and tsc build
-**/.dapr/logs
-build/
-
 # Nuxt dev/build outputs
 .output
 .data
@@ -27,17 +23,6 @@ logs
 .env.*
 !.env.example
 
-# dotnet files
-[Oo]bj/
-[Bb]in/
-.nuget/
-_ReSharper.*
-packages/
-artifacts/
-*.user
-*.suo
-*.userprefs
-*DS_Store
-*.sln.ide
-
-vite.config.ts.timestamp-*
+dist
+server
+tmp
