@@ -3,9 +3,9 @@ services:
   ############################
   # Web app + Dapr sidecar
   ############################
-  webnuxt:
+  web-nuxt:
     build:
-      context: ./app/webnuxt
+      context: ./app/web-nuxt
       dockerfile: ./Dockerfile.dev
     ports:
       - "3100:3000" # Dev server
@@ -23,13 +23,13 @@ services:
     networks:
       - dapr-net
     volumes:
-      - ./app/webnuxt:/app # Mount localhost source to support HMR live updates
-      - webnuxt-node_modules:/app/node_modules # Persist docker containers modules so that localhost are not used
-  webnuxt-dapr:
+      - ./app/web-nuxt:/app # Mount localhost source to support HMR live updates
+      - /app/node_modules # Persist docker containers modules so that localhost are not used
+  web-nuxt-dapr:
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
-      "--app-id", "webnuxt",
+      "--app-id", "web-nuxt",
       "--app-port", "3000",
       "--config", "/configuration/config.yaml",
       "--dapr-http-port", "3500",
@@ -45,11 +45,8 @@ services:
       - "./dapr/components/:/components"
       - "./dapr/config/:/configuration"
     depends_on:
-      - webnuxt
-    network_mode: service:webnuxt
-
-volumes:
-  webnuxt-node_modules: # Persist the node_modules directory built and used by the linux container
+      - web-nuxt
+    network_mode: service:web-nuxt
 
 networks:
   dapr-net: # here we set the network name
