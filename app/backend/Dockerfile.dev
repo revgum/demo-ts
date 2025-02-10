@@ -11,4 +11,4 @@ WORKDIR /app
 COPY --from=build /app /app
 COPY /src /app/src
 EXPOSE 3001
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "dev" ]

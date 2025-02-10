@@ -47,7 +47,7 @@ services:
     profiles: [observability]
     image: "docker.io/grafana/otel-lgtm"
     ports:
-      - "3100:3000"
+      - "3200:3000"
     networks:
       - dapr-net
   # Dapr dashboard

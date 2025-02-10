@@ -18,8 +18,10 @@ async function start() {
     await server.invoker.listen(route.methodName, (d) => route.fn(context, d), route.opts);
   }
 
-  const record = await create(context, {});
-  console.log(`Created new Test model: ${JSON.stringify(record)}`);
+  if (process.env.SEED_DATA) {
+    const record = await create(context, {});
+    console.log(`Created new Test model: ${JSON.stringify(record)}`);
+  }
 
   await server.start();
 }

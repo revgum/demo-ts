@@ -5,6 +5,7 @@
   "scripts": {
     "compile": "tsc",
     "ci": "biome ci",
+    "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",
     "debug": "tsx --inspect-brk=0.0.0.0 src/main.ts",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"

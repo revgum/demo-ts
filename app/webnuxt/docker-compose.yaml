@@ -8,7 +8,7 @@ services:
       context: ./app/webnuxt
       dockerfile: ./Dockerfile.dev
     ports:
-      - "3000:3000" # Dev server
+      - "3100:3000" # Dev server
       - "24678:24678" # Vite HMR endpoint for live updates
     environment:
       DAPR_HOST: 127.0.0.1

@@ -26,7 +26,9 @@ This behavior is intended to bring your service up in such a way that you can at
 
 # Example application details
 ## [Backend](./app/backend/README.md)
-A simple node backend microservice with postgres and dapr integration.
+An example Typescript/Node backend microservice with postgres and dapr integration.
+## [BackendDotnet](./app/backend-dotnet/README.md)
+An example ASP.Net API backend microservice with postgres and dapr integration.
 ## [WebNuxt](./app/webnuxt/README.md)
-A simple Nuxt server-side rendering application integrated to make API calls to the backend.
+An example Nuxt server-side rendering application with dapr integration for making microservice API calls.
 
