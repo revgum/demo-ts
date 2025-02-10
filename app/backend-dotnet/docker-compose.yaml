@@ -25,6 +25,7 @@ services:
       - placement
       - zipkin
       - postgres
+    restart: on-failure:3
     networks:
       - dapr-net
   backend-dotnet-dapr:
