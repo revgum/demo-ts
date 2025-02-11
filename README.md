@@ -24,6 +24,19 @@ SERVICE=backend-ts make debug
 
 This behavior is intended to bring your service up in such a way that you can attach a debugger. The example in the `backend-ts` service launches a node app with port `9229` mapped and ready to attach the VSCode debugger.
 
+# Backend DB migration strategy
+A common pattern for database migrations in a microservice environment is to have a deployment focused on performing the migration ahead of deploying the functional code updates. Performing database migrations are **expected to be non-breaking** to currently deployed code. In the rare case that a breaking change to the database must be deployed, these changes are expected to coincide with a downtime/maintenance window rollout.
+
+Below is a description of the process of creating and deploying a migration;
+
+1. Run `make db-up` in a terminal window to bring the database container up.
+2. In a new terminal window, run the migration process for the specific backend service (see its README.md for details)
+3. In a terminal window from this projects root directory, run the migration on localhost using the `SERVICE` variable to target a specific backend service. (i.e. `SERVICE=backend-ts make up-migrations`). Watch the output to validate that the migrations complete without issue.
+4. Stop the terminal window with the database container running, it has been migrated and will launch properly in the next step.
+5. Run `make` to bring the full stack up with migrations having run and the backend microservice ready for code updates to make use of the new structures.
+
+
+
 # Example application details
 ## [BackendTs](./app/backend-ts/README.md)
 An example Typescript/Node backend microservice with postgres and dapr integration.
