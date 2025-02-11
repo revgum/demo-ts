@@ -4,6 +4,7 @@ name: demo
 
 # Add a new microservice docker-compose to the full stack
 include:
+  - shared/db/docker-compose.yaml
   - app/web-nuxt/docker-compose.yaml
   - app/web-qwikjs/docker-compose.yaml
   - app/backend-ts/docker-compose.yaml
@@ -67,25 +68,6 @@ services:
       - ./docker-compose.yaml:/home/nonroot/docker-compose.yaml
     networks:
       - dapr-net
-
-  # Shared db
-  postgres:
-    image: "docker.io/postgres:17-alpine"
-    ports:
-      - "5432:5432"
-    restart: always
-    shm_size: 128mb
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - dapr-net
-
-volumes:
-  db-data:
 
 networks:
   dapr-net: # here we set the network name

@@ -1,4 +1,6 @@
 version: '3.7'
+name: demo
+
 services:
   ############################
   # backend app + Dapr sidecar
@@ -9,8 +11,7 @@ services:
       dockerfile: ./Dockerfile.dev
     ports:
       - "3001:3001"
-    command: >
-      sh -c "npm run knex -- migrate:latest && npm run dev"
+    command: npm run dev
     environment:
       SEED_DATA: true # Load seed data on start
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
@@ -21,7 +22,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
-      DB_NAME: postgres
+      DB_NAME: postgres-ts
       DB_PASSWORD: postgres
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production

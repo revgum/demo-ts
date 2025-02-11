@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up down login shell psql debug redis-cli
+.PHONY: setup build up up-db down login shell psql debug redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -20,7 +20,18 @@ build: setup
 
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up: setup
+	echo "\n\n***Bringing up the stack***\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up"
+
+# Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
+up-db: setup
+	echo "\n\n***Bringing up the db***\n\n"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the db***; cd -; podman-compose down; exit 1' SIGINT SIGTERM ERR; cd shared/db && podman-compose up"
+
+# Run migrations for specified service.
+up-migrations: setup
+	echo "\n\n***Bringing up the $$SERVICE migrations***\n\n"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the migrations***; podman-compose -f docker-compose.migrations.yaml down; cd -; exit 1' SIGINT SIGTERM ERR; cd app/$$SERVICE && podman-compose -f docker-compose.migrations.yaml up && podman-compose -f docker-compose.migrations.yaml down"
 
 # Bring up the stack while debugging a service,
 # i.e. SERVICE=backend-ts make debug
