@@ -49,6 +49,7 @@ login:
 
 # Run psql to connect to local postgres, default password is "postgres"
 psql:
+	echo "\n\n***Default user 'postgres' has default password 'postgres'***\n\n"
 	podman run -it --rm --network demo_dapr-net postgres:17-alpine psql -h postgres -U postgres
 
 redis-cli:

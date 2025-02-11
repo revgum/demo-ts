@@ -29,11 +29,19 @@ A common pattern for database migrations in a microservice environment is to hav
 
 Below is a description of the process of creating and deploying a migration;
 
-1. Run `make db-up` in a terminal window to bring the database container up.
+1. Run `make up-db` in a terminal window to bring the database container up.
 2. In a new terminal window, run the migration process for the specific backend service (see its README.md for details)
 3. In a terminal window from this projects root directory, run the migration on localhost using the `SERVICE` variable to target a specific backend service. (i.e. `SERVICE=backend-ts make up-migrations`). Watch the output to validate that the migrations complete without issue.
 4. Stop the terminal window with the database container running, it has been migrated and will launch properly in the next step.
 5. Run `make` to bring the full stack up with migrations having run and the backend microservice ready for code updates to make use of the new structures.
+
+# Connecting to the DB
+The command `make psql` exists to launch the database container to establish a connection to the shared database. Because the database container exposes port `5432`, any postgres compatible database client could be used to establish a connection.
+
+The database container must be running from within the full stack or on its own. Below is a description of the process, and sample output, for connecting to the database container.
+
+1. *If the full stack is running, skip this step.* Run `make up-db` in a terminal window to bring the database container up.
+2. Connect your database client to `localhost:5432` as user `postgres` with password `postgres`, **OR** run `make psql` to open a connection to and use the postgres CLI query tool.
 
 
 
