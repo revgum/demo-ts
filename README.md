@@ -43,6 +43,42 @@ The database container must be running from within the full stack or on its own.
 1. *If the full stack is running, skip this step.* Run `make up-db` in a terminal window to bring the database container up.
 2. Connect your database client to `localhost:5432` as user `postgres` with password `postgres`, **OR** run `make psql` to open a connection to and use the postgres CLI query tool.
 
+Example usage output:
+```
+$make psql
+
+
+***Default user 'postgres' has default password 'postgres'***
+
+
+Password for user postgres:
+psql (17.2)
+Type "help" for help.
+
+postgres=# \c postgres-ts
+You are now connected to database "postgres-ts" as user "postgres".
+postgres-ts=# \dt
+                List of relations
+ Schema |         Name         | Type  |  Owner
+--------+----------------------+-------+----------
+ public | knex_migrations      | table | postgres
+ public | knex_migrations_lock | table | postgres
+ public | test                 | table | postgres
+(3 rows)
+
+postgres-ts=# \c postgres-dotnet
+You are now connected to database "postgres-dotnet" as user "postgres".
+postgres-dotnet=# \dt
+                 List of relations
+ Schema |         Name          | Type  |  Owner
+--------+-----------------------+-------+----------
+ public | __EFMigrationsHistory | table | postgres
+ public | test                  | table | postgres
+(2 rows)
+
+postgres-dotnet=# \q
+```
+
 
 
 # Example application details
