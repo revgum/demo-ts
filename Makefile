@@ -31,7 +31,7 @@ up-db: setup
 # Run migrations for specified service.
 up-migrations: setup
 	echo "\n\n***Bringing up the $$SERVICE migrations***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the migrations***; podman-compose -f docker-compose.migrations.yaml down; cd -; exit 1' SIGINT SIGTERM ERR; cd app/$$SERVICE && podman-compose -f docker-compose.migrations.yaml up && podman-compose -f docker-compose.migrations.yaml down"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the migrations***; podman-compose -f docker-compose.migrations.yaml down; cd -; exit 1' SIGINT SIGTERM ERR; cd app/$$SERVICE && podman-compose -f docker-compose.migrations.yaml build && podman-compose -f docker-compose.migrations.yaml up && podman-compose -f docker-compose.migrations.yaml down"
 
 # Bring up the stack while debugging a service,
 # i.e. SERVICE=backend-ts make debug

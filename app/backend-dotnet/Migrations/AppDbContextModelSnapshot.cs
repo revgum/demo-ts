@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend_dotnet.src.Models;
@@ -11,14 +10,10 @@ using backend_dotnet.src.Models;
 
 namespace backend_dotnet.Migrations
 {
-    [DbContext(typeof(TestContext))]
-    [Migration("20250210230505_test")]
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-    partial class test
-#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,26 +22,43 @@ namespace backend_dotnet.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("backend_dotnet.src.Models.Test", b =>
+            modelBuilder.Entity("backend_dotnet.src.Models.Todo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<bool>("Completed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("completed")
+                        .HasAnnotation("Relational:JsonPropertyName", "completed");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()")
                         .HasAnnotation("Relational:JsonPropertyName", "created_at");
 
-                    b.Property<string>("Field1")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at")
+                        .HasAnnotation("Relational:JsonPropertyName", "deleted_at");
+
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("due_at")
+                        .HasAnnotation("Relational:JsonPropertyName", "due_at");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("field1")
-                        .HasAnnotation("Relational:JsonPropertyName", "field1");
+                        .HasColumnName("title")
+                        .HasAnnotation("Relational:JsonPropertyName", "title");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -55,7 +67,7 @@ namespace backend_dotnet.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("test");
+                    b.ToTable("todo");
                 });
 #pragma warning restore 612, 618
         }

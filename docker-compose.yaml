@@ -66,6 +66,7 @@ services:
       - "./dapr/config/:/home/nonroot/config"
       - "./app/:/app/app"
       - ./docker-compose.yaml:/home/nonroot/docker-compose.yaml
+      - "./shared/db/docker-compose.yaml:/app/shared/db/docker-compose.yaml"
     networks:
       - dapr-net
 

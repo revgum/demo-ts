@@ -1,0 +1,17 @@
+# Get all Todo
+curl http://localhost:3002/api/todos
+
+# Create a Todo
+curl --json '{"title":"Create a new Todo","completed":false}' http://localhost:3002/api/todos
+
+# Get a Todo by ID (replace ID with a valid one)
+curl http://localhost:3002/api/todos/0194fc1f-a621-73e9-8da4-3eaa35a7c298
+
+# Update a Todo (replace ID with a valid one)
+curl -d '{"title":"Update title using PUT"}' -X PUT -H 'Content-Type:application/json' http://localhost:3002/api/todos/0194fc1f-a621-73e9-8da4-3eaa35a7c298
+
+# Update a Todo (replace ID with a valid one)
+curl -d '{"title":"Update title using PATCH"}' -X PATCH -H 'Content-Type:application/json' http://localhost:3002/api/todos/0194fc1f-a621-73e9-8da4-3eaa35a7c298
+
+# Delete a Todo (replace ID with a valid one)
+curl -X DELETE http://localhost:3002/api/todos/0194fc1f-a621-73e9-8da4-3eaa35a7c298

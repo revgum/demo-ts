@@ -17,7 +17,7 @@ services:
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500
       # Aspnet connectionstrings environment variable convention
-      ConnectionStrings__Postgres: "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=postgres;"
+      ConnectionStrings__Postgres: "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=postgres-dotnet;"
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:

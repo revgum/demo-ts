@@ -9,4 +9,4 @@ WORKDIR /App
 COPY --from=build /App .
 RUN dotnet build
 EXPOSE 3002
-ENTRYPOINT ["dotnet", "watch", "run", "--no-launch-profile"]
+ENTRYPOINT ["dotnet", "watch", "run", "--no-launch-profile", "--non-interactive"]
