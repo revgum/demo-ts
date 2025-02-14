@@ -22,7 +22,7 @@ public class Todo
 
   [Column("due_at")]
   [JsonPropertyName("due_at")]
-  public required DateTime? DueAt { get; set; }
+  public DateTime? DueAt { get; set; }
 
   [Column("created_at")]
   [JsonPropertyName("created_at")]

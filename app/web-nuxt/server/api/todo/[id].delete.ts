@@ -1,7 +1,7 @@
-import { getById } from '../../services/test';
+import { deleteById } from '../../services/backend-dotnet';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id') as string;
-  const response = await getById(Number.parseInt(id, 10));
+  const response = await deleteById(id);
   return { response };
 });

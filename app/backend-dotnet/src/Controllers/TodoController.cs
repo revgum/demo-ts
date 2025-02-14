@@ -32,9 +32,13 @@ public class TodoController(AppDbContext context) : ControllerBase
         {
             Title = model.Title,
             Completed = model.Completed,
-            DueAt = model.DueAt,
             CreatedAt = DateTime.UtcNow
         };
+
+        if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
+        {
+            todo.DueAt = DueAt.ToUniversalTime();
+        }
 
         _context.Todos.Add(todo);
         await _context.SaveChangesAsync();
@@ -54,7 +58,10 @@ public class TodoController(AppDbContext context) : ControllerBase
 
         if (model.Title != null) todo.Title = model.Title;
         if (model.Completed != null) todo.Completed = (bool)model.Completed;
-        if (model.DueAt != null) todo.DueAt = model.DueAt;
+        if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
+        {
+            todo.DueAt = DueAt.ToUniversalTime();
+        }
         todo.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

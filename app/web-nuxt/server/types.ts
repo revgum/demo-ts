@@ -5,9 +5,12 @@ export type Context = {
   dapr: DaprClient;
 };
 
-export type Test = {
-  id: number;
-  field1: string;
+export type Todo = {
+  id: string;
+  title: string;
+  completed: boolean;
+  due_at?: string | null;
   created_at: string;
   updated_at?: string;
+  deleted_at?: string;
 };

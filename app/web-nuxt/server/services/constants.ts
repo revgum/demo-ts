@@ -1,5 +1,7 @@
-export const METHODS = {
-  TestGetAll: 'test-get-all',
-  TestCreate: 'test-create',
-  TestGetById: 'test-get-by-id',
-} as const;
+export const APIS = {
+  TodoGetAll: () => 'api/todos',
+  TodoGetById: (id: string) => `api/todos/${id}`,
+  TodoCreate: () => 'api/todos',
+  TodoUpdate: (id: string) => `api/todos/${id}`,
+  TodoDelete: (id: string) => `api/todos/${id}`,
+};
