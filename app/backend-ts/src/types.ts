@@ -18,9 +18,12 @@ export interface ServiceRoutes extends Record<string, unknown> {
   };
 }
 
-export type Test = {
-  id: number;
-  field1: string;
+export type Todo = {
+  id: string;
+  title: string;
+  completed: boolean;
   created_at: string | Date;
+  due_at?: string | Date;
+  deleted_at?: string | Date;
   updated_at?: string | Date;
 };

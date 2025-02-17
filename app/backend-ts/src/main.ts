@@ -1,8 +1,8 @@
 import { DaprServer } from '@dapr/dapr';
 import * as config from './config';
 import { context } from './context';
-import { routes as testRoutes } from './handlers/test';
-import { create } from './models/test';
+import { routes as todoRoutes } from './handlers/todo';
+import { create } from './models/todo';
 
 async function start() {
   const server = new DaprServer({
@@ -14,13 +14,16 @@ async function start() {
     },
   });
 
-  for await (const route of Object.values(testRoutes)) {
+  for await (const route of Object.values(todoRoutes)) {
     await server.invoker.listen(route.methodName, (d) => route.fn(context, d), route.opts);
   }
 
   if (process.env.SEED_DATA) {
-    const record = await create(context, {});
-    console.log(`Created new Test model: ${JSON.stringify(record)}`);
+    const record = await create(context, {
+      title: `Task ${new Date().toISOString()}`,
+      completed: false,
+    });
+    console.log(`Created new Todo model: ${JSON.stringify(record)}`);
   }
 
   await server.start();
