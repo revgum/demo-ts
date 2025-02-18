@@ -27,8 +27,8 @@ services:
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:
-      - ./app/backend-ts/src:/app/src
       - /app/node_modules # Persist docker containers modules so that localhost are not used
+      - ./app/backend-ts/src:/app/src
     depends_on:
       - redis
       - placement

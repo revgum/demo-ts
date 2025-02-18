@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up up-db down login shell psql debug redis-cli
+.PHONY: setup build up up-db down prune login shell psql debug redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -21,7 +21,7 @@ build: setup
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up: setup
 	echo "\n\n***Bringing up the stack***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up -V"
 
 # Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up-db: setup
@@ -37,11 +37,16 @@ up-migrations: setup
 # i.e. SERVICE=backend-ts make debug
 debug: setup
 	echo "\n\n***Starting $$SERVICE in debug mode***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up -V"
 
 # Take down the stack
 down:
 	podman-compose down
+
+prune:
+	podman system prune
+	podman volume prune --filter label!=io.podman.compose.project=demo
+
 
 # Login to Dockerhub
 login:

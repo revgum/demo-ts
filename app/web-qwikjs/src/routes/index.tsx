@@ -1,55 +1,105 @@
-import { $, component$, useStore } from '@builder.io/qwik';
-import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
-import { type InitialValues, type SubmitHandler, formAction$, reset, useForm, valiForm$ } from '@modular-forms/qwik';
-import * as v from 'valibot';
+import { $, component$ } from '@builder.io/qwik';
+import { type DocumentHead, routeAction$, routeLoader$, z, zod$ } from '@builder.io/qwik-city';
+import { type InitialValues, type SubmitHandler, formAction$, reset, useForm, zodForm$ } from '@modular-forms/qwik';
+import { LineMdAlertCircleLoop } from '~/components/icons/Alert';
+import TodoList from '~/components/todo/TodoList';
+import { create, deleteById, getAll, updateById } from '~/services/backend-ts';
+import type { Todo } from '~/types';
 
-const TaskSchema = v.object({
-  title: v.string(),
-  dueDate: v.string(),
+const TodoSchema = z.object({
+  title: z
+    .string({
+      required_error: 'Title required.',
+    })
+    .min(1, { message: 'Title must have at least 1 character.' })
+    .max(256, { message: 'Title cannot exceed 256 characters.' })
+    .trim(),
+  due_at: z.string().optional().nullable(),
 });
-type TaskForm = v.InferInput<typeof TaskSchema>;
-type Task = v.InferInput<typeof TaskSchema> & { id: number; completed: boolean };
+type TodoForm = z.infer<typeof TodoSchema>;
 
-export const useFormLoader = routeLoader$<InitialValues<TaskForm>>(() => ({
+// (Server-side) When accessing this route/page, fetch all of the Todo items and
+// sort them in a logical fashion.
+export const useTodos = routeLoader$(async (_requestEvent) => {
+  const { payload } = await getAll();
+  // Sort by date ascending with null dates at the bottom
+  const sortedByDueAt = payload.sort((a, b) => {
+    if (!a.due_at) return 1;
+    if (!b.due_at) return -1;
+    if (a.due_at === b.due_at) return 0;
+    return Date.parse(a.due_at) > Date.parse(b.due_at) ? 1 : -1;
+  });
+  return sortedByDueAt;
+});
+
+// (Server-side) Validate that the dynamic "form" posted includes Todo fields necessary
+// to perform updates before calling the microservice to update it.
+export const useUpdateTodo = routeAction$(
+  async (t) => {
+    const { id, ...rest } = t;
+    const { payload } = await updateById(id, rest);
+    return payload;
+  },
+  zod$({
+    id: z.string(),
+    title: z.string().optional(),
+    due_at: z.string().optional().nullable(),
+    completed: z.boolean().optional(),
+  }),
+);
+
+// (Server-side) Validate that the dynamic "form" posted includes the Todo ID before attempting to
+// calling the microservice to delete it.
+export const useDeleteTodo = routeAction$(
+  async (t) => {
+    const { id } = t;
+    const { payload } = await deleteById(id);
+    return payload;
+  },
+  zod$({
+    id: z.string(),
+  }),
+);
+
+// (Server-side) Preset the "Add Task" form with default values.
+export const useFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
   title: '',
-  dueDate: '',
-  id: 0,
-  completed: false,
+  due_at: null,
 }));
 
-export const useFormAction = formAction$<TaskForm>((values) => {
-  // Runs on server
-  console.log(values);
-  // tasks.push({ id: 4, title: values.title, dueDate: values.dueDate, completed: false });
-}, valiForm$(TaskSchema));
+// (Server-side) When the "Add Task" form is submitted to create a new Todo, run the form validation
+// on the server-side.
+export const useFormAction = formAction$<TodoForm>(async (values) => {
+  await create(values);
+}, zodForm$(TodoSchema));
 
+// (Server-side) Render the route/page and return it to the client.
 export default component$(() => {
-  const [taskForm, { Form, Field }] = useForm<TaskForm>({
+  // Perform form validation on the "Add Task" form on the client side.
+  const [TodoForm, { Form, Field }] = useForm<TodoForm>({
     loader: useFormLoader(),
-    // action: useFormAction(),
-    validate: valiForm$(TaskSchema),
+    action: useFormAction(),
+    validate: zodForm$(TodoSchema),
   });
 
-  const store = useStore<{ tasks: Task[] }>({
-    tasks: [],
+  const todos = useTodos();
+  const updateTodo = useUpdateTodo();
+  const deleteTodo = useDeleteTodo();
+
+  // (Client-side) Submit a dynamic "form" to the backend targetting the useUpdateTodo action
+  const handleToggle = $(async (t: Todo) => {
+    t.completed = !t.completed;
+    await updateTodo.submit(t);
   });
 
-  const handleSubmit = $<SubmitHandler<TaskForm>>((values) => {
-    let newId = 1;
-    if (store.tasks.length) {
-      newId =
-        store.tasks
-          .map((t) => t.id)
-          .sort()
-          .reverse()[0] + 1;
-    }
-    store.tasks.push({ id: newId, title: values.title, dueDate: values.dueDate, completed: false });
-    reset(taskForm);
+  // (Client-side) Submit a dynamic "form" to the backend targetting the useDeleteTodo action
+  const handleDelete = $(async (t: Todo) => {
+    await deleteTodo.submit(t);
   });
 
-  const toggleTask = $((id: number) => {
-    const task = store.tasks.find((task) => task.id === id);
-    if (task) task.completed = !task.completed;
+  // (Client-side) Reset the form on the client side
+  const handleSubmit = $<SubmitHandler<TodoForm>>(() => {
+    reset(TodoForm);
   });
 
   return (
@@ -59,10 +109,24 @@ export default component$(() => {
         <Form onSubmit$={handleSubmit} class="mb-4 flex flex-col gap-2">
           <Field name="title">
             {(field, props) => (
-              <input {...props} type="text" value={field.value} class="p-2 border rounded-md w-full" />
+              <div>
+                <input
+                  {...props}
+                  type="text"
+                  value={field.value}
+                  class={`p-2 border rounded-md w-full ${field.error ? 'border-red-700 focus:border-red-700' : ''} `}
+                  placeholder="Task title..."
+                />
+                {field.error && (
+                  <div class="flex items-center mt-2 p-2 text-sm text-red-700">
+                    <LineMdAlertCircleLoop class="pr-1" height="1.25rem" width="1.25rem" />
+                    <span>{field.error}</span>
+                  </div>
+                )}
+              </div>
             )}
           </Field>
-          <Field name="dueDate">
+          <Field name="due_at">
             {(field, props) => (
               <input {...props} type="date" value={field.value} class="p-2 border rounded-md w-full" />
             )}
@@ -71,37 +135,18 @@ export default component$(() => {
             Add Task
           </button>
         </Form>
-        {store.tasks.map((task) => (
-          <div
-            key={task.id}
-            class={`flex items-center justify-between p-4 border-b last:border-none transition-opacity ${task.completed ? 'opacity-50' : 'opacity-100'}`}
-          >
-            <div>
-              <h3 class="text-lg font-medium">{task.title}</h3>
-              <p class="text-sm text-gray-500">Due: {task.dueDate}</p>
-            </div>
-            <button
-              type="button"
-              onClick$={() => toggleTask(task.id)}
-              class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${task.completed ? 'bg-green-500' : 'bg-gray-300'}`}
-            >
-              <span
-                class={`inline-block h-4 w-4 transform bg-white rounded-full transition-transform ${task.completed ? 'translate-x-6' : 'translate-x-1'}`}
-              />
-            </button>
-          </div>
-        ))}
+        <TodoList todos={todos.value} handleDelete={handleDelete} handleToggle={handleToggle} />
       </div>
     </div>
   );
 });
 
 export const head: DocumentHead = {
-  title: 'Welcome to Qwik',
+  title: 'Todo App',
   meta: [
     {
       name: 'description',
-      content: 'Qwik site description',
+      content: 'description',
     },
   ],
 };

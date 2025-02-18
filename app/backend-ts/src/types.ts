@@ -23,7 +23,7 @@ export type Todo = {
   title: string;
   completed: boolean;
   created_at: string | Date;
-  due_at?: string | Date;
-  deleted_at?: string | Date;
-  updated_at?: string | Date;
+  due_at?: string | Date | null;
+  deleted_at?: string | Date | null;
+  updated_at?: string | Date | null;
 };

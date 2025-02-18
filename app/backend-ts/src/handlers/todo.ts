@@ -25,7 +25,7 @@ const post = async (
 ): Promise<{ payload?: Todo; error?: string }> => {
   try {
     //TODO: Use Zod to validate/transform
-    const newTodo = JSON.parse(data.body) as Partial<Todo>;
+    const { data: newTodo } = JSON.parse(data.body) as { data: Partial<Todo> };
     const todo = await create(context, newTodo);
     return { payload: todo };
   } catch (error) {
@@ -40,7 +40,7 @@ const getById = async (
 ): Promise<{ payload?: Todo; error?: string }> => {
   try {
     //TODO: Use Zod to validate/transform
-    const { id } = JSON.parse(data.body) as Partial<Todo>;
+    const { id } = JSON.parse(data.body) as { id: string };
     const todo = await getTodoById(context, id);
     return { payload: todo };
   } catch (error) {
@@ -55,9 +55,8 @@ const updateById = async (
 ): Promise<{ payload?: Todo; error?: string }> => {
   try {
     //TODO: Use Zod to validate/transform
-    const updatedTodo = JSON.parse(data.body) as Partial<Todo>;
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const todo = await updateTodoById(context, updatedTodo.id!, updatedTodo);
+    const { id, data: updatedTodo } = JSON.parse(data.body) as { id: string; data: Partial<Todo> };
+    const todo = await updateTodoById(context, id, updatedTodo);
     return { payload: todo };
   } catch (error) {
     console.error(error);
@@ -71,7 +70,7 @@ const deleteById = async (
 ): Promise<{ payload?: Todo; error?: string }> => {
   try {
     //TODO: Use Zod to validate/transform
-    const { id } = JSON.parse(data.body) as Partial<Todo>;
+    const { id } = JSON.parse(data.body) as { id: string };
     const todo = await deleteTodoById(context, id);
     return { payload: todo };
   } catch (error) {

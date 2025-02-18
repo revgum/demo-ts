@@ -25,8 +25,8 @@ services:
     networks:
       - dapr-net
     volumes:
-      - ./app/web-nuxt:/app # Mount localhost source to support HMR live updates
       - /app/node_modules # Persist docker containers modules so that localhost are not used
+      - ./app/web-nuxt:/app # Mount localhost source to support HMR live updates
   web-nuxt-dapr:
     image: "docker.io/daprio/daprd:edge"
     command: [
