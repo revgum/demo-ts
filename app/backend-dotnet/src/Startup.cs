@@ -1,5 +1,9 @@
 using backend_dotnet.src.Models;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace backend_dotnet.src;
 
@@ -27,6 +31,23 @@ public class WebApiStartup : IStartup
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddDbContextPool<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres") ?? throw new Exception("Postgres connection string missing.")));
+
+    var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:Endpoint");
+
+    Console.WriteLine(otlpEndpoint);
+
+    builder.Services.AddOpenTelemetry()
+      .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
+      .WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation().AddOtlpExporter(o =>
+      {
+        o.Endpoint = new Uri($"{otlpEndpoint}/v1/metrics");
+        o.Protocol = OtlpExportProtocol.HttpProtobuf;
+      }))
+      .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddOtlpExporter(o =>
+      {
+        o.Endpoint = new Uri($"{otlpEndpoint}/v1/traces");
+        o.Protocol = OtlpExportProtocol.HttpProtobuf;
+      }));
 
     var app = builder.Build();
 

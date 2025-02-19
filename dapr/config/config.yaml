@@ -4,13 +4,16 @@ metadata:
   name: daprConfig
   namespace: default
 spec:
+  metrics:
+    enabled: true
   tracing:
     samplingRate: "1"
     zipkin:
       endpointAddress: "http://zipkin:9411/api/v2/spans"
-# Testing OTEL for metrics and tracing
-#    otel:
-#      endpointAddress: "http://grafana-otel:4318"
+    otel:
+      endpointAddress: "grafana-otel:4318"
+      isSecure: false
+      protocol: http
   policies:
     retries:
       noRetries:

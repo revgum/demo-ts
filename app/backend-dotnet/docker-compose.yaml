@@ -18,6 +18,7 @@ services:
       DAPR_PORT: 3500
       # Aspnet connectionstrings environment variable convention
       ConnectionStrings__Postgres: "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=postgres-dotnet;"
+      OpenTelemetry__Endpoint: "http://grafana-otel:4318"
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:
