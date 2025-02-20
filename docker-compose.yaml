@@ -44,15 +44,6 @@ services:
       - "9411:9411"
     networks:
       - dapr-net
-  # Grafana OTEL collector, metrics, traces and logs. TODO: update dapr/config.yaml to wire this up
-  grafana-otel:
-    # profiles: [observability]
-    image: "docker.io/grafana/otel-lgtm"
-    ports:
-      - "3200:3000"
-      - "4318:4318"
-    networks:
-      - dapr-net
   # Dapr dashboard
   dapr-dashboard:
     image: "docker.io/daprio/dashboard:latest"

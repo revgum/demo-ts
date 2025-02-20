@@ -1,6 +1,8 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using backend_dotnet.src.Models;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -34,20 +36,45 @@ public class WebApiStartup : IStartup
 
     var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:Endpoint");
 
-    Console.WriteLine(otlpEndpoint);
+    builder.Logging.AddOpenTelemetry(logging =>
+    {
+      logging.IncludeFormattedMessage = true;
+      logging.IncludeScopes = true;
+      logging.AddOtlpExporter(o =>
+      {
+        o.Endpoint = new Uri($"{otlpEndpoint}/v1/logs");
+        o.Protocol = OtlpExportProtocol.HttpProtobuf;
+      });
+    });
 
-    builder.Services.AddOpenTelemetry()
-      .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
-      .WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation().AddOtlpExporter(o =>
+    var otel = builder.Services.AddOpenTelemetry();
+
+    otel.ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName));
+    otel.WithMetrics(metrics =>
+    {
+      metrics.AddAspNetCoreInstrumentation();
+      metrics.AddMeter("SOS.*");
+      metrics.AddOtlpExporter(o =>
       {
         o.Endpoint = new Uri($"{otlpEndpoint}/v1/metrics");
         o.Protocol = OtlpExportProtocol.HttpProtobuf;
-      }))
-      .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddOtlpExporter(o =>
+      });
+    });
+
+    otel.WithTracing(tracing =>
+    {
+      tracing.AddAspNetCoreInstrumentation();
+      tracing.AddOtlpExporter(o =>
       {
         o.Endpoint = new Uri($"{otlpEndpoint}/v1/traces");
         o.Protocol = OtlpExportProtocol.HttpProtobuf;
-      }));
+      });
+    });
+
+    if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("AzureMonitor:ConnectionString")))
+    {
+      otel.UseAzureMonitor();
+    }
 
     var app = builder.Build();
 

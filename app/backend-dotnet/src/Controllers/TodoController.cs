@@ -8,77 +8,137 @@ namespace backend_dotnet.src.Controllers;
 [Route("api/todos")]
 public class TodoController(AppDbContext context) : ControllerBase
 {
+    private readonly Metrics _metrics = new();
     private readonly AppDbContext _context = context;
 
     [HttpGet]
-    public async Task<ActionResult<List<Todo>>> GetTodos() => await _context.Todos.Where(t => t.DeletedAt == null).ToListAsync();
+    public async Task<ActionResult<List<Todo>>> GetTodos()
+    {
+        var success = false;
+        KeyValuePair<string, object?>[] tags = [];
+        try
+        {
+            var todos = await _context.Todos.Where(t => t.DeletedAt == null).ToListAsync();
+            success = true;
+            return todos;
+        }
+        finally
+        {
+            tags = [new KeyValuePair<string, object?>("success", success)];
+            _metrics.Increment("todo.getall", tags);
+        }
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Todo>> GetTodo(Guid id)
     {
-        Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
-        if (todo == null)
+        var success = false;
+        KeyValuePair<string, object?>[] tags = [];
+        try
         {
-            return NotFound();
-        }
+            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
 
-        return todo;
+            success = true;
+            return todo;
+
+        }
+        finally
+        {
+            tags = [new KeyValuePair<string, object?>("success", success)];
+            _metrics.Increment("todo.get", tags);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<Todo>> CreateTodo([FromBody] CreateTodoModel model)
     {
-        Todo todo = new()
+        var success = false;
+        KeyValuePair<string, object?>[] tags = [];
+        try
         {
-            Title = model.Title,
-            Completed = model.Completed,
-            CreatedAt = DateTime.UtcNow
-        };
+            Todo todo = new()
+            {
+                Title = model.Title,
+                Completed = model.Completed,
+                CreatedAt = DateTime.UtcNow
+            };
 
-        if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
-        {
-            todo.DueAt = DueAt.ToUniversalTime();
+            if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
+            {
+                todo.DueAt = DueAt.ToUniversalTime();
+            }
+
+            _context.Todos.Add(todo);
+            await _context.SaveChangesAsync();
+            success = true;
+            return todo;
         }
-
-        _context.Todos.Add(todo);
-        await _context.SaveChangesAsync();
-
-        return todo;
+        finally
+        {
+            tags = [new KeyValuePair<string, object?>("success", success)];
+            _metrics.Increment("todo.create", tags);
+        }
     }
 
     [HttpPatch("{id:guid}")]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<Todo>> UpdateTodo(Guid id, [FromBody] UpdateTodoModel model)
     {
-        Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
-        if (todo == null)
+        var success = false;
+        KeyValuePair<string, object?>[] tags = [];
+        try
         {
-            return NotFound();
-        }
+            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
 
-        if (model.Title != null) todo.Title = model.Title;
-        if (model.Completed != null) todo.Completed = (bool)model.Completed;
-        if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
+            if (model.Title != null) todo.Title = model.Title;
+            if (model.Completed != null) todo.Completed = (bool)model.Completed;
+            if (DateTime.TryParse(model.DueAt.ToString(), out DateTime DueAt))
+            {
+                todo.DueAt = DueAt.ToUniversalTime();
+            }
+            todo.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            success = true;
+            return todo;
+        }
+        finally
         {
-            todo.DueAt = DueAt.ToUniversalTime();
+            tags = [new KeyValuePair<string, object?>("success", success)];
+            _metrics.Increment("todo.update", tags);
         }
-        todo.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-        return todo;
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<Todo>> DeleteTodo(Guid id)
     {
-        Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
-        if (todo == null)
+        var success = false;
+        KeyValuePair<string, object?>[] tags = [];
+        try
         {
-            return NotFound();
-        }
-        todo.DeletedAt = DateTime.UtcNow;
+            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
+            todo.DeletedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-        return todo;
+            await _context.SaveChangesAsync();
+            success = true;
+            return todo;
+        }
+        finally
+        {
+            tags = [new KeyValuePair<string, object?>("success", success)];
+            _metrics.Increment("todo.delete", tags);
+        }
     }
 }

@@ -1,0 +1,19 @@
+version: '3.7'
+
+name: demo
+
+services:
+  # Grafana OTEL collector, metrics, traces and logs. TODO: update dapr/config.yaml to wire this up
+  grafana-otel:
+    image: "docker.io/grafana/otel-lgtm"
+    ports:
+      - "3200:3000"
+      - "4318:4318"
+    volumes:
+      - "./config/prometheus.yaml:/otel-lgtm/prometheus.yaml"
+    networks:
+      - dapr-net
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge
