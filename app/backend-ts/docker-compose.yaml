@@ -24,6 +24,7 @@ services:
       DB_USER: postgres
       DB_NAME: postgres-ts
       DB_PASSWORD: postgres
+      OTLP_ENDPOINT: http://grafana-otel:4318
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:

@@ -5,13 +5,22 @@
   "scripts": {
     "compile": "tsc",
     "ci": "biome ci",
-    "dev": "tsx watch src/main.ts",
-    "start": "tsx src/main.ts",
-    "debug": "tsx --inspect-brk=0.0.0.0 src/main.ts",
+    "dev": "tsx -r ./src/instrumentation.ts --watch ./src/main.ts",
+    "start": "tsx -r ./src/instrumentation.ts ./src/main.ts",
+    "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 ./src/main.ts",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
   },
   "dependencies": {
     "@dapr/dapr": "^3.4.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.56.1",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.57.2",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.57.2",
+    "@opentelemetry/resources": "^1.30.1",
+    "@opentelemetry/sdk-metrics": "^1.30.1",
+    "@opentelemetry/sdk-node": "^0.57.2",
+    "@opentelemetry/sdk-trace-node": "^1.30.1",
+    "@opentelemetry/semantic-conventions": "^1.30.0",
     "knex": "^3.1.0",
     "pg": "^8.13.1",
     "tsx": "^4.19.2"
