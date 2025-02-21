@@ -12,7 +12,8 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "allowArbitraryExtensions": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "strictNullChecks": true
   },
   "ts-node": {
     "compilerOptions": {

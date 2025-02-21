@@ -7,7 +7,14 @@ import {
   getById as getTodoById,
   updateById as updateTodoById,
 } from '../models/todo';
-import type { Context, ServiceRoutes, Todo } from '../types';
+import {
+  CreateTodoSchema,
+  GetTodoSchema,
+  TodoListResponseSchema,
+  TodoResponseSchema,
+  UpdateTodoSchema,
+} from '../schemas/todo';
+import type { Context, ServiceRoutes, Todo, TodoListResponse, TodoResponse } from '../types';
 import { METHODS } from './constants';
 
 const meter = opentelemetry.metrics.getMeter('todo-handler', '1.0.0');
@@ -19,91 +26,80 @@ const counters = {
   deleteById: meter.createCounter('todo.delete'),
 };
 
-const get = async (context: Context, _data: DaprInvokerCallbackContent): Promise<{ payload: Todo[] }> => {
+const get = async (context: Context, _data: DaprInvokerCallbackContent): Promise<TodoListResponse> => {
   let success = false;
   try {
-    const rows = await getAll(context);
+    const payload = await getAll(context);
     success = true;
-    return { payload: rows };
-  } catch (error) {
-    console.error(error);
-    return { payload: [] };
+    return TodoListResponseSchema.parse({ payload });
+  } catch (err) {
+    console.error(err);
+    const error = err.detail || 'Unhandled error';
+    return TodoListResponseSchema.parse({ error });
   } finally {
     counters.get.add(1, { success });
   }
 };
 
-const post = async (
-  context: Context,
-  data: DaprInvokerCallbackContent,
-): Promise<{ payload?: Todo; error?: string }> => {
+const post = async (context: Context, data: DaprInvokerCallbackContent): Promise<TodoResponse> => {
   let success = false;
   try {
-    //TODO: Use Zod to validate/transform
-    const { data: newTodo } = JSON.parse(data.body) as { data: Partial<Todo> };
-    const todo = await create(context, newTodo);
+    const { data: newTodo } = CreateTodoSchema.parse(JSON.parse(data.body ?? '{}'));
+    const payload = await create(context, newTodo);
     success = true;
-    return { payload: todo };
-  } catch (error) {
-    console.error(error);
-    return { error: error.detail || 'Unhandled error' };
+    return TodoResponseSchema.parse({ payload });
+  } catch (err) {
+    console.error(err);
+    const error = err.detail || 'Unhandled error';
+    return TodoResponseSchema.parse({ error });
   } finally {
     counters.post.add(1, { success });
   }
 };
 
-const getById = async (
-  context: Context,
-  data: DaprInvokerCallbackContent,
-): Promise<{ payload?: Todo; error?: string }> => {
+const getById = async (context: Context, data: DaprInvokerCallbackContent): Promise<TodoResponse> => {
   let success = false;
   try {
-    //TODO: Use Zod to validate/transform
-    const { id } = JSON.parse(data.body) as { id: string };
-    const todo = await getTodoById(context, id);
+    const { id } = GetTodoSchema.parse(JSON.parse(data.body ?? '{}'));
+    const payload = await getTodoById(context, id);
     success = true;
-    return { payload: todo };
-  } catch (error) {
-    console.error(error);
-    return { error: error.detail || 'Unhandled error' };
+    return TodoResponseSchema.parse({ payload });
+  } catch (err) {
+    console.error(err);
+    const error = err.detail || 'Unhandled error';
+    return TodoResponseSchema.parse({ error });
   } finally {
     counters.getById.add(1, { success });
   }
 };
 
-const updateById = async (
-  context: Context,
-  data: DaprInvokerCallbackContent,
-): Promise<{ payload?: Todo; error?: string }> => {
+const updateById = async (context: Context, data: DaprInvokerCallbackContent): Promise<TodoResponse> => {
   let success = false;
   try {
-    //TODO: Use Zod to validate/transform
-    const { id, data: updatedTodo } = JSON.parse(data.body) as { id: string; data: Partial<Todo> };
-    const todo = await updateTodoById(context, id, updatedTodo);
+    const { id, data: updatedTodo } = UpdateTodoSchema.parse(JSON.parse(data.body ?? '{}'));
+    const payload = await updateTodoById(context, id, updatedTodo);
     success = true;
-    return { payload: todo };
-  } catch (error) {
-    console.error(error);
-    return { error: error.detail || 'Unhandled error' };
+    return TodoResponseSchema.parse({ payload });
+  } catch (err) {
+    console.error(err);
+    const error = err.detail || 'Unhandled error';
+    return TodoResponseSchema.parse({ error });
   } finally {
     counters.updateById.add(1, { success });
   }
 };
 
-const deleteById = async (
-  context: Context,
-  data: DaprInvokerCallbackContent,
-): Promise<{ payload?: Todo; error?: string }> => {
+const deleteById = async (context: Context, data: DaprInvokerCallbackContent): Promise<TodoResponse> => {
   let success = false;
   try {
-    //TODO: Use Zod to validate/transform
-    const { id } = JSON.parse(data.body) as { id: string };
-    const todo = await deleteTodoById(context, id);
+    const { id } = GetTodoSchema.parse(JSON.parse(data.body ?? '{}'));
+    const payload = await deleteTodoById(context, id);
     success = true;
-    return { payload: todo };
-  } catch (error) {
-    console.error(error);
-    return { error: error.detail || 'Unhandled error' };
+    return TodoResponseSchema.parse({ payload });
+  } catch (err) {
+    console.error(err);
+    const error = err.detail || 'Unhandled error';
+    return TodoResponseSchema.parse({ error });
   } finally {
     counters.deleteById.add(1, { success });
   }

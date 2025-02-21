@@ -13,7 +13,7 @@ services:
       - "3001:3001"
     command: npm run dev
     environment:
-      SEED_DATA: true # Load seed data on start
+      # SEED_DATA: true # Load seed data on start
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500

@@ -5,9 +5,9 @@
   "scripts": {
     "compile": "tsc",
     "ci": "biome ci",
-    "dev": "tsx -r ./src/instrumentation.ts --watch ./src/main.ts",
-    "start": "tsx -r ./src/instrumentation.ts ./src/main.ts",
-    "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 ./src/main.ts",
+    "dev": "tsx -r ./src/instrumentation.ts --watch src/main.ts",
+    "start": "tsx -r ./src/instrumentation.ts src/main.ts",
+    "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
   },
   "dependencies": {
@@ -23,7 +23,8 @@
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "knex": "^3.1.0",
     "pg": "^8.13.1",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",
