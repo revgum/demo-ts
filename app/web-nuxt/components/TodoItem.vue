@@ -32,7 +32,8 @@ const handleToggleTodo = async (todo: Todo) => {
   >
     <div>
       <h3 class="text-lg font-medium">{{todo.title}}</h3>
-      <p v-if="todo.due_at" class="text-sm text-slate-500">Due {{  todo.due_at.substring(0,10)  }}</p>
+      <p v-if="todo.completed && todo.updated_at" class="text-sm text-slate-500">Completed {{ todo.updated_at.substring(0,10) }}</p>
+      <p v-else-if="todo.due_at" class="text-sm text-slate-500">Due {{ todo.due_at.substring(0,10) }}</p>
       <p v-else class="text-sm text-slate-500">No due date</p>
     </div>
     <div class="relative inline-flex h-6 w-11 items-center text-2xl">
