@@ -6,6 +6,7 @@
   "scripts": {
     "build": "nuxt build",
     "start": "nuxt dev",
+    "localhost": "LOCAL_DEV=true nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

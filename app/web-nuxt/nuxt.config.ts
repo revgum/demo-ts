@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
-  devtools: { enabled: true },
+  devtools: { enabled: Boolean(process.env.NUXT_DEV_TOOLS || false) },
   modules: ['@nuxt/ui'],
   css: ['~/assets/tailwind.css'],
   colorMode: {

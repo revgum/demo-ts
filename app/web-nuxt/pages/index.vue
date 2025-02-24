@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import TodoItem from '~/components/TodoItem.vue';
 import type { Todo } from '~/server/types';
 
 const { data, refresh } = await useFetch<{ response: Todo[] }>('/api/todo');
