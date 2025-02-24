@@ -2,13 +2,12 @@
 import type { Todo } from '~/server/types';
 
 const route = useRoute();
-const { data, status } = await useFetch<{ response: Todo }>(`/api/todo/${route.params.id}`);
+const { data } = await useFetch<{ response: Todo }>(`/api/todo/${route.params.id}`);
 </script>
 
 <template>
   <div>
-    <div v-if="status.pending">Loading todo...</div>
-    <div v-else-if="data" style="font-size: 0.85rem;">
+    <div v-if="data" style="font-size: 0.85rem;">
       <div>{{ data.response.id }}</div>
       <div>{{ data.response.title }}</div>
       <div>{{ data.response.created_at }}</div>
