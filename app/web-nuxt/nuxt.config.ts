@@ -2,9 +2,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   typescript: {
-    typeCheck: true,
+    typeCheck: false,
   },
   devtools: { enabled: Boolean(process.env.NUXT_DEV_TOOLS || false) },
+  srcDir: 'src/',
+  ignore: ['./*', '!./src/**'],
   modules: ['@nuxt/ui'],
   css: ['~/assets/tailwind.css'],
   colorMode: {

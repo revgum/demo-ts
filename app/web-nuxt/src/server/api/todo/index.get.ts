@@ -1,5 +1,5 @@
-import type { Todo } from '~/server/types';
 import { getAll } from '../../services/backend-dotnet';
+import type { Todo } from '../../types';
 
 export default defineEventHandler(async (_event) => {
   const response = (await getAll()) as Todo[];
