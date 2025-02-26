@@ -1,11 +1,14 @@
 
 <script setup lang="ts">
 import type { Todo } from '~/server/types';
+import { TodoModal } from '#components';
 
 const { todo, refresh } = defineProps<{
   todo: Todo;
   refresh: () => void;
 }>();
+
+const modal = useModal();
 
 const handleDeleteTodo = async (todo: Todo) => {
   await useFetch<{ response: Todo }>(`/api/todo/${todo.id}`, { method: 'DELETE' });
@@ -22,6 +25,18 @@ const handleToggleTodo = async (todo: Todo) => {
   });
   refresh();
 };
+
+const handleHeaderClick = () => {
+  modal.open(TodoModal, {
+    refresh,
+    todo,
+    closeModal,
+  });
+};
+
+const closeModal = () => {
+  modal.close();
+};
 </script>
 
 <template>
@@ -31,7 +46,9 @@ const handleToggleTodo = async (todo: Todo) => {
     :class="todo.completed ? 'opacity-50' : 'opacity-100'"
   >
     <div>
-      <h3 class="text-lg font-medium">{{todo.title}}</h3>
+      <!-- <NuxtLink :to="{ name:'todos-id', params: { id: todo.id}}"> -->
+        <h3 @click="handleHeaderClick" class="text-lg font-medium underline cursor-pointer">{{todo.title}}</h3>
+      <!-- </NuxtLink> -->
       <p v-if="todo.completed && todo.updated_at" class="text-sm text-slate-500">Completed {{ todo.updated_at.substring(0,10) }}</p>
       <p v-else-if="todo.due_at" class="text-sm text-slate-500">Due {{ todo.due_at.substring(0,10) }}</p>
       <p v-else class="text-sm text-slate-500">No due date</p>

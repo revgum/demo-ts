@@ -29,7 +29,7 @@ export const getAll = () => {
 };
 
 export const create = (data: Partial<Todo>) => {
-  const newTodo = buildTodos({ ...data }, 1)[0];
+  const newTodo = buildTodos({ ...data, created_at: new Date().toISOString() }, 1)[0];
   _mockTodos.push(newTodo);
   return newTodo;
 };
@@ -42,7 +42,7 @@ export const deleteById = (id: Todo['id']) => {
 export const updateById = (id: Todo['id'], data: Partial<Todo>) => {
   const todoIndex = _mockTodos.findIndex((t) => t.id === id);
   const foundTodo = _mockTodos.find((t) => t.id === id);
-  _mockTodos[todoIndex] = { ...foundTodo, ...data, id } as Todo;
+  _mockTodos[todoIndex] = { ...foundTodo, ...data, id, updated_at: new Date().toISOString() } as Todo;
   return _mockTodos[todoIndex];
 };
 

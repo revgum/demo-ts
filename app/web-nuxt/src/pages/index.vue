@@ -6,7 +6,6 @@ const { data, refresh } = await useFetch<{ response: Todo[] }>('/api/todo');
 
 <template>
   <div class="min-h-screen w-full bg-slate-100 flex flex-col items-center">
-    <nav class="w-full bg-blue-600 text-white py-4 px-6 text-lg font-semibold shadow-lg text-center">Todo App</nav>
     <div class="w-full max-w-lg mt-6 bg-white p-4 rounded-xl shadow-lg">
       <TodoForm :refresh="refresh"/>
       <div
