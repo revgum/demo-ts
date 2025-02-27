@@ -64,6 +64,7 @@ public class WebApiStartup : IStartup
     otel.WithTracing(tracing =>
     {
       tracing.AddAspNetCoreInstrumentation();
+      tracing.AddSource("SOS.BackendDotnet");
       tracing.AddOtlpExporter(o =>
       {
         o.Endpoint = new Uri($"{otlpEndpoint}/v1/traces");

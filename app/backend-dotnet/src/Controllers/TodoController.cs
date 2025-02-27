@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using backend_dotnet.src.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace backend_dotnet.src.Controllers;
 
@@ -18,7 +19,11 @@ public class TodoController(AppDbContext context) : ControllerBase
         KeyValuePair<string, object?>[] tags = [];
         try
         {
-            var todos = await _context.Todos.Where(t => t.DeletedAt == null).ToListAsync();
+            List<Todo> todos;
+            using (Activity? activity = Traces.source.StartActivity("db.get-all-todo"))
+            {
+                todos = await _context.Todos.Where(t => t.DeletedAt == null).ToListAsync();
+            }
             success = true;
             return todos;
         }
@@ -36,7 +41,11 @@ public class TodoController(AppDbContext context) : ControllerBase
         KeyValuePair<string, object?>[] tags = [];
         try
         {
-            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            Todo? todo;
+            using (Activity? activity = Traces.source.StartActivity("db.get-one-todo"))
+            {
+                todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            }
             if (todo == null)
             {
                 return NotFound();
@@ -72,8 +81,11 @@ public class TodoController(AppDbContext context) : ControllerBase
                 todo.DueAt = DueAt.ToUniversalTime();
             }
 
-            _context.Todos.Add(todo);
-            await _context.SaveChangesAsync();
+            using (Activity? activity = Traces.source.StartActivity("db.create-todo"))
+            {
+                _context.Todos.Add(todo);
+                await _context.SaveChangesAsync();
+            }
             success = true;
             return todo;
         }
@@ -92,7 +104,11 @@ public class TodoController(AppDbContext context) : ControllerBase
         KeyValuePair<string, object?>[] tags = [];
         try
         {
-            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            Todo? todo;
+            using (Activity? activity = Traces.source.StartActivity("db.get-one-todo"))
+            {
+                todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            }
             if (todo == null)
             {
                 return NotFound();
@@ -106,7 +122,10 @@ public class TodoController(AppDbContext context) : ControllerBase
             }
             todo.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            using (Activity? activity = Traces.source.StartActivity("db.update-todo"))
+            {
+                await _context.SaveChangesAsync();
+            }
             success = true;
             return todo;
         }
@@ -124,14 +143,21 @@ public class TodoController(AppDbContext context) : ControllerBase
         KeyValuePair<string, object?>[] tags = [];
         try
         {
-            Todo? todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            Todo? todo;
+            using (Activity? activity = Traces.source.StartActivity("db.get-one-todo"))
+            {
+                todo = await _context.Todos.SingleOrDefaultAsync(t => t.DeletedAt == null && t.Id == id);
+            }
             if (todo == null)
             {
                 return NotFound();
             }
             todo.DeletedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            using (Activity? activity = Traces.source.StartActivity("db.delete-todo"))
+            {
+                await _context.SaveChangesAsync();
+            }
             success = true;
             return todo;
         }
