@@ -11,7 +11,7 @@ services:
       dockerfile: ./Dockerfile.dev
     ports:
       - "3003:3003"
-    command: "flask --app src/app run -h 0.0.0.0 -p 3003 --extra-files src/ --debug"
+    command: "opentelemetry-instrument flask --app src/app run -h 0.0.0.0 -p 3003"
     environment:
       # SEED_DATA: true # Load seed data on start
       DAPR_HOST: 127.0.0.1
@@ -19,7 +19,13 @@ services:
       SERVER_HOST: 127.0.0.1
       SERVER_PORT: 3003
       DB_URI: "postgresql+psycopg://postgres:postgres@postgres:5432/postgres-flask"
-      OTLP_ENDPOINT: http://grafana-otel:4318
+      OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: true
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-otel:4318/
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: backend-flask
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:

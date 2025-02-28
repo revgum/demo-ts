@@ -16,7 +16,7 @@ services:
       DB_NAMES: postgres-ts,postgres-dotnet,postgres-flask
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
+      - ./shared/db/init/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
     networks:
       - dapr-net
 

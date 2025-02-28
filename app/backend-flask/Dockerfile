@@ -5,5 +5,6 @@ COPY requirements.txt /app
 RUN pip install -r requirements.txt
 COPY /src /app/src
 COPY /migrations /app/migrations
+RUN opentelemetry-bootstrap -a install
 EXPOSE 3003
 CMD [ "gunicorn", "-b", "0.0.0.0:3003", "-w", "4", "'app:app'" ]

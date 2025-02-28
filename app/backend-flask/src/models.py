@@ -1,5 +1,4 @@
 from os import environ
-from typing import Optional
 from flask import Flask
 from sqlalchemy import Null
 from sqlalchemy.dialects.postgresql import UUID
