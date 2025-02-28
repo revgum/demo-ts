@@ -1,0 +1,21 @@
+version: '3.7'
+name: demo
+
+services:
+  backend-flask-migrations:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    command: "flask --app src/models db upgrade"
+    environment:
+      DB_URI: "postgresql+psycopg://postgres:postgres@postgres:5432/postgres-flask"
+      # DB_DEBUG: 1
+      # DB_SSL: postgres # Production
+    volumes:
+      - ./migrations:/app/migrations
+    networks:
+      - dapr-net
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge

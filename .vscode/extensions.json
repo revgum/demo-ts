@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "ms-python.black-formatter",
+    "ms-python.debugpy",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "ms-vscode.js-debug",
+    "ms-vscode.vscode-js-profile-table",
+    "biomejs.biome",
+    "redhat.vscode-yaml",
+    "dreamcatcher45.podmanager",
+    "Vue.volar",
+    "Nuxtr.nuxt-vscode-extentions",
+    "Nuxtr.nuxtr-vscode",
+    "antfu.goto-alias"
+  ]
+}
