@@ -1,0 +1,23 @@
+meta {
+  name: Update Todo
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/todo/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: f4f19652-2989-421b-b9f5-1a8a8a2d8794
+}
+
+body:json {
+  {
+    "title": "updated todo",
+    "completed": true,
+    "due_at": "2024-01-01"
+  }
+}

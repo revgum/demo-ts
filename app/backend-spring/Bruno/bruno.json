@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "API - Flask",
+  "name": "API - Spring",
   "type": "collection",
   "ignore": [
     "node_modules",
