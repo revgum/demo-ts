@@ -1,22 +1,33 @@
-import { DaprServer } from '@dapr/dapr';
-import * as config from './config';
+import { DaprServer, LogLevel } from '@dapr/dapr';
+import express from 'express';
 import { context } from './context';
-import { routes as todoRoutes } from './handlers/todo';
 import { create } from './models/todo';
+import { DaprRouter } from './routers/dapr';
+import { V1Router } from './routers/v1/router';
 
 async function start() {
+  const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  app.use('/api/v1', V1Router(context));
+
+  if (context.runtime.localhost) {
+    app.use('/v1.0', DaprRouter);
+  }
+
   const server = new DaprServer({
-    serverHost: config.server.host,
-    serverPort: config.server.port,
+    serverHost: context.server.host,
+    serverPort: context.server.port,
+    serverHttp: app,
     clientOptions: {
-      daprHost: config.dapr.host,
-      daprPort: config.dapr.port,
+      daprHost: context.dapr.host,
+      daprPort: context.dapr.port,
+    },
+    logger: {
+      level: context.runtime.debug ? LogLevel.Debug : LogLevel.Info,
     },
   });
-
-  for await (const route of Object.values(todoRoutes)) {
-    await server.invoker.listen(route.methodName, (d) => route.fn(context, d), route.opts);
-  }
 
   if (process.env.SEED_DATA) {
     const record = await create(context, {

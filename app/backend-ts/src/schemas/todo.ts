@@ -12,22 +12,16 @@ export const TodoSchema = z.object({
 
 // Has data object with fields appropriate for creating a new Todo. ({ data }).
 // due_at can be a date or datetime string (ie. 2025-01-01, 2025-01-01T12:00:00.000Z)
-export const CreateTodoSchema = z.object({
-  data: TodoSchema.pick({
-    title: true,
-    completed: true,
-  }).merge(
-    z.object({
-      due_at: z.union([z.string().date(), z.string().datetime()]).nullish(),
-    }),
-  ),
-});
+export const CreateTodoSchema = TodoSchema.pick({
+  title: true,
+  completed: true,
+}).merge(
+  z.object({
+    due_at: z.union([z.string().date(), z.string().datetime()]).nullish(),
+  }),
+);
 
-// Has id field. ({ id })
-export const GetTodoSchema = TodoSchema.pick({ id: true });
-
-// Has id field and data object. ({ id, data })
-export const UpdateTodoSchema = GetTodoSchema.extend(CreateTodoSchema.shape);
+export const UpdateTodoSchema = CreateTodoSchema;
 
 // Has either Todo object payload or error string
 export const TodoResponseSchema = z.object({

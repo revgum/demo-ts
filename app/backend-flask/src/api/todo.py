@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from app import get_db
 from models import TodoModel
 
-router = Blueprint("todo", __name__, url_prefix="/api/todo")
+router = Blueprint("todo", __name__, url_prefix="/api/v1/todos")
 db = get_db()
 
 

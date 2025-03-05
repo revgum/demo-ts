@@ -12,6 +12,14 @@
       "localRoot": "${workspaceFolder}/app/${input:appName}",
       "remoteRoot": "/",
       "type": "node"
+    },
+    {
+      "name": "Local: Attach",
+      "port": 9229,
+      "request": "attach",
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/app/${input:appName}",
+      "type": "node"
     }
   ],
   "inputs": [

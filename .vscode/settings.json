@@ -20,5 +20,6 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
-  }
+  },
+  "remote.autoForwardPortsFallback": 0
 }

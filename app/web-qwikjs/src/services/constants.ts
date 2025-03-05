@@ -1,7 +1,7 @@
 export const METHODS = {
-  TodoGetAll: 'todo-get-all',
-  TodoCreate: 'todo-create',
-  TodoGetById: 'todo-get-by-id',
-  TodoUpdateById: 'todo-update-by-id',
-  TodoDeleteById: 'todo-delete-by-id',
+  TodoGetAll: () => '/api/v1/todos',
+  TodoCreate: () => '/api/v1/todos',
+  TodoGetById: (id: string) => `/api/v1/todos/${id}`,
+  TodoUpdateById: (id: string) => `/api/v1/todos/${id}`,
+  TodoDeleteById: (id: string) => `/api/v1/todos/${id}`,
 } as const;

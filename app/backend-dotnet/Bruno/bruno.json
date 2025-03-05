@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "API - Dotnet",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}

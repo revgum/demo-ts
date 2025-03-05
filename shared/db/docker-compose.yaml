@@ -25,7 +25,7 @@ services:
       POSTGRES_USER: postgres
       DB_NAMES: postgres-ts,postgres-dotnet,postgres-flask,postgres-spring
     volumes:
-      - ./build-dbs.sh:/usr/local/bin/build-dbs.sh
+      - ./shared/db/build-dbs.sh:/usr/local/bin/build-dbs.sh
     depends_on:
       - postgres
     networks:

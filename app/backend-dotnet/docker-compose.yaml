@@ -43,16 +43,17 @@ services:
       "--enable-api-logging",
       "--enable-profiling",
       "--log-as-json", "true",
-      "--placement-host-address", "placement:50006",
+      "--placement-host-address", "placement:50005",
       "--profile-port", "7777",
       "--resources-path", "/components"
       ]
     volumes:
       # Volume mounts are relative from the root directory where dapr-net-compose is run from
-      - "./dapr/components/:/components"
-      - "./dapr/config/:/configuration"
+      - "./shared/dapr/dapr/components/:/components"
+      - "./shared/dapr/dapr/config/:/configuration"
     depends_on:
       - backend-dotnet
+      - placement
     labels:
       - "dapr.io/enabled=true"  # Enable Dapr for this service
       - "dapr.io/config=configstore"

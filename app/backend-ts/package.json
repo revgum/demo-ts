@@ -7,7 +7,9 @@
     "ci": "biome ci",
     "dev": "tsx -r ./src/instrumentation.ts --watch src/main.ts",
     "start": "tsx -r ./src/instrumentation.ts src/main.ts",
+    "start:localhost": "LOCALHOST=1 DAPR_PORT=3500 dapr run --app-id backend-ts --app-port 3001 --dapr-http-port 3500 --scheduler-host-address '' -- npm run dev",
     "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
+    "debug:localhost": "LOCALHOST=1 DAPR_PORT=3500 dapr run --app-id backend-ts --app-port 3001 --dapr-http-port 3500 --scheduler-host-address '' -- npm run debug",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
   },
   "dependencies": {
@@ -21,12 +23,14 @@
     "@opentelemetry/sdk-node": "^0.57.2",
     "@opentelemetry/sdk-trace-node": "^1.30.1",
     "@opentelemetry/semantic-conventions": "^1.30.0",
+    "express": "^4.21.2",
     "knex": "^3.1.0",
     "pg": "^8.13.1",
     "tsx": "^4.19.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^22.13.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"

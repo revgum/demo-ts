@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace backend_dotnet.src.Controllers;
 
 [ApiController]
-[Route("api/todos")]
+[Route("api/v1/todos")]
 public class TodoController(AppDbContext context) : ControllerBase
 {
     private readonly Metrics _metrics = new();

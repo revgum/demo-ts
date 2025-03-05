@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  dapr-app-id: backend-ts
+}
+
 body:json {
   {
     "title": "new todo",

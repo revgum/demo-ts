@@ -1,7 +1,5 @@
-import type { DaprInvokerCallbackContent, HttpMethod } from '@dapr/dapr';
 import type { Knex } from 'knex';
 import type { z } from 'zod';
-import type { METHODS } from './handlers/constants';
 import type {
   CreateTodoSchema,
   TodoListResponseSchema,
@@ -14,17 +12,19 @@ export type Context = {
   env: 'development' | 'staging' | 'production';
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   db: Knex<any, unknown[]>;
-};
-
-export type ServiceMethod = (typeof METHODS)[keyof typeof METHODS];
-
-export interface ServiceRoutes extends Record<string, unknown> {
-  [key: string]: {
-    methodName: ServiceMethod;
-    fn: (context: Context, data: DaprInvokerCallbackContent) => Promise<unknown>;
-    opts: { method: HttpMethod };
+  runtime: {
+    debug: boolean;
+    localhost: boolean;
   };
-}
+  server: {
+    host: string;
+    port: string;
+  };
+  dapr: {
+    host: string;
+    port: string;
+  };
+};
 
 export type Todo = z.infer<typeof TodoSchema>;
 export type CreateTodoModel = z.infer<typeof CreateTodoSchema>;

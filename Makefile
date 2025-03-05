@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up up-db up-migrations up-otel down prune login shell psql debug redis-cli
+.PHONY: setup build up up-db up-migrations up-otel up-dapr down prune login shell psql debug redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -28,7 +28,7 @@ up: setup
 # Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up-db: setup
 	echo "\n\n***Bringing up the db***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the db***; cd -; podman-compose down; exit 1' SIGINT SIGTERM ERR; cd shared/db && podman-compose up"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the db***; podman-compose down; exit 1' SIGINT SIGTERM ERR; cd shared/db && podman-compose up"
 
 # Run migrations for specified service.
 up-migrations: setup
@@ -40,16 +40,15 @@ up-otel:
 	echo "\n\n***Bringing up the OpenTelemetry services***\n\n"
 	bash -c "cd shared/otel && podman-compose up -d grafana-otel && cd -"
 
+# Bring up Dapr stack running detached
+up-dapr:
+	echo "\n\n***Bringing up the Dapr services***\n\n"
+	bash -c "cd shared/dapr && podman-compose up -d placement redis zipkin dapr-dashboard && cd -"
+
 # Take down Grafana OpenTelemetry stack running detached
 down-otel:
 	echo "\n\n***Shutting down the OpenTelemetry services***\n\n"
 	bash -c "cd shared/otel && podman-compose down grafana-otel && cd -"
-
-# Bring up the stack while debugging a service,
-# i.e. SERVICE=backend-ts make debug
-debug: setup
-	echo "\n\n***Starting $$SERVICE in debug mode***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up -V"
 
 # Take down the stack
 down:

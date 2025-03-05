@@ -3,6 +3,7 @@ name: demo
 
 services:
   backend-ts:
-    command: ["npm", "run", "debug"]
+    command: npm run debug
     ports:
+      - "3001:3001"
       - "9229:9229"
