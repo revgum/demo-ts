@@ -30,7 +30,6 @@ public class TodoApplication {
 
   @GetMapping("/api/todos")
   public List<Todo> GetAllTodo() {
-    System.out.println("here ehrelkrjlkerjklerj");
     return todoService.fetchTodoList();
   }
 

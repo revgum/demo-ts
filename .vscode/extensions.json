@@ -14,6 +14,9 @@
     "Vue.volar",
     "Nuxtr.nuxt-vscode-extentions",
     "Nuxtr.nuxtr-vscode",
-    "antfu.goto-alias"
+    "antfu.goto-alias",
+    "vscjava.vscode-java-debug",
+    "redhat.java",
+    "vscjava.vscode-gradle"
   ]
 }
