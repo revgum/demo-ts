@@ -1,5 +1,13 @@
 # Local development
 
+## Setup (TODO: Add details)
+- Install Podman and podman-compose
+- Install devcontainers extension, configure VSCode user settings:
+```
+  "dev.containers.dockerComposePath": "podman-compose",
+  "dev.containers.dockerPath": "podman"
+```
+
 ## Running the full stack
 The Makefile includes a target to launch the full stack (infrastructure, services) in `development` mode. In general, running `make` is the recommended way to build and launch a fresh stack everytime.
 

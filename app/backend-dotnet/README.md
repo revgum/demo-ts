@@ -1,6 +1,12 @@
 - TODO: Documentation for running, call out that this has live reloading
 
-`dotnet tool install --global dotnet-ef`
+Install Dotnet on Ubuntu: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?tabs=dotnet9&pivots=os-linux-ubuntu-2404
+
+- `sudo apt install software-properties-common`
+- `sudo add-apt-repository ppa:dotnet/backports`
+- `sudo apt-get update && sudo apt-get install -y dotnet-sdk-9.0`
+
+- `dotnet tool install --global dotnet-ef`
 
 # DB Migration strategy
 
