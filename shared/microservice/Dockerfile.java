@@ -6,4 +6,6 @@ COPY zscaler_chain_root-int.pem /usr/local/share/ca-certificates/zscaler.crt
 # update-ca-certificates not installed on base image
 # RUN chmod 644 /usr/local/share/ca-certificates/zscaler.crt && update-ca-certificates
 
-RUN keytool -import -file /usr/local/share/ca-certificates/zscaler.crt -cacerts -alias zscaler -storepass changeit --noprompt
+# npm settings
+ARG NO_CERT
+RUN if [ "$NO_CERT" = "true" ]; then echo "No CA cert added."; else keytool -import -file /usr/local/share/ca-certificates/zscaler.crt -cacerts -alias zscaler -storepass changeit --noprompt; fi

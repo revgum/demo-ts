@@ -7,6 +7,7 @@
   "dev.containers.dockerComposePath": "podman-compose",
   "dev.containers.dockerPath": "podman"
 ```
+- Can build base images without Zscaler, if necessary, using an ENV.. i.e. `NO_CERT="true" make`
 
 ## Running the full stack
 The Makefile includes a target to launch the full stack (infrastructure, services) in `development` mode. In general, running `make` is the recommended way to build and launch a fresh stack everytime.

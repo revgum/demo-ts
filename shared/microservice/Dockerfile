@@ -7,4 +7,5 @@ RUN mkdir -p ${CERT_HOME}
 ADD zscaler_chain_root-int.pem ${CERT_FILE_PATH}
 
 # npm settings
-RUN npm config set cafile ${CERT_FILE_PATH}
+ARG NO_CERT
+RUN if [ "$NO_CERT" = "true" ]; then echo "No CA cert added."; else npm config set cafile ${CERT_FILE_PATH}; fi

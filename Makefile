@@ -11,10 +11,10 @@ all: setup build up
 # Build the microservice base image
 setup:
 	echo "\n\n***Building microservice base image***\n\n"
-	podman build ./shared/microservice -t microservice-build
+	podman build ./shared/microservice -t microservice-build --build-arg NO_CERT=$$NO_CERT
 	podman build -f ./shared/microservice/Dockerfile.dotnet -t microservice-dotnet-build
 	podman build -f ./shared/microservice/Dockerfile.python -t microservice-python-build
-	podman build -f ./shared/microservice/Dockerfile.java -t microservice-java-build
+	podman build -f ./shared/microservice/Dockerfile.java -t microservice-java-build --build-arg NO_CERT=$$NO_CERT
 
 # Build the stack
 build: setup
