@@ -13,7 +13,7 @@ At times you may want to run the microservice and attach to its database without
 - Run the db container from the project root, `make up-db`
 - Run the application in a separate window, `npm run start:localhost` or `npm run debug:localhost`
 
-Add `DUBUG=1` to start commands to enable additional debug logging; `DEBUG=1 npm run start:localhost`
+Add `DEBUG=1` to start commands to enable additional debug logging; `DEBUG=1 npm run start:localhost`
 
 
 ## Run the stack

@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up up-db up-migrations up-otel down prune login shell psql debug redis-cli
+.PHONY: setup build up up-db up-migrations up-dapr up-otel down prune login shell psql redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -34,6 +34,11 @@ up-db: setup
 up-migrations: setup
 	echo "\n\n***Bringing up the $$SERVICE migrations***\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the migrations***; podman-compose -f docker-compose.migrations.yaml down; cd -; exit 1' SIGINT SIGTERM ERR; cd app/$$SERVICE && podman-compose -f docker-compose.migrations.yaml build && podman-compose -f docker-compose.migrations.yaml up && podman-compose -f docker-compose.migrations.yaml down"
+
+# Bring up Dapr services
+up-dapr: setup
+	echo "\n\n***Bringing up Dapr services**\n\n"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down Dapr services***; podman-compose down placement redis zipkin dapr-dashboard exit 1' SIGINT SIGTERM ERR; podman-compose up placement redis zipkin dapr-dashboard"
 
 # Bring up Grafana OpenTelemetry stack running detached
 up-otel:

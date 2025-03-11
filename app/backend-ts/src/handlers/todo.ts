@@ -31,7 +31,6 @@ export const getAllTodo = (context: Context) => async (_req: Request, res: Respo
 export const createTodo = (context: Context) => async (req: Request, res: Response) => {
   let success = false;
   try {
-    console.log(req.body);
     const newTodo = CreateTodoSchema.parse(req.body ?? {});
     const payload = await create(context, newTodo);
     success = true;
