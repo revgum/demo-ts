@@ -6,12 +6,12 @@ name: demo
 include:
   - shared/dapr/docker-compose.yaml
   - shared/db/docker-compose.yaml
-  - app/web-nuxt/docker-compose.yaml
+  # - app/web-nuxt/docker-compose.yaml
   - app/web-qwikjs/docker-compose.yaml
   - app/backend-flask/docker-compose.yaml
-  - app/backend-ts/docker-compose.yaml
-  - app/backend-dotnet/docker-compose.yaml
-  - app/backend-spring/docker-compose.yaml
+  # - app/backend-ts/docker-compose.yaml
+  # - app/backend-dotnet/docker-compose.yaml
+  # - app/backend-spring/docker-compose.yaml
 
 services:
 

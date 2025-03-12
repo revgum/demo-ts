@@ -3,7 +3,7 @@
 # Don't output the makefile commands being executed
 .SILENT:
 # Makefile targets don't correspond to actual files
-.PHONY: setup build up up-db up-migrations up-dapr up-otel down prune login shell psql redis-cli
+.PHONY: setup build up up-db up-migrations up-dapr up-otel debug down prune login shell psql redis-cli
 
 # Default target to bring up a fresh stack
 all: setup build up
@@ -53,6 +53,11 @@ down-otel:
 # Take down the stack
 down:
 	podman-compose down
+
+# Bring up the stack, setting a single service in debug mode
+debug: setup
+	echo "\n\n***Bringing up a service in debug mode***\n\n"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml down; exit 1' SIGINT SIGTERM ERR; podman-compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up -V"
 
 prune:
 	podman system prune

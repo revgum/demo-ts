@@ -1,6 +1,7 @@
 import datetime
 from flask import Blueprint, request
 from app import get_db
+from log import logger
 from models import TodoModel
 
 router = Blueprint("todo", __name__, url_prefix="/api/v1/todos")
@@ -10,6 +11,7 @@ db = get_db()
 @router.route("/", methods=["GET"])
 def get_all_todos():
     todos = TodoModel.query.where(TodoModel.deleted_at == None).all()
+    logger().info("Found {} todos".format(len(todos)))
     results = [todo.to_json() for todo in todos]
     return {"payload": results}
 

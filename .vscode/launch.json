@@ -5,8 +5,8 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Docker: Attach",
-      "port": 9229,
+      "name": "Docker: Node",
+      "port": "${input:debuggerPort}",
       "request": "attach",
       "address": "localhost",
       "localRoot": "${workspaceFolder}/app/${input:appName}",
@@ -14,12 +14,44 @@
       "type": "node"
     },
     {
-      "name": "Local: Attach",
-      "port": 9229,
+      "name": "Local: Node",
+      "port": "${input:debuggerPort}",
       "request": "attach",
       "address": "localhost",
       "localRoot": "${workspaceFolder}/app/${input:appName}",
       "type": "node"
+    },
+    {
+      "name": "Docker: Python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": "${input:debuggerPort}"
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/app/${input:appName}",
+          "remoteRoot": "/app"
+        }
+      ],
+      "type": "debugpy",
+      "justMyCode": false
+    },
+    {
+      "name": "Local: Python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": "${input:debuggerPort}"
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/app/${input:appName}",
+          "remoteRoot": "${workspaceFolder}/app/${input:appName}"
+        }
+      ],
+      "type": "debugpy",
+      "justMyCode": false
     }
   ],
   "inputs": [
@@ -27,7 +59,14 @@
       "type": "pickString",
       "id": "appName",
       "description": "Which app do you want to debug?",
-      "options": ["backend-ts", "web-nuxt"]
+      "options": ["backend-ts", "backend-flask", "web-nuxt"]
+    },
+    {
+      "type": "pickString",
+      "id": "debuggerPort",
+      "description": "What is the debugger port?",
+      "options": ["9229", "10001"],
+      "default": "9229"
     }
   ]
 }
