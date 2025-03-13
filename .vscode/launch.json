@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Docker: Node",
+      "name": "Podman: Node",
       "port": "${input:debuggerPort}",
       "request": "attach",
       "address": "localhost",
       "localRoot": "${workspaceFolder}/app/${input:appName}",
-      "remoteRoot": "/",
+      "remoteRoot": "/app",
       "type": "node"
     },
     {
@@ -22,7 +22,7 @@
       "type": "node"
     },
     {
-      "name": "Docker: Python",
+      "name": "Podman: Python",
       "request": "attach",
       "connect": {
         "host": "localhost",
@@ -59,7 +59,7 @@
       "type": "pickString",
       "id": "appName",
       "description": "Which app do you want to debug?",
-      "options": ["backend-ts", "backend-flask", "web-nuxt"]
+      "options": ["backend-ts", "backend-flask", "web-nuxt", "web-qwikjs"]
     },
     {
       "type": "pickString",
