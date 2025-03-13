@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import { useTodos } from '~/routes';
+import { useTodos } from '~/routes/todos/layout';
 import TodoItem from './TodoItem';
 
 export default component$(() => {

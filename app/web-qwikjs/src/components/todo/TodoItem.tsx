@@ -1,5 +1,5 @@
 import { $, component$ } from '@builder.io/qwik';
-import { useDeleteTodo, useUpdateTodo } from '~/routes';
+import { useDeleteTodo, useUpdateTodo } from '~/routes/todos/layout';
 import type { Todo } from '~/types';
 import { LineMdCloseCircleFilled } from '../icons/Close';
 import { LineMdSquareFilledToConfirmSquareFilledTransition } from '../icons/Confirm';
