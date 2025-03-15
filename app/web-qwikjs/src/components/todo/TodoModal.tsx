@@ -5,7 +5,6 @@ import { Modal, buttonVariants } from '~/components/ui';
 import type { Todo } from '~/types';
 import TodoForm from './TodoForm';
 
-// TODO: pass in Todo from clicking edit button on a todo item?
 export default component$(({ show, todo }: { show: Signal<boolean>; todo: Todo }) => {
   return (
     <Modal.Panel class="max-w-sm rounded-xl">

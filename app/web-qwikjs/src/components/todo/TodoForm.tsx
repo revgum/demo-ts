@@ -1,42 +1,16 @@
 import { $, type ClassList, type Signal, component$, useTask$ } from '@builder.io/qwik';
-import { z } from '@builder.io/qwik-city';
-import { type Maybe, type SubmitHandler, formAction$, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
+import { type Maybe, type SubmitHandler, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
 import { cn } from '@qwik-ui/utils';
 import { MatReportFilled } from '@qwikest/icons/material';
-import { useFormLoader } from '~/routes/todos/layout';
-import { create, updateById } from '~/services/backend-ts';
-import type { Todo } from '~/types';
+import { useFormAction, useFormLoader } from '~/routes/todos/layout';
+import type { Todo, TodoForm } from '~/types';
+import { TodoSchema } from './schemas';
 
 interface TodoFormProps {
   todo?: Todo
   modalVisible?: Signal<boolean>;
   classList?: Maybe<ClassList | Signal<ClassList>>
 }
-
-const TodoSchema = z.object({
-  id: z.string().optional(),
-  title: z
-    .string({
-      required_error: 'Title required.',
-    })
-    .min(1, { message: 'Title must have at least 1 character.' })
-    .max(256, { message: 'Title cannot exceed 256 characters.' })
-    .trim(),
-  due_at: z.string().optional().nullable(),
-});
-export type TodoForm = z.infer<typeof TodoSchema>;
-
-
-// (Server-side) When the Todo form is submitted to create or update a Todo,
-// run the form validation on the server-side.
-export const useFormAction = formAction$<TodoForm>(async (values) => {
-  if (values.id) {
-    await updateById(values.id, values);
-  } else {
-    await create(values);
-  }
-
-}, zodForm$(TodoSchema));
 
 // (Server-side) Render the route/page and return it to the client.
 export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => {

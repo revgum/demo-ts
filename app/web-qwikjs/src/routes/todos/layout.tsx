@@ -1,7 +1,8 @@
 import { routeAction$, routeLoader$, z, zod$ } from '@builder.io/qwik-city';
-import type { InitialValues } from '@modular-forms/qwik';
-import type { TodoForm } from '~/components/todo/TodoForm';
-import { deleteById, getAll, updateById } from '~/services/backend-ts';
+import { type InitialValues, formAction$, zodForm$ } from '@modular-forms/qwik';
+import { TodoSchema } from '~/components/todo/schemas';
+import { create, deleteById, getAll, updateById } from '~/services/backend-ts';
+import type { TodoForm } from '~/types';
 
 // (Server-side) When accessing this route/page, fetch all of the Todo items and
 // sort them in a logical fashion.
@@ -23,6 +24,17 @@ export const useFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
   title: '',
   due_at: null,
 }));
+
+// (Server-side) When the Todo form is submitted to create or update a Todo,
+// run the form validation on the server-side.
+export const useFormAction = formAction$<TodoForm>(async (values) => {
+  if (values.id) {
+    await updateById(values.id, values);
+  } else {
+    await create(values);
+  }
+
+}, zodForm$(TodoSchema));
 
 // (Server-side) Validate that the dynamic "form" posted includes Todo fields necessary
 // to perform updates before calling the microservice to update it.

@@ -1,4 +1,6 @@
+import type { z } from '@builder.io/qwik-city';
 import type { DaprClient } from '@dapr/dapr';
+import type { TodoSchema } from './components/todo/schemas';
 
 export type Context = {
   env: 'development' | 'staging' | 'production';
@@ -14,3 +16,5 @@ export type Todo = {
   updated_at?: string;
   deleted_at?: string;
 };
+
+export type TodoForm = z.infer<typeof TodoSchema>;
