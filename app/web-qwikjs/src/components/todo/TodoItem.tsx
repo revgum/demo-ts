@@ -1,6 +1,12 @@
 import { $, component$, useSignal } from '@builder.io/qwik';
 import { cn } from '@qwik-ui/utils';
-import { MatCancelFilled, MatCheckCircleFilled, MatEditFilled, MatTaskOutlined, MatTodayFilled } from '@qwikest/icons/material';
+import {
+  MatCancelFilled,
+  MatCheckCircleFilled,
+  MatEditFilled,
+  MatTaskOutlined,
+  MatTodayFilled,
+} from '@qwikest/icons/material';
 import { useDeleteTodo, useUpdateTodo } from '~/routes/todos/layout';
 import type { Todo } from '~/types';
 import { Modal } from '../ui';
@@ -28,16 +34,20 @@ export default component$<TodoItemProps>(({ todo }) => {
 
   const getDate = () => {
     if (todo.completed && todo.updated_at) {
-      return (<>
-        <MatTaskOutlined />
-        <span class="ml-1">{todo.updated_at.substring(0, 10)}</span>
-      </>)
+      return (
+        <>
+          <MatTaskOutlined />
+          <span class="ml-1">{todo.updated_at.substring(0, 10)}</span>
+        </>
+      );
     }
     if (todo.due_at) {
-      return (<>
-        <MatTodayFilled />
-        <span class="ml-1">{todo.due_at.substring(0, 10)}</span>
-      </>)
+      return (
+        <>
+          <MatTodayFilled />
+          <span class="ml-1">{todo.due_at.substring(0, 10)}</span>
+        </>
+      );
     }
     return 'No due date.';
   };
@@ -46,8 +56,8 @@ export default component$<TodoItemProps>(({ todo }) => {
     <Modal.Root bind:show={show} closeOnBackdropClick={false}>
       <div
         class={cn(
-          "flex items-center justify-between p-2 transition-opacity",
-          todo.completed ? 'opacity-50' : 'opacity-100'
+          'flex items-center justify-between p-2 transition-opacity',
+          todo.completed ? 'opacity-50' : 'opacity-100',
         )}
       >
         <TodoModal show={show} todo={todo} />
@@ -55,9 +65,7 @@ export default component$<TodoItemProps>(({ todo }) => {
           <Modal.Trigger class="text-left">
             <h3 class="text-lg font-medium">{todo.title}</h3>
           </Modal.Trigger>
-          <div class="flex flex-row items-center text-sm text-gray-400">
-            {getDate()}
-          </div>
+          <div class="flex flex-row items-center text-sm text-gray-400">{getDate()}</div>
         </div>
         <div class="relative inline-flex h-6 w-fit items-center text-2xl pl-2">
           <button

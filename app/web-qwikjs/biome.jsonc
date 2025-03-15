@@ -15,6 +15,6 @@
     }
   },
   "files": {
-    "ignore": ["dist", "server", "tmp"]
+    "ignore": ["dist", "server", "tmp", ".nx"]
   }
 }

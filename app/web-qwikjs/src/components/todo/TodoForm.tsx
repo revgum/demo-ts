@@ -7,9 +7,9 @@ import type { Todo, TodoForm } from '~/types';
 import { TodoSchema } from './schemas';
 
 interface TodoFormProps {
-  todo?: Todo
+  todo?: Todo;
   modalVisible?: Signal<boolean>;
-  classList?: Maybe<ClassList | Signal<ClassList>>
+  classList?: Maybe<ClassList | Signal<ClassList>>;
 }
 
 // (Server-side) Render the route/page and return it to the client.
@@ -50,12 +50,8 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
   });
 
   return (
-    <Form onSubmit$={handleButtonClick} class={cn(classList, "flex flex-col gap-2")}>
-      <Field name="id">
-        {(field, props) => (
-          <input {...props} type="hidden" value={field.value} />
-        )}
-      </Field>
+    <Form onSubmit$={handleButtonClick} class={cn(classList, 'flex flex-col gap-2')}>
+      <Field name="id">{(field, props) => <input {...props} type="hidden" value={field.value} />}</Field>
       <Field name="title">
         {(field, props) => (
           <div>
@@ -63,7 +59,7 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
               {...props}
               type="text"
               value={field.value}
-              class={cn("p-2 border rounded-md w-full", field.error ? 'border-red-600 focus:border-red-600' : '')}
+              class={cn('p-2 border rounded-md w-full', field.error ? 'border-red-600 focus:border-red-600' : '')}
               placeholder="Todo title..."
             />
             {field.error && (
@@ -76,17 +72,20 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
         )}
       </Field>
       <Field name="due_at">
-        {(field, props) => (
-          <input {...props} type="date" value={field.value} class="p-2 border rounded-md w-full" />
-        )}
+        {(field, props) => <input {...props} type="date" value={field.value} class="p-2 border rounded-md w-full" />}
       </Field>
       <button type="submit" class="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
-        {todo ? "Save" : "Add Todo"}
+        {todo ? 'Save' : 'Add Todo'}
       </button>
-      {todo && <button onClick$={closeModal} type="reset" class="bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition">
-        Cancel
-      </button>
-      }
+      {todo && (
+        <button
+          onClick$={closeModal}
+          type="reset"
+          class="bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
+        >
+          Cancel
+        </button>
+      )}
     </Form>
   );
 });
