@@ -1,5 +1,6 @@
 import { $, component$, useSignal } from '@builder.io/qwik';
-import { MatCancelFilled, MatCheckBoxFilled, MatEditFilled } from '@qwikest/icons/material';
+import { cn } from '@qwik-ui/utils';
+import { MatCancelFilled, MatCheckCircleFilled, MatEditFilled, MatTaskOutlined, MatTodayFilled } from '@qwikest/icons/material';
 import { useDeleteTodo, useUpdateTodo } from '~/routes/todos/layout';
 import type { Todo } from '~/types';
 import { Modal } from '../ui';
@@ -27,10 +28,16 @@ export default component$<TodoItemProps>(({ todo }) => {
 
   const getDate = () => {
     if (todo.completed && todo.updated_at) {
-      return `Completed ${todo.updated_at.substring(0, 10)}`;
+      return (<>
+        <MatTaskOutlined />
+        <span class="ml-1">{todo.updated_at.substring(0, 10)}</span>
+      </>)
     }
     if (todo.due_at) {
-      return `Due ${todo.due_at.substring(0, 10)}`;
+      return (<>
+        <MatTodayFilled />
+        <span class="ml-1">{todo.due_at.substring(0, 10)}</span>
+      </>)
     }
     return 'No due date.';
   };
@@ -38,14 +45,19 @@ export default component$<TodoItemProps>(({ todo }) => {
   return (
     <Modal.Root bind:show={show} closeOnBackdropClick={false}>
       <div
-        class={`flex items-start justify-between p-2 border-b last:border-none transition-opacity ${todo.completed ? 'opacity-50' : 'opacity-100'}`}
+        class={cn(
+          "flex items-center justify-between p-2 transition-opacity",
+          todo.completed ? 'opacity-50' : 'opacity-100'
+        )}
       >
         <TodoModal show={show} todo={todo} />
         <div>
           <Modal.Trigger class="text-left">
             <h3 class="text-lg font-medium">{todo.title}</h3>
           </Modal.Trigger>
-          <p class="text-sm text-gray-500">{getDate()}</p>
+          <div class="flex flex-row items-center text-sm text-gray-400">
+            {getDate()}
+          </div>
         </div>
         <div class="relative inline-flex h-6 w-fit items-center text-2xl pl-2">
           <button
@@ -53,13 +65,13 @@ export default component$<TodoItemProps>(({ todo }) => {
             onClick$={() => handleToggle(todo)}
             class={todo.completed ? 'text-green-500' : 'text-gray-300 hover:text-green-500'}
           >
-            <MatCheckBoxFilled>Delete</MatCheckBoxFilled>
+            <MatCheckCircleFilled />
           </button>
           <Modal.Trigger class="text-gray-300 hover:text-gray-900 mr-2">
-            <MatEditFilled>Edit</MatEditFilled>
+            <MatEditFilled />
           </Modal.Trigger>
           <button type="button" onClick$={() => handleDelete(todo)} class="text-red-500">
-            <MatCancelFilled>Delete</MatCancelFilled>
+            <MatCancelFilled />
           </button>
         </div>
       </div>

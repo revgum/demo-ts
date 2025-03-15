@@ -1,7 +1,8 @@
 import { $, type ClassList, type Signal, component$, useTask$ } from '@builder.io/qwik';
 import { z } from '@builder.io/qwik-city';
 import { type Maybe, type SubmitHandler, formAction$, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
-import { LineMdAlertCircleLoop } from '~/components/icons/Alert';
+import { cn } from '@qwik-ui/utils';
+import { MatReportFilled } from '@qwikest/icons/material';
 import { useFormLoader } from '~/routes/todos/layout';
 import { create, updateById } from '~/services/backend-ts';
 import type { Todo } from '~/types';
@@ -75,7 +76,7 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
   });
 
   return (
-    <Form onSubmit$={handleButtonClick} class={`${classList} flex flex-col gap-2`}>
+    <Form onSubmit$={handleButtonClick} class={cn(classList, "flex flex-col gap-2")}>
       <Field name="id">
         {(field, props) => (
           <input {...props} type="hidden" value={field.value} />
@@ -88,13 +89,13 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
               {...props}
               type="text"
               value={field.value}
-              class={`p-2 border rounded-md w-full ${field.error ? 'border-red-700 focus:border-red-700' : ''} `}
-              placeholder="Task title..."
+              class={cn("p-2 border rounded-md w-full", field.error ? 'border-red-600 focus:border-red-600' : '')}
+              placeholder="Todo title..."
             />
             {field.error && (
-              <div class="flex items-center mt-2 p-2 text-sm text-red-700">
-                <LineMdAlertCircleLoop class="pr-1" height="1.25rem" width="1.25rem" />
-                <span>{field.error}</span>
+              <div class="flex items-center mt-2 p-2 text-sm text-red-600">
+                <MatReportFilled />
+                <span class="ml-1">{field.error}</span>
               </div>
             )}
           </div>
@@ -106,7 +107,7 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
         )}
       </Field>
       <button type="submit" class="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
-        {todo ? "Save" : "Add Task"}
+        {todo ? "Save" : "Add Todo"}
       </button>
       {todo && <button onClick$={closeModal} type="reset" class="bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition">
         Cancel
