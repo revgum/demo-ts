@@ -1,11 +1,19 @@
-import { $, component$ } from '@builder.io/qwik';
+import { $, type ClassList, type Signal, component$, useTask$ } from '@builder.io/qwik';
 import { z } from '@builder.io/qwik-city';
-import { type SubmitHandler, formAction$, reset, useForm, zodForm$ } from '@modular-forms/qwik';
+import { type Maybe, type SubmitHandler, formAction$, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
 import { LineMdAlertCircleLoop } from '~/components/icons/Alert';
 import { useFormLoader } from '~/routes/todos/layout';
-import { create } from '~/services/backend-ts';
+import { create, updateById } from '~/services/backend-ts';
+import type { Todo } from '~/types';
+
+interface TodoFormProps {
+  todo?: Todo
+  modalVisible?: Signal<boolean>;
+  classList?: Maybe<ClassList | Signal<ClassList>>
+}
 
 const TodoSchema = z.object({
+  id: z.string().optional(),
   title: z
     .string({
       required_error: 'Title required.',
@@ -18,14 +26,19 @@ const TodoSchema = z.object({
 export type TodoForm = z.infer<typeof TodoSchema>;
 
 
-// (Server-side) When the "Add Task" form is submitted to create a new Todo, run the form validation
-// on the server-side.
+// (Server-side) When the Todo form is submitted to create or update a Todo,
+// run the form validation on the server-side.
 export const useFormAction = formAction$<TodoForm>(async (values) => {
-  await create(values);
+  if (values.id) {
+    await updateById(values.id, values);
+  } else {
+    await create(values);
+  }
+
 }, zodForm$(TodoSchema));
 
 // (Server-side) Render the route/page and return it to the client.
-export default component$(() => {
+export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => {
   // Perform form validation on the "Add Task" form on the client side.
   const [TodoForm, { Form, Field }] = useForm<TodoForm>({
     loader: useFormLoader(),
@@ -33,13 +46,41 @@ export default component$(() => {
     validate: zodForm$(TodoSchema),
   });
 
+  useTask$(({ track }) => {
+    const id = track(() => todo?.id);
+    const title = track(() => todo?.title);
+    const due_at = track(() => todo?.due_at);
+
+    if (id) {
+      setValue(TodoForm, 'id', id);
+    }
+    if (due_at) {
+      setValue(TodoForm, 'due_at', due_at);
+    }
+    if (title) {
+      setValue(TodoForm, 'title', title);
+    }
+  });
+
+  const closeModal = $(() => {
+    if (modalVisible) {
+      modalVisible.value = false;
+    }
+  });
+
   // (Client-side) Reset the form on the client side
-  const handleSubmit = $<SubmitHandler<TodoForm>>(() => {
+  const handleButtonClick = $<SubmitHandler<TodoForm>>(() => {
     reset(TodoForm);
+    closeModal();
   });
 
   return (
-    <Form onSubmit$={handleSubmit} class="mb-4 flex flex-col gap-2">
+    <Form onSubmit$={handleButtonClick} class={`${classList} flex flex-col gap-2`}>
+      <Field name="id">
+        {(field, props) => (
+          <input {...props} type="hidden" value={field.value} />
+        )}
+      </Field>
       <Field name="title">
         {(field, props) => (
           <div>
@@ -65,8 +106,12 @@ export default component$(() => {
         )}
       </Field>
       <button type="submit" class="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
-        Add Task
+        {todo ? "Save" : "Add Task"}
       </button>
+      {todo && <button onClick$={closeModal} type="reset" class="bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition">
+        Cancel
+      </button>
+      }
     </Form>
   );
 });

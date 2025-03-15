@@ -17,8 +17,9 @@ export const useTodos = routeLoader$(async (_requestEvent) => {
   return sortedByDueAt;
 });
 
-// (Server-side) Preset the "Add Task" form with default values.
+// (Server-side) Preset the Todo form with default values.
 export const useFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
+  id: '',
   title: '',
   due_at: null,
 }));

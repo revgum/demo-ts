@@ -6,7 +6,7 @@
 .PHONY: setup build up up-db up-migrations up-dapr up-otel debug down prune login shell psql redis-cli
 
 # Default target to bring up a fresh stack
-all: setup build up
+all: build up
 
 # Build the microservice base image
 setup:
@@ -17,26 +17,26 @@ setup:
 	podman build -f ./shared/microservice/Dockerfile.java -t microservice-java-build --build-arg NO_CERT=$$NO_CERT
 
 # Build the stack
-build: setup
+build:
 	podman-compose --parallel 3 build
 
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
-up: setup
+up:
 	echo "\n\n***Bringing up the stack***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up -V"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman-compose down; exit 1' SIGINT SIGTERM ERR; podman-compose up --remove-orphans"
 
 # Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
-up-db: setup
+up-db:
 	echo "\n\n***Bringing up the db***\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the db***; podman-compose down postgres postgres-build-dbs; exit 1' SIGINT SIGTERM ERR; podman-compose up postgres postgres-build-dbs"
 
 # Run migrations for specified service.
-up-migrations: setup
+up-migrations:
 	echo "\n\n***Bringing up the $$SERVICE migrations***\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down the migrations***; podman-compose -f docker-compose.migrations.yaml down; cd -; exit 1' SIGINT SIGTERM ERR; cd app/$$SERVICE && podman-compose -f docker-compose.migrations.yaml build && podman-compose -f docker-compose.migrations.yaml up && podman-compose -f docker-compose.migrations.yaml down"
 
 # Bring up Dapr services
-up-dapr: setup
+up-dapr:
 	echo "\n\n***Bringing up Dapr services**\n\n"
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down Dapr services***; podman-compose down placement redis zipkin dapr-dashboard exit 1' SIGINT SIGTERM ERR; podman-compose up placement redis zipkin dapr-dashboard"
 
