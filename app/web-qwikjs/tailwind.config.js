@@ -2,10 +2,7 @@ import flowbitePlugin from 'flowbite/plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    'node_modules/flowbite-qwik/**/*.{cjs,mjs}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['node_modules/flowbite-qwik/**/*.{cjs,mjs}', './src/**/*.{js,ts,jsx,tsx,mdx}'],
   plugins: [flowbitePlugin],
   theme: {
     extend: {

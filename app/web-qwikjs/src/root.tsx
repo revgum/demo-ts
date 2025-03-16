@@ -1,11 +1,10 @@
-import { FlowbiteProvider, FlowbiteProviderHeader } from 'flowbite-qwik';
-
 import { component$ } from '@builder.io/qwik';
 import { isDev } from '@builder.io/qwik';
 import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
+import { FlowbiteProvider, FlowbiteProviderHeader } from 'flowbite-qwik';
 import { RouterHead } from './components/router-head/router-head';
-
 import './global.css';
+import Navbar from './components/ui/navbar/navbar';
 
 export default component$(() => {
   /**
@@ -25,9 +24,13 @@ export default component$(() => {
       </head>
       <body lang="en">
         <FlowbiteProvider theme="blue" toastPosition="bottom-right">
-          <RouterOutlet />
+          <div class="w-full min-h-screen min-w-sm bg-gray-200 flex flex-col items-center">
+            <Navbar />
+            <div class="pt-12" />
+            <RouterOutlet />
+            {!isDev && <ServiceWorkerRegister />}
+          </div>
         </FlowbiteProvider>
-        {!isDev && <ServiceWorkerRegister />}
       </body>
     </QwikCityProvider>
   );

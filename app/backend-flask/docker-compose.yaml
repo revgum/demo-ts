@@ -6,6 +6,8 @@ services:
   # backend app + Dapr sidecar
   ############################
   backend-flask:
+    labels:
+      - "sos.service-type=microservice"
     build:
       context: ./app/backend-flask
       dockerfile: ./Dockerfile.dev
@@ -41,6 +43,10 @@ services:
     networks:
       - dapr-net
   backend-flask-dapr:
+    labels:
+      - "sos.service-type=microservice"
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
@@ -62,9 +68,6 @@ services:
     depends_on:
       - backend-flask
       - placement
-    labels:
-      - "dapr.io/enabled=true"  # Enable Dapr for this service
-      - "dapr.io/config=configstore"
     network_mode: "service:backend-flask"
 
 networks:

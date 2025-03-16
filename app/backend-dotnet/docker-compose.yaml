@@ -6,6 +6,8 @@ services:
   # backend app + Dapr sidecar
   ############################
   backend-dotnet:
+    labels:
+      - "sos.service-type=microservice"
     build:
       context: ./app/backend-dotnet
       dockerfile: ./Dockerfile.dev
@@ -33,6 +35,10 @@ services:
     networks:
       - dapr-net
   backend-dotnet-dapr:
+    labels:
+      - "sos.service-type=microservice"
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
@@ -54,9 +60,6 @@ services:
     depends_on:
       - backend-dotnet
       - placement
-    labels:
-      - "dapr.io/enabled=true"  # Enable Dapr for this service
-      - "dapr.io/config=configstore"
     network_mode: "service:backend-dotnet"
 
 networks:

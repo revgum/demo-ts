@@ -6,6 +6,8 @@ services:
   # Web app + Dapr sidecar
   ############################
   web-qwikjs:
+    labels:
+      - "sos.service-type=microservice"
     build:
       context: ./app/web-qwikjs
       dockerfile: ./Dockerfile.dev
@@ -28,6 +30,10 @@ services:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
       - ./app/web-qwikjs:/app # Mount localhost source to support HMR live updates
   web-qwikjs-dapr:
+    labels:
+      - "sos.service-type=microservice"
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
