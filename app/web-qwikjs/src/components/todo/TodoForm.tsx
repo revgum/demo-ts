@@ -60,7 +60,10 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
               {...props}
               type="text"
               value={field.value}
-              class={cn('p-2 border rounded-md w-full', field.error ? 'border-red-600 focus:border-red-600' : '')}
+              class={cn(
+                'p-2 border rounded-md w-full',
+                field.error ? 'border-red-600 focus:border-red-600 text-red-600' : '',
+              )}
               placeholder="Todo title..."
             />
             {field.error && (
