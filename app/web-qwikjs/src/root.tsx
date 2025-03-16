@@ -4,7 +4,7 @@ import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.
 import { FlowbiteProvider, FlowbiteProviderHeader } from 'flowbite-qwik';
 import { RouterHead } from './components/router-head/router-head';
 import './global.css';
-import Navbar from './components/ui/navbar/navbar';
+import Navbar from './components/navbar';
 
 export default component$(() => {
   /**

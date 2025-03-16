@@ -17,4 +17,9 @@ const dapr = {
 };
 const env = getEnv();
 
-export { dapr, env };
+const session = {
+  cookieName: 'sess',
+  expires: 120000,
+};
+
+export { dapr, env, session };
