@@ -49,7 +49,8 @@ describe('Component: TodoItem', () => {
     const { screen, render } = await createDOM();
     await render(<TodoItem todo={mockTodos[0]} />);
     const modal = screen.querySelector('[data-testid="todo-modal"]');
-    expect(modal?.outerHTML).toContain('Edit Todo');
+    expect(modal).not.toBeNull();
+    expect(modal?.outerHTML).toContain('Make changes to your todo');
     const form = modal?.querySelector('[data-testid="todo-form-wrapper"]');
     expect(form).not.toBeNull();
   });

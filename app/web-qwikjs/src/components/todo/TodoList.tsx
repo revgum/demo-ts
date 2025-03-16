@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import { cn } from '@qwik-ui/utils';
+import cn from 'classnames';
 import { useTodos } from '~/routes/todos/layout';
 import TodoItem from './TodoItem';
 

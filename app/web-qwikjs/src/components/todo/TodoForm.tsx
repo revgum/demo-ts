@@ -1,7 +1,7 @@
 import { $, type ClassList, type Signal, component$, useTask$ } from '@builder.io/qwik';
 import { type Maybe, type SubmitHandler, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
-import { cn } from '@qwik-ui/utils';
 import { MatReportFilled } from '@qwikest/icons/material';
+import cn from 'classnames';
 import { useFormAction, useFormLoader } from '~/routes/todos/layout';
 import type { Todo, TodoForm } from '~/types';
 import { TodoSchema } from './schemas';
@@ -80,7 +80,7 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
       {todo && (
         <button
           onClick$={closeModal}
-          type="reset"
+          type="button"
           class="bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
         >
           Cancel

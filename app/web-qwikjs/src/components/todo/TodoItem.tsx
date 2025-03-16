@@ -1,5 +1,4 @@
 import { $, component$, useSignal } from '@builder.io/qwik';
-import { cn } from '@qwik-ui/utils';
 import {
   MatCancelFilled,
   MatCheckCircleFilled,
@@ -7,9 +6,9 @@ import {
   MatTaskOutlined,
   MatTodayFilled,
 } from '@qwikest/icons/material';
+import cn from 'classnames';
 import { useDeleteTodo, useUpdateTodo } from '~/routes/todos/layout';
 import type { Todo } from '~/types';
-import { Modal } from '../ui';
 import TodoModal from './TodoModal';
 
 type TodoItemProps = {
@@ -53,18 +52,16 @@ export default component$<TodoItemProps>(({ todo }) => {
   };
 
   return (
-    <Modal.Root bind:show={show} closeOnBackdropClick={false}>
+    <div>
+      <TodoModal show={show} todo={todo} />
       <div
         class={cn(
           'flex items-center justify-between p-2 transition-opacity',
           todo.completed ? 'opacity-50' : 'opacity-100',
         )}
       >
-        <TodoModal show={show} todo={todo} />
         <div>
-          <Modal.Trigger class="text-left">
-            <h3 class="text-lg font-medium">{todo.title}</h3>
-          </Modal.Trigger>
+          <h3 class="text-lg font-medium">{todo.title}</h3>
           <div class="flex flex-row items-center text-sm text-gray-400">{getDate()}</div>
         </div>
         <div class="relative inline-flex h-6 w-fit items-center text-2xl pl-2">
@@ -75,14 +72,17 @@ export default component$<TodoItemProps>(({ todo }) => {
           >
             <MatCheckCircleFilled />
           </button>
-          <Modal.Trigger class="text-gray-300 hover:text-gray-900 mr-2">
-            <MatEditFilled />
-          </Modal.Trigger>
+          <MatEditFilled
+            class="cursor-pointer"
+            onClick$={() => {
+              show.value = true;
+            }}
+          />
           <button type="button" onClick$={() => handleDelete(todo)} class="text-red-500">
             <MatCancelFilled />
           </button>
         </div>
       </div>
-    </Modal.Root>
+    </div>
   );
 });
