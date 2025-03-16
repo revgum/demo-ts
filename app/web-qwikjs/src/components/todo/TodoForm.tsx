@@ -2,6 +2,7 @@ import { $, type ClassList, type Signal, component$, useTask$ } from '@builder.i
 import { type Maybe, type SubmitHandler, reset, setValue, useForm, zodForm$ } from '@modular-forms/qwik';
 import { MatReportFilled } from '@qwikest/icons/material';
 import cn from 'classnames';
+import { DatePicker } from 'flowbite-qwik';
 import { useFormAction, useFormLoader } from '~/routes/todos/layout';
 import type { Todo, TodoForm } from '~/types';
 import { TodoSchema } from './schemas';
@@ -72,7 +73,15 @@ export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => 
         )}
       </Field>
       <Field name="due_at">
-        {(field, props) => <input {...props} type="date" value={field.value} class="p-2 border rounded-md w-full" />}
+        {(field) => (
+          <DatePicker
+            name="due_at"
+            value={field.value?.substring(0, 10)}
+            onSelectedDateChanged$={(selectedDate: Date) => {
+              setValue(TodoForm, 'due_at', selectedDate.toISOString());
+            }}
+          />
+        )}
       </Field>
       <button type="submit" class="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
         {todo ? 'Save' : 'Add Todo'}

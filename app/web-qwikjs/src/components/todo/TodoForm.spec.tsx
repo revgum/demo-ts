@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { createDOM } from '@builder.io/qwik/testing';
 import { type Mocked, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDOM } from '~/lib/test/utils';
 import * as TodosLayout from '~/routes/todos/layout';
 import type { Todo } from '~/types';
 import TodoForm from './TodoForm';
@@ -29,8 +29,9 @@ describe('Component: TodoForm', () => {
   });
 
   it('renders a todo item without a due date', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoForm todo={mockTodos[0]} />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoForm todo={mockTodos[0]} />, { render });
+
     expect(screen.outerHTML).toContain('Buy groceries');
     expect(screen.outerHTML).toContain('Save');
     expect(screen.outerHTML).toContain('Cancel');
@@ -39,8 +40,9 @@ describe('Component: TodoForm', () => {
   });
 
   it('renders a todo item with a due date', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoForm todo={mockTodos[1]} />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoForm todo={mockTodos[1]} />, { render });
+
     expect(screen.outerHTML).toContain('Walk the dog');
     expect(screen.outerHTML).toContain('Save');
     expect(screen.outerHTML).toContain('Cancel');
@@ -50,14 +52,14 @@ describe('Component: TodoForm', () => {
 
   it('renders an empty form', async () => {
     mockTodosLayout.useFormLoader.mockReturnValue({ value: { id: '', title: '', due_at: null } });
-    const { screen, render } = await createDOM();
-    await render(<TodoForm />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoForm />, { render });
+
     expect(screen.outerHTML).toContain('Add Todo');
     expect(screen.outerHTML).not.toContain('Cancel');
     const due_at = screen.querySelector('[name="due_at"]');
     expect(due_at?.getAttribute('value')).toBeNull();
     const title = screen.querySelector('[name="title"]');
-    console.log(title?.outerHTML);
     expect(title?.getAttribute('value')).toBe('');
   });
 });

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { createDOM } from '@builder.io/qwik/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDOM } from '~/lib/test/utils';
 import type { Todo } from '~/types';
 import TodoItem from './TodoItem';
 
@@ -32,22 +32,25 @@ describe('Component: TodoItem', () => {
   });
 
   it('renders a todo item without a due date', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoItem todo={mockTodos[0]} />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoItem todo={mockTodos[0]} />, { render });
+
     expect(screen.outerHTML).toContain('Buy groceries');
     expect(screen.outerHTML).toContain('No due date');
   });
 
   it('renders a todo item with a due date', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoItem todo={mockTodos[1]} />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoItem todo={mockTodos[1]} />, { render });
+
     expect(screen.outerHTML).toContain('Walk the dog');
     expect(screen.outerHTML).toContain(mockTodos[1].due_at?.substring(0, 10));
   });
 
   it('renders a hidden modal', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoItem todo={mockTodos[0]} />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoItem todo={mockTodos[0]} />, { render });
+
     const modal = screen.querySelector('[data-testid="todo-modal"]');
     expect(modal).not.toBeNull();
     expect(modal?.outerHTML).toContain('Make changes to your todo');

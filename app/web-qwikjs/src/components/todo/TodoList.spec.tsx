@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { createDOM } from '@builder.io/qwik/testing';
 import { type Mocked, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDOM } from '~/lib/test/utils';
 import * as TodoLayout from '~/routes/todos/layout';
 import type { Todo } from '~/types';
 import TodoList from './TodoList';
@@ -34,8 +34,9 @@ describe('Component: TodoList', () => {
   });
 
   it('renders a message when there are no todos', async () => {
-    const { screen, render } = await createDOM();
-    await render(<TodoList />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoList />, { render });
+
     expect(screen.outerHTML).toContain('No todos found, add a new todo.');
   });
 
@@ -43,8 +44,9 @@ describe('Component: TodoList', () => {
     mockTodoLayout.useTodos.mockReturnValue({
       value: mockTodos.slice(0, 2),
     });
-    const { screen, render } = await createDOM();
-    await render(<TodoList />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoList />, { render });
+
     expect(screen.outerHTML).toContain('Buy groceries');
     expect(screen.outerHTML).toContain('Walk the dog');
   });
@@ -53,8 +55,8 @@ describe('Component: TodoList', () => {
     mockTodoLayout.useTodos.mockReturnValue({
       value: mockTodos,
     });
-    const { screen, render } = await createDOM();
-    await render(<TodoList />);
+    const { screen, render, renderWithProviders } = await getDOM();
+    await renderWithProviders(<TodoList />, { render });
 
     expect(screen.querySelectorAll('hr')).toHaveLength(2);
   });
