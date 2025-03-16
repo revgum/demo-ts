@@ -32,6 +32,8 @@ describe('Component: TodoForm', () => {
     const { screen, render } = await createDOM();
     await render(<TodoForm todo={mockTodos[0]} />);
     expect(screen.outerHTML).toContain('Buy groceries');
+    expect(screen.outerHTML).toContain('Save');
+    expect(screen.outerHTML).toContain('Cancel');
     const due_at = screen.querySelector('[name="due_at"]');
     expect(due_at?.getAttribute('value')).toBeNull();
   });
@@ -40,6 +42,8 @@ describe('Component: TodoForm', () => {
     const { screen, render } = await createDOM();
     await render(<TodoForm todo={mockTodos[1]} />);
     expect(screen.outerHTML).toContain('Walk the dog');
+    expect(screen.outerHTML).toContain('Save');
+    expect(screen.outerHTML).toContain('Cancel');
     const due_at = screen.querySelector('[name="due_at"]');
     expect(due_at?.getAttribute('value')).toContain(mockTodos[1].due_at?.substring(0, 10));
   });
@@ -48,6 +52,8 @@ describe('Component: TodoForm', () => {
     mockTodosLayout.useFormLoader.mockReturnValue({ value: { id: '', title: '', due_at: null } });
     const { screen, render } = await createDOM();
     await render(<TodoForm />);
+    expect(screen.outerHTML).toContain('Add Todo');
+    expect(screen.outerHTML).not.toContain('Cancel');
     const due_at = screen.querySelector('[name="due_at"]');
     expect(due_at?.getAttribute('value')).toBeNull();
     const title = screen.querySelector('[name="title"]');
