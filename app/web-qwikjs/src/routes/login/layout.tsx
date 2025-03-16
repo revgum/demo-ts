@@ -23,7 +23,7 @@ export const useFormAction = formAction$<LoginForm>(async (values, { url, send, 
       cookie.set(session.cookieName, sessionId, { maxAge: session.expires / 1000, path: '/' }); // Set the session cookie
 
       // Redirect to the main page and send the response
-      headers.set('Location', new URL('/', url).toString());
+      headers.set('Location', new URL('/todos', url).toString());
       const response = new Response(null, { status: 302 });
       send(response);
     } else {
