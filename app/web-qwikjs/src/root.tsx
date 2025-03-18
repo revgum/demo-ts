@@ -5,6 +5,7 @@ import { FlowbiteProvider, FlowbiteProviderHeader } from 'flowbite-qwik';
 import { RouterHead } from './components/router-head/router-head';
 import './global.css';
 import Navbar from './components/navbar';
+import { ToastProvider } from './lib/hooks/useToast';
 
 export default component$(() => {
   /**
@@ -25,10 +26,12 @@ export default component$(() => {
       <body lang="en">
         <FlowbiteProvider theme="blue" toastPosition="bottom-right">
           <div class="w-full min-h-screen min-w-sm bg-gray-200 flex flex-col items-center">
-            <Navbar />
-            <div class="pt-12" />
-            <RouterOutlet />
-            {!isDev && <ServiceWorkerRegister />}
+            <ToastProvider>
+              <Navbar />
+              <div class="pt-12" />
+              <RouterOutlet />
+              {!isDev && <ServiceWorkerRegister />}
+            </ToastProvider>
           </div>
         </FlowbiteProvider>
       </body>

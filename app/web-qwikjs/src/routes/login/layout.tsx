@@ -1,9 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import { routeLoader$ } from '@builder.io/qwik-city';
-import { type InitialValues, formAction$, zodForm$ } from '@modular-forms/qwik';
-import { LoginSchema } from '~/components/login/schemas';
+import { FormError, type InitialValues, formAction$, zodForm$ } from '@modular-forms/qwik';
+import { LoginSchema } from '~/components/auth/schemas';
 import { session } from '~/config';
 import { createSession } from '~/services/session';
+import { getUserByLogin, validateUser } from '~/services/user';
 import type { LoginForm } from '~/types';
 
 // (Server-side) Preset the Login form with default values.
@@ -13,22 +13,23 @@ export const useFormLoader = routeLoader$<InitialValues<LoginForm>>(() => ({
 }));
 
 // (Server-side) When the Login form is submitted attempt to validate the user
-export const useFormAction = formAction$<LoginForm>(async (values, { url, send, fail, cookie, headers, redirect }) => {
-  if (values.login && values.password) {
-    // TODO: Get validated user from database
-    const userId = randomUUID();
-    if (userId) {
-      // Create a session for the user and set the session cookie
-      const sessionId = createSession(userId);
-      cookie.set(session.cookieName, sessionId, { maxAge: session.expires / 1000, path: '/' }); // Set the session cookie
-
-      // Redirect to the main page and send the response
-      headers.set('Location', new URL('/todos', url).toString());
-      const response = new Response(null, { status: 302 });
-      send(response);
-    } else {
-      return fail(400, { message: 'Invalid login or password' });
-    }
+export const useFormAction = formAction$<LoginForm>(async (values, { cookie, redirect }) => {
+  if (!values.login || !values.password) {
+    throw new FormError('Login and password are required');
   }
-  return fail(400, { message: 'Invalid login or password' });
+  const loggedIn = await validateUser(values.login, values.password);
+  if (!loggedIn) {
+    throw new FormError('Invalid login or password');
+  }
+  const user = getUserByLogin(values.login);
+  if (!user) {
+    throw new FormError('Invalid login or password');
+  }
+
+  // Create a session for the user and set the session cookie
+  const sessionId = createSession(user.id);
+  cookie.set(session.cookieName, sessionId, { maxAge: session.expires / 1000, path: '/' }); // Set the session cookie
+
+  // Redirect to the main page
+  throw redirect(302, '/todos');
 }, zodForm$(LoginSchema));

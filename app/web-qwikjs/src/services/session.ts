@@ -5,7 +5,7 @@ import type { User } from '~/types';
 
 // Replace in-memory session store with a more persistent solution (e.g., Redis, database) for production use
 // This is a simple in-memory session store for demonstration purposes only.
-const sessions = new Map<string, { userId: User['id']; expires: number }>();
+export const sessions = new Map<string, { userId: User['id']; expires: number }>();
 
 const pruneExpiredSessions = () => {
   const now = Date.now();

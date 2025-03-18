@@ -1,6 +1,7 @@
 import type { JSXChildren, JSXOutput, RenderResult } from '@builder.io/qwik';
 import { createDOM } from '@builder.io/qwik/testing';
 import { FlowbiteProvider } from 'flowbite-qwik';
+import { ToastProvider } from '../hooks/useToast';
 
 /**
  * Renders the given JSX children within a FlowbiteProvider using the provided render function.
@@ -14,7 +15,11 @@ export const renderWithProviders = async (
   child: JSXChildren,
   { render }: { render: (jsxElement: JSXOutput) => Promise<RenderResult> },
 ) => {
-  return render(<FlowbiteProvider>{child}</FlowbiteProvider>);
+  return render(
+    <FlowbiteProvider>
+      <ToastProvider>{child}</ToastProvider>
+    </FlowbiteProvider>,
+  );
 };
 
 /**

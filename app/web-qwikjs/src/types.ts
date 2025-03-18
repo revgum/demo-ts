@@ -1,7 +1,15 @@
 import type { z } from '@builder.io/qwik-city';
 import type { DaprClient } from '@dapr/dapr';
-import type { LoginSchema } from './components/login/schemas';
+import type { LoginSchema, RegisterSchema } from './components/auth/schemas';
 import type { TodoSchema } from './components/todo/schemas';
+
+export type Session = {
+  userId: string;
+  expires: number;
+};
+
+// Replace in-memory session store with a more persistent solution (e.g., Redis, database) for production use
+export type SessionStore = Map<string, Session>;
 
 export type User = {
   id: string;
@@ -25,3 +33,4 @@ export type Todo = {
 
 export type TodoForm = z.infer<typeof TodoSchema>;
 export type LoginForm = z.infer<typeof LoginSchema>;
+export type RegisterForm = z.infer<typeof RegisterSchema>;

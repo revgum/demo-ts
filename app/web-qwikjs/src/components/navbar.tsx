@@ -1,11 +1,12 @@
 import { component$ } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
+import { Link, useLocation } from '@builder.io/qwik-city';
 import cn from 'classnames';
 import { Dropdown, Navbar } from 'flowbite-qwik';
 import { useUser } from '~/routes/layout';
 
 export default component$(() => {
   const user = useUser();
+  const location = useLocation();
 
   // The following adhoc styles are required to target the navbar list items that are otherwise
   // inaccessible by flowbit-qwik at the moment.
@@ -46,7 +47,9 @@ export default component$(() => {
             <Dropdown.Item>Dashboard</Dropdown.Item>
             <Dropdown.Item>Settings</Dropdown.Item>
             <Dropdown.Item divider />
-            <Dropdown.Item>Sign out</Dropdown.Item>
+            <Dropdown.Item>
+              <Navbar.Link href="/logout/">Sign out</Navbar.Link>
+            </Dropdown.Item>
           </Dropdown>
         </div>
       )}
@@ -64,6 +67,20 @@ export default component$(() => {
           </Navbar.Link>
           <Navbar.Link href="/contact">Contact</Navbar.Link>
           <Navbar.Link href="/about">About</Navbar.Link>
+        </Navbar.Collapse>
+      )}
+      {!user.value && (
+        <Navbar.Collapse class={cn(styleOverrides.base, styleOverrides.md)}>
+          {location.url.pathname === '/login/' && (
+            <Navbar.Link href="/register" active>
+              Register
+            </Navbar.Link>
+          )}
+          {location.url.pathname === '/register/' && (
+            <Navbar.Link href="/login" active>
+              Login
+            </Navbar.Link>
+          )}
         </Navbar.Collapse>
       )}
     </Navbar>

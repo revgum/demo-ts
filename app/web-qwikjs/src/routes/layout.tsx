@@ -1,12 +1,18 @@
 import { Slot, component$ } from '@builder.io/qwik';
 import { type RequestHandler, routeLoader$ } from '@builder.io/qwik-city';
-import { loadUserFromCookie } from '~/services/session';
-import type { User } from '~/types';
+import { loadUserFromCookie, sessions } from '~/services/session';
+import type { SessionStore, User } from '~/types';
 
 // Generic function `onRequest` is executed before any method specific handler (like `onGet`).
 export const onRequest: RequestHandler = async ({ next, sharedMap, cookie, redirect, url }) => {
-  if (url.pathname.startsWith('/login')) {
-    // Skip authentication for the login page
+  sharedMap.set('sessions', sessions);
+
+  if (
+    url.pathname.startsWith('/login/') ||
+    url.pathname.startsWith('/register/') ||
+    url.pathname.startsWith('/logout/')
+  ) {
+    // Skip authentication for the auth pages
     return await next();
   }
 
@@ -34,6 +40,10 @@ export const onGet: RequestHandler = async ({ next, cacheControl }) => {
 
 export const useUser = routeLoader$(({ sharedMap }) => {
   return sharedMap.get('user') as User | null;
+});
+
+export const useSessions = routeLoader$(({ sharedMap }) => {
+  return sharedMap.get('sessions') as SessionStore | null;
 });
 
 export default component$(() => {
