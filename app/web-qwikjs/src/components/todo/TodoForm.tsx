@@ -3,7 +3,7 @@ import { type Maybe, type SubmitHandler, reset, setValue, useForm, zodForm$ } fr
 import { MatReportFilled } from '@qwikest/icons/material';
 import cn from 'classnames';
 import { DatePicker } from 'flowbite-qwik';
-import { useFormAction, useFormLoader } from '~/routes/todos/layout';
+import { useFormAction, useTodoFormLoader } from '~/routes/todos/layout';
 import type { Todo, TodoForm } from '~/types';
 import { TodoSchema } from './schemas';
 
@@ -17,7 +17,7 @@ interface TodoFormProps {
 export default component$<TodoFormProps>(({ todo, modalVisible, classList }) => {
   // Perform form validation on the "Add Task" form on the client side.
   const [TodoForm, { Form, Field }] = useForm<TodoForm>({
-    loader: useFormLoader(),
+    loader: useTodoFormLoader(),
     action: useFormAction(),
     validate: zodForm$(TodoSchema),
   });

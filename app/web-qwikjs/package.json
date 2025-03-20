@@ -18,8 +18,8 @@
     "preview": "qwik build preview && vite preview --open",
     "serve": "node server/entry.express",
     "start": "vite --open --mode ssr",
-    "test.unit": "vitest components",
-    "test.unit.ui": "vitest --ui components",
+    "test": "vitest components",
+    "test.ui": "vitest --ui components",
     "qwik": "qwik"
   },
   "devDependencies": {

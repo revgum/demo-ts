@@ -9,7 +9,7 @@ import type { TodoForm } from '~/types';
 export const useTodos = routeLoader$(async (_requestEvent) => {
   const { payload } = await getAll();
   // Sort by date ascending with null dates at the bottom
-  const sortedByDueAt = payload.sort((a, b) => {
+  const sortedByDueAt = (payload ?? []).sort((a, b) => {
     if (!a.due_at) return 1;
     if (!b.due_at) return -1;
     if (a.due_at === b.due_at) return 0;
@@ -19,7 +19,7 @@ export const useTodos = routeLoader$(async (_requestEvent) => {
 });
 
 // (Server-side) Preset the Todo form with default values.
-export const useFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
+export const useTodoFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
   id: '',
   title: '',
   due_at: null,

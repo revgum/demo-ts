@@ -1,4 +1,5 @@
 import type { JSXChildren, JSXOutput, RenderResult } from '@builder.io/qwik';
+import { QwikCityMockProvider } from '@builder.io/qwik-city';
 import { createDOM } from '@builder.io/qwik/testing';
 import { FlowbiteProvider } from 'flowbite-qwik';
 import { ToastProvider } from '../hooks/useToast';
@@ -16,9 +17,11 @@ export const renderWithProviders = async (
   { render }: { render: (jsxElement: JSXOutput) => Promise<RenderResult> },
 ) => {
   return render(
-    <FlowbiteProvider>
-      <ToastProvider>{child}</ToastProvider>
-    </FlowbiteProvider>,
+    <QwikCityMockProvider>
+      <FlowbiteProvider>
+        <ToastProvider>{child}</ToastProvider>
+      </FlowbiteProvider>
+    </QwikCityMockProvider>,
   );
 };
 

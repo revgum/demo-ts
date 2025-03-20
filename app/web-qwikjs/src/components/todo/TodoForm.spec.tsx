@@ -25,7 +25,7 @@ describe('Component: TodoForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockTodosLayout = TodosLayout as Mocked<typeof TodosLayout>;
-    mockTodosLayout.useFormLoader.mockReturnValue({ value: { id: randomUUID(), title: 'Title', due_at: null } });
+    mockTodosLayout.useTodoFormLoader.mockReturnValue({ value: { id: randomUUID(), title: 'Title', due_at: null } });
   });
 
   it('renders a todo item without a due date', async () => {
@@ -51,7 +51,7 @@ describe('Component: TodoForm', () => {
   });
 
   it('renders an empty form', async () => {
-    mockTodosLayout.useFormLoader.mockReturnValue({ value: { id: '', title: '', due_at: null } });
+    mockTodosLayout.useTodoFormLoader.mockReturnValue({ value: { id: '', title: '', due_at: null } });
     const { screen, render, renderWithProviders } = await getDOM();
     await renderWithProviders(<TodoForm />, { render });
 
