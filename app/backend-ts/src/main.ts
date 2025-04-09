@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { join } from 'node:path';
 import { context } from '@/context';
 import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from '@/handlers/todo';

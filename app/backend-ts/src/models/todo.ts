@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { Context, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
+import createHttpError from 'http-errors';
 
 export const TABLE_NAME = 'todo';
 
@@ -25,7 +26,7 @@ export const getById = async (context: Context, id: Todo['id']): Promise<Todo> =
   const rows = await context.db<TodoDb>(TABLE_NAME).where({ id }).whereNull('deleted_at');
 
   if (!rows.length) {
-    throw new Error(`Todo ${id} not found.`);
+    throw createHttpError(404, `Todo ${id} not found.`);
   }
 
   return asModel(rows[0]);
@@ -45,7 +46,7 @@ export const create = async (context: Context, obj: Partial<CreateTodoModel>): P
     .returning<TodoDb[]>('*');
 
   if (!rows.length) {
-    throw new Error('New todo record not returned.');
+    throw createHttpError(400, 'Created Todo not returned.');
   }
 
   return asModel(rows[0]);
@@ -67,7 +68,7 @@ export const updateById = async (context: Context, id: Todo['id'], obj: Partial<
     .returning<TodoDb[]>('*');
 
   if (!rows.length) {
-    throw new Error('Updated todo record not returned.');
+    throw createHttpError(400, `Updated Todo ${id} not returned.`);
   }
 
   return asModel(rows[0]);
@@ -84,7 +85,7 @@ export const deleteById = async (context: Context, id: Todo['id']): Promise<Todo
     .returning<TodoDb[]>('*');
 
   if (!rows.length) {
-    throw new Error('Deleted todo record not returned.');
+    throw createHttpError(404, `Todo ${id} not found.`);
   }
 
   return asModel(rows[0]);

@@ -25,8 +25,9 @@ const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(contex
  * - Returns a list of todo records or an error according to the ApiPayloadSchema
  */
 export const getAllTodo = todoEndpointsFactory.build({
+  method: 'get',
   output: ApiPayloadSchema,
-  handler: async ({ options: { context } }) => {
+  handler: async ({ options: { context, user } }) => {
     let success = false;
     try {
       const payload = await getAll(context);
@@ -47,6 +48,7 @@ export const getAllTodo = todoEndpointsFactory.build({
  * - Returns a new todo record or an error according to the ApiPayloadSchema
  */
 export const createTodo = todoEndpointsFactory.build({
+  method: 'post',
   input: TodoCreateSchema,
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context } }) => {
@@ -70,6 +72,7 @@ export const createTodo = todoEndpointsFactory.build({
  * - Returns a todo record or an error according to the ApiPayloadSchema
  */
 export const getTodoById = todoEndpointsFactory.build({
+  method: 'get',
   input: UuidParamsSchema,
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context } }) => {
@@ -93,6 +96,7 @@ export const getTodoById = todoEndpointsFactory.build({
  * - Returns an updated todo record or an error according to the ApiPayloadSchema
  */
 export const updateTodoById = todoEndpointsFactory.build({
+  method: ['put', 'patch'],
   input: UuidParamsSchema.merge(TodoUpdateSchema),
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context } }) => {
@@ -117,6 +121,7 @@ export const updateTodoById = todoEndpointsFactory.build({
  * - Returns a deleted todo record or an error according to the ApiPayloadSchema
  */
 export const deleteTodoById = todoEndpointsFactory.build({
+  method: 'delete',
   input: UuidParamsSchema,
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context } }) => {

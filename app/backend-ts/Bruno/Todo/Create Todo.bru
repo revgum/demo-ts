@@ -12,11 +12,12 @@ post {
 
 headers {
   dapr-app-id: backend-ts
+  authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMWIyYzMiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.G5wdYS1G5gfd14BnsXrZ0JcLW0kB5ItFd7M_9elzjUQ
 }
 
 body:json {
   {
     "title": "new todo",
-    "due_at": "2025-01-01T12:00:00Z"
+    "dueAt": "2025-01-01T12:00:00Z"
   }
 }

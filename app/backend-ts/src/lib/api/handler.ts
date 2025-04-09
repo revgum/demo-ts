@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import { AuthMiddleware } from '@/lib/api/middlewares/auth';
 import { ErrorPayloadSchema, createSuccessPayloadSchema } from '@/lib/api/schemas';
 import type { Response } from 'express';
 import {
@@ -7,11 +9,13 @@ import {
   ensureHttpError,
   getMessageFromError,
 } from 'express-zod-api';
+import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import type { ZodTypeAny } from 'zod';
 
 type EndpointOptions<C = unknown> = {
   context: C;
+  requestId: string; // UUID v4 for this request
 };
 
 /**
@@ -65,7 +69,7 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
       response: Response;
       options: FlatObject;
     }) => {
-      const { context } = params.options as EndpointOptions<C>;
+      const { context, requestId } = params.options as EndpointOptions<C>;
       const { error, output, response } = params;
 
       if (error) {
@@ -76,6 +80,7 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
         return void response.status(statusCode).json({
           // biome-ignore lint/suspicious/noExplicitAny: <explanation>
           apiVersion: (context as any)?.api.version,
+          id: requestId,
           error: {
             code: statusCode,
             message,
@@ -84,7 +89,7 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
       }
 
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      response.json({ ...(output as any) });
+      response.json({ id: requestId, ...(output as any) });
     },
   });
 
@@ -102,15 +107,19 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
  * @returns An instance of `EndpointsFactory` configured with the provided context, kind, and item schema.
  */
 export const endpointsFactory = <C, T extends ZodTypeAny>(context: C, kind: string, itemSchema: T) =>
-  new EndpointsFactory(apiResultsHandler(itemSchema, kind)).addOptions<EndpointOptions<C>>(async () => {
-    return {
-      context: {
-        ...context,
-        api: {
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-          ...(context as any).api,
-          kind,
+  new EndpointsFactory(apiResultsHandler(itemSchema, kind))
+    .addExpressMiddleware(helmet())
+    .addOptions<EndpointOptions<C>>(async () => {
+      return {
+        requestId: randomUUID(),
+        context: {
+          ...context,
+          api: {
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            ...(context as any).api,
+            kind,
+          },
         },
-      },
-    };
-  });
+      };
+    })
+    .addMiddleware(AuthMiddleware);
