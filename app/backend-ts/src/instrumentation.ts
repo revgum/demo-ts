@@ -7,6 +7,7 @@ import * as opentelemetry from '@opentelemetry/sdk-node';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
 const otlpEndpoint = process.env.OTLP_ENDPOINT;
+
 if (otlpEndpoint) {
   const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({

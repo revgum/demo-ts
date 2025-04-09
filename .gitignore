@@ -45,3 +45,6 @@ vite.config.ts.timestamp-*
 # python files
 __pycache__
 .venv
+
+
+openapi.yaml

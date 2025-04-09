@@ -15,7 +15,7 @@ const dapr = {
   port: process.env.DAPR_PORT || '3001',
 };
 const server = {
-  host: process.env.SERVER_HOST || 'localhost',
+  host: process.env.SERVER_HOST || '0.0.0.0',
   port: process.env.SERVER_PORT || '3001',
 };
 const db = {
@@ -30,6 +30,7 @@ const db = {
 const runtime = {
   localhost: !!process.env.LOCALHOST,
   debug: !!process.env.DEBUG,
+  logLevel: process.env.LOG_LEVEL || 'debug',
 };
 
 const env = getEnv();

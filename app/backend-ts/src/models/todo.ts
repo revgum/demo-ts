@@ -1,75 +1,91 @@
 import { randomUUID } from 'node:crypto';
-import type { Context, Todo } from '../types';
+import type { Context, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
 
 export const TABLE_NAME = 'todo';
 
-export const getAll = async (context: Context): Promise<Todo[]> => context.db<Todo>(TABLE_NAME).whereNull('deleted_at');
+const asModel = (item: TodoDb): Todo => {
+  return {
+    id: item.id,
+    kind: 'todo',
+    completed: item.completed,
+    createdAt: item.created_at.toISOString(),
+    deletedAt: item.deleted_at?.toISOString(),
+    dueAt: item.due_at?.toISOString(),
+    title: item.title,
+    updatedAt: item.updated_at?.toISOString(),
+  };
+};
+
+export const getAll = async (context: Context): Promise<Todo[]> => {
+  const rows = await context.db<TodoDb>(TABLE_NAME).whereNull('deleted_at');
+  return rows.map(asModel);
+};
 
 export const getById = async (context: Context, id: Todo['id']): Promise<Todo> => {
-  const rows = await context.db<Todo>(TABLE_NAME).where({ id }).whereNull('deleted_at');
+  const rows = await context.db<TodoDb>(TABLE_NAME).where({ id }).whereNull('deleted_at');
 
   if (!rows.length) {
     throw new Error(`Todo ${id} not found.`);
   }
 
-  return rows[0];
+  return asModel(rows[0]);
 };
 
-export const create = async (context: Context, obj: Partial<Todo>): Promise<Todo> => {
-  const due_at = obj.due_at ? new Date(obj.due_at).toUTCString() : null;
+export const create = async (context: Context, obj: Partial<CreateTodoModel>): Promise<Todo> => {
+  const due_at = obj.dueAt ? new Date(obj.dueAt) : null;
   const rows = await context
-    .db<Todo>(TABLE_NAME)
+    .db<TodoDb>(TABLE_NAME)
     .insert({
       id: randomUUID(),
       title: obj.title,
-      completed: obj.completed,
+      completed: obj.completed ?? false,
       due_at,
-      created_at: new Date().toUTCString(),
+      created_at: new Date(),
     })
-    .returning<Todo[]>('*');
+    .returning<TodoDb[]>('*');
 
   if (!rows.length) {
     throw new Error('New todo record not returned.');
   }
 
-  return rows[0];
+  return asModel(rows[0]);
 };
 
-export const updateById = async (context: Context, id: Todo['id'], obj: Partial<Todo>): Promise<Todo> => {
+export const updateById = async (context: Context, id: Todo['id'], obj: Partial<UpdateTodoModel>): Promise<Todo> => {
   const todo = await getById(context, id);
-  const { title, completed, due_at } = obj;
+  const { title, completed, dueAt } = obj;
 
   const rows = await context
-    .db<Todo>(TABLE_NAME)
+    .db<TodoDb>(TABLE_NAME)
     .where({ id })
     .update({
       title: title ?? todo.title,
-      completed: completed ?? todo.completed,
-      due_at: due_at ?? todo.due_at,
-      updated_at: new Date().toUTCString(),
+      completed: completed ?? todo.completed ?? false,
+      due_at: dueAt ? new Date(dueAt) : todo.dueAt ? new Date(todo.dueAt) : null,
+      updated_at: new Date(),
     })
-    .returning<Todo[]>('*');
+    .returning<TodoDb[]>('*');
 
   if (!rows.length) {
     throw new Error('Updated todo record not returned.');
   }
 
-  return rows[0];
+  return asModel(rows[0]);
 };
 
 export const deleteById = async (context: Context, id: Todo['id']): Promise<Todo> => {
   const rows = await context
-    .db<Todo>(TABLE_NAME)
+    .db<TodoDb>(TABLE_NAME)
     .where({ id })
     .whereNull('deleted_at')
     .update({
-      deleted_at: new Date().toUTCString(),
+      deleted_at: new Date(),
     })
-    .returning<Todo[]>('*');
+    .returning<TodoDb[]>('*');
 
   if (!rows.length) {
     throw new Error('Deleted todo record not returned.');
   }
 
-  return rows[0];
+  return asModel(rows[0]);
 };

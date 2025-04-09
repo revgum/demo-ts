@@ -1,15 +1,16 @@
+import type { TodoApiDataSchema, TodoCreateSchema, TodoDbSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import type { Knex } from 'knex';
 import type { z } from 'zod';
-import type {
-  CreateTodoSchema,
-  TodoListResponseSchema,
-  TodoResponseSchema,
-  TodoSchema,
-  UpdateTodoSchema,
-} from './schemas/todo';
+
+export const ContextKinds = { UNKNOWN: 'unknown', TODO: 'todo' } as const;
+export type ContextKind = (typeof ContextKinds)[keyof typeof ContextKinds];
 
 export type Context = {
   env: 'development' | 'staging' | 'production';
+  api: {
+    version: string;
+    kind: ContextKind;
+  };
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   db: Knex<any, unknown[]>;
   runtime: {
@@ -26,8 +27,8 @@ export type Context = {
   };
 };
 
+export type TodoDb = z.infer<typeof TodoDbSchema>;
 export type Todo = z.infer<typeof TodoSchema>;
-export type CreateTodoModel = z.infer<typeof CreateTodoSchema>;
-export type UpdateTodoModel = z.infer<typeof UpdateTodoSchema>;
-export type TodoResponse = z.infer<typeof TodoResponseSchema>;
-export type TodoListResponse = z.infer<typeof TodoListResponseSchema>;
+export type CreateTodoModel = z.infer<typeof TodoCreateSchema>;
+export type UpdateTodoModel = z.infer<typeof TodoUpdateSchema>;
+export type TodoData = z.infer<typeof TodoApiDataSchema>;

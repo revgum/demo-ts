@@ -1,46 +1,70 @@
-import { DaprServer, LogLevel } from '@dapr/dapr';
-import express from 'express';
-import { context } from './context';
-import { create } from './models/todo';
-import { DaprRouter } from './routers/dapr';
-import { V1Router } from './routers/v1/router';
+import { join } from 'node:path';
+import { context } from '@/context';
+import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from '@/handlers/todo';
+import { buildOpenApiSpec } from '@/openapi';
+import { loadSeedData } from '@/seed';
+import { DependsOnMethod, type Routing, ServeStatic, createConfig, createServer } from 'express-zod-api';
+import pino from 'pino';
+import ui from 'swagger-ui-express';
 
-async function start() {
-  const app = express();
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
-  app.use('/api/v1', V1Router(context));
-
-  if (context.runtime.localhost) {
-    app.use('/v1.0', DaprRouter);
-  }
-
-  const server = new DaprServer({
-    serverHost: context.server.host,
-    serverPort: context.server.port,
-    serverHttp: app,
-    clientOptions: {
-      daprHost: context.dapr.host,
-      daprPort: context.dapr.port,
+const serverConfig = createConfig({
+  startupLogo: false,
+  http: {
+    listen: {
+      port: Number.parseInt(context.server.port),
+      host: context.server.host,
     },
-    logger: {
-      level: context.runtime.debug ? LogLevel.Debug : LogLevel.Info,
+  },
+  cors: true,
+  compression: true,
+  logger: pino({
+    level: context.runtime.debug ? 'debug' : 'info',
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        translateTime: 'SYS:standard',
+        colorize: true,
+        ignore: 'pid,hostname',
+      },
     },
-  });
+  }),
+  beforeRouting: ({ app }) => {
+    app.use('/docs', ui.serve, ui.setup(null, { swaggerUrl: '/public/openapi.yaml' }));
+  },
+});
 
+const serverRouting: Routing = {
+  api: {
+    v1: {
+      todos: new DependsOnMethod({
+        get: getAllTodo,
+        post: createTodo,
+      }).nest({
+        ':id': new DependsOnMethod({
+          get: getTodoById,
+          put: updateTodoById,
+          delete: deleteTodoById,
+        }),
+      }),
+    },
+  },
+  // path /public serves static files from /public
+  public: new ServeStatic(join(__dirname, 'public'), {
+    dotfiles: 'deny',
+    index: false,
+    redirect: false,
+  }),
+};
+
+const startServer = async () => {
   if (process.env.SEED_DATA) {
-    const record = await create(context, {
-      title: `Task ${new Date().toISOString()}`,
-      completed: false,
-    });
-    console.log(`Created new Todo model: ${JSON.stringify(record)}`);
+    await loadSeedData(context);
   }
+  await buildOpenApiSpec(serverRouting, serverConfig, context);
+  await createServer(serverConfig, serverRouting);
+};
 
-  await server.start();
-}
-
-start().catch((e) => {
+startServer().catch((e) => {
   console.error(e);
   process.exit(1);
 });

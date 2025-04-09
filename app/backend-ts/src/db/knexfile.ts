@@ -1,5 +1,5 @@
+import { db } from '@/config';
 import type { Knex } from 'knex';
-import { db } from '../config';
 
 const knexConfig: Knex.Config = {
   client: 'pg',
