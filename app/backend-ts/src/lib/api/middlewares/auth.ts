@@ -26,7 +26,7 @@ export const AuthMiddleware = new Middleware({
     };
     if (user.id !== payload.sub || user.token !== token) throw createHttpError(422, 'Unauthorized');
 
-    logger.info(`User authenticated: ${user.id}`);
+    logger.info('User authenticated', { userId: user.id });
     return { user }; // provides endpoints with options.user
   },
 });
