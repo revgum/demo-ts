@@ -1,5 +1,5 @@
-import { ApiPayloadSchema } from '@/lib/api/schemas';
-import type { ApiDataPayload, ApiErrorPayload } from '@/lib/api/types';
+import { ApiPayloadSchema } from '@/lib/shared/api/schemas';
+import type { ApiDataPayload, ApiErrorPayload } from '@/lib/shared/api/types';
 import { type ZodType, z } from 'zod';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

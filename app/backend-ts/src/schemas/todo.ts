@@ -1,4 +1,4 @@
-import { createDataSchema } from '@/lib/api/schemas';
+import { createDataSchema } from '@/lib/shared/api/schemas';
 import { ContextKinds } from '@/types';
 import { ez } from 'express-zod-api';
 import { z } from 'zod';

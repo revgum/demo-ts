@@ -1,10 +1,12 @@
 import { context } from '@/context';
-import { endpointsFactory } from '@/lib/api/handler';
-import { buildItemsResponse, buildResponse } from '@/lib/api/payload';
-import { ApiPayloadSchema, UuidParamsSchema } from '@/lib/api/schemas';
+import { endpointsFactory } from '@/lib/shared/api/handler';
+import { buildItemsResponse, buildResponse } from '@/lib/shared/api/payload';
+import { ApiPayloadSchema, UuidParamsSchema } from '@/lib/shared/api/schemas';
+import getDaprClient from '@/lib/shared/dapr/client';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import type { Context } from '@/types';
+import { HttpMethod } from '@dapr/dapr';
 import opentelemetry from '@opentelemetry/api';
 import createHttpError from 'http-errors';
 
@@ -28,6 +30,12 @@ export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
   output: ApiPayloadSchema,
   handler: async ({ options: { context, user } }) => {
+    const doc = await getDaprClient().invoker.invoke('backend-ts', 'docs', HttpMethod.GET, undefined, {
+      headers: {
+        'dapr-app-id': 'backend-ts',
+      },
+    });
+    console.log(doc);
     let success = false;
     try {
       const payload = await getAll(context);

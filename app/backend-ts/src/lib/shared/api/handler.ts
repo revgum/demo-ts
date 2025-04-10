@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { AuthMiddleware } from '@/lib/api/middlewares/auth';
-import { ErrorPayloadSchema, createSuccessPayloadSchema } from '@/lib/api/schemas';
+import { AuthMiddleware } from '@/lib/shared/api/middlewares/auth';
+import { ErrorPayloadSchema, createSuccessPayloadSchema } from '@/lib/shared/api/schemas';
 import type { Response } from 'express';
 import {
   EndpointsFactory,
