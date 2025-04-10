@@ -1,0 +1,16 @@
+meta {
+  name: Get All Todo
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/todos
+  body: none
+  auth: none
+}
+
+headers {
+  dapr-app-id: <%= name %>
+  authorization: Bearer PUT-JWT-HERE
+}

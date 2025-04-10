@@ -1,0 +1,28 @@
+meta {
+  name: Update Todo
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/v1/todos/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 93e65029-5816-401b-913c-e4ae0de4ff39
+}
+
+headers {
+  dapr-app-id: <%= name %>
+  authorization: Bearer PUT-JWT-HERE
+}
+
+body:json {
+  {
+    "title": "updated todo",
+    "completed": true,
+    "dueAt": "2024-01-01"
+  }
+}

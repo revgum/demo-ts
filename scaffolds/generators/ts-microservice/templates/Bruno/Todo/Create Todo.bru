@@ -1,0 +1,23 @@
+meta {
+  name: Create Todo
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/todos
+  body: json
+  auth: none
+}
+
+headers {
+  dapr-app-id: <%= name %>
+  authorization: Bearer PUT-JWT-HERE
+}
+
+body:json {
+  {
+    "title": "new todo",
+    "dueAt": "2025-01-01T12:00:00Z"
+  }
+}

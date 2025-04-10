@@ -1,0 +1,72 @@
+version: '3.7'
+name: demo
+
+services:
+  ############################
+  # backend app + Dapr sidecar
+  ############################
+  <%= name %>:
+    labels:
+      - "sos.service-type=microservice"
+    build:
+      context: ./app/<%= name %>
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "3001:3001"
+    command: npm run dev
+    environment:
+      # SEED_DATA: true # Load seed data on start
+      CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
+      DAPR_HOST: 127.0.0.1
+      DAPR_PORT: 3500
+      SERVER_HOST: 127.0.0.1
+      SERVER_PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_NAME: postgres-ts
+      DB_PASSWORD: postgres
+      OTLP_ENDPOINT: http://grafana-otel:4318
+      # DB_DEBUG: 1
+      # DB_SSL: postgres # Production
+    volumes:
+      - /app/node_modules # Persist docker containers modules so that localhost are not used
+      - ./app/<%= name %>/src:/app/src
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - postgres
+    restart: on-failure:3
+    networks:
+      - dapr-net
+  <%= name %>-dapr:
+    labels:
+      - "sos.service-type=microservice"
+      - "dapr.io/enabled=true"  # Enable Dapr for this service
+      - "dapr.io/config=configstore"
+    image: "docker.io/daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "--app-id", "<%= name %>",
+      "--app-port", "3001",
+      "--config", "/configuration/config.yaml",
+      "--dapr-http-port", "3500",
+      "--enable-api-logging",
+      "--enable-profiling",
+      "--log-as-json", "true",
+      "--placement-host-address", "placement:50005",
+      "--profile-port", "7777",
+      "--resources-path", "/components"
+      ]
+    volumes:
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
+      - "./shared/dapr/dapr/components/:/components"
+      - "./shared/dapr/dapr/config/:/configuration"
+    depends_on:
+      - <%= name %>
+    network_mode: "service:<%= name %>"
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge
