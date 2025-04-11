@@ -2,7 +2,7 @@ server:
   port: 3004
 spring:
   profiles:
-    default: development
+    default: localhost
   application:
     name: backend-spring
   main:
