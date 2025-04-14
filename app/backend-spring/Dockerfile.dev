@@ -8,10 +8,6 @@ RUN gradle build -x test
 FROM localhost/microservice-java-build
 WORKDIR /app
 COPY --from=BUILD /app .
-COPY ./src /app/src
-
-RUN chmod +x start.sh
 
 EXPOSE 3004
-# script which watches source file changes in background and executes bootRun
-CMD ["sh", "start.sh", "development"]
+CMD ["gradle", "bootRun"]

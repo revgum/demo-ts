@@ -24,6 +24,8 @@
   },
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "interactive",
+  "java.autobuild.enabled": false,
+  "gradle.nestedProjects": true,
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
   },

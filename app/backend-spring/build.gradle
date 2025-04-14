@@ -3,7 +3,6 @@ plugins {
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
   id 'io.freefair.lombok' version '8.12.2.1'
-  id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
 group = 'com.sos'
@@ -24,11 +23,13 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.flywaydb:flyway-core'
-  implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'io.opentelemetry:opentelemetry-api'
   implementation 'io.opentelemetry:opentelemetry-sdk'
   implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
   implementation 'io.opentelemetry:opentelemetry-exporter-logging'
+  implementation 'io.dapr:dapr-sdk:1.13.1'
+  runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+  runtimeOnly 'io.dapr:dapr-sdk-springboot:1.13.1'
   runtimeOnly 'org.postgresql:postgresql'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,11 +40,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// Hot reloading build step
-task buildAndReload {
-    dependsOn build
-    mustRunAfter build    // buildAndReload must run after the source files are built into class files using build task
-    doLast {
-        new File(".", "reload-trigger.txt").text = "${System.currentTimeMillis()}" // update trigger file in root folder for hot reload
-    }
+bootRun {
+  classpath = sourceSets.main.runtimeClasspath + configurations.developmentOnly
+  sourceResources sourceSets.main
 }

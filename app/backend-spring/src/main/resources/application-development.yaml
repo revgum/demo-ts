@@ -1,10 +1,6 @@
 spring:
   main:
     banner-mode: console
-  devtools:
-    restart:
-      additional-paths: .
-      trigger-file: reload-trigger.txt
   application:
     admin:
       enabled: true
