@@ -23,7 +23,7 @@ services:
     environment:
       PGPASSWORD: postgres
       POSTGRES_USER: postgres
-      DB_NAMES: postgres-ts,postgres-dotnet,postgres-flask,postgres-spring
+      DB_NAMES: postgres-ts,postgres-another-ts
     volumes:
       - ./shared/db/build-dbs.sh:/usr/local/bin/build-dbs.sh
     depends_on:
