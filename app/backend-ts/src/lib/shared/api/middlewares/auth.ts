@@ -19,12 +19,10 @@ export const AuthMiddleware = new Middleware({
     if (payload instanceof jwt.JsonWebTokenError) throw createHttpError(401, 'Invalid token');
     if (!payload.sub) throw createHttpError(401, 'Invalid token');
 
-    const user = {
-      id: 'a1b2c3',
-    };
+    const user = { id: 'a1b2c3' };
     if (user.id !== payload.sub) throw createHttpError(422, 'Unauthorized');
 
-    logger.info('User authenticated', { userId: payload.sub });
+    logger.info({ userId: payload.sub }, 'User authenticated');
     return { user }; // provides endpoints with options.user
   },
 });

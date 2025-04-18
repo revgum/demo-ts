@@ -4,7 +4,6 @@ import { getAll } from '@/services/backend-ts';
 export default async function Page() {
   const { token } = await verifySession();
   const allTodos = await getAll(token);
-  console.log(allTodos);
   return (
     <ul>
       <li>All Todos updates</li>
