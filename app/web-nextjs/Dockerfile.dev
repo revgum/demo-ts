@@ -2,8 +2,10 @@
 FROM localhost/microservice-build as build
 ENV NODE_ENV=development
 WORKDIR /app
-COPY package.json package-lock.json tsconfig.json .env .
+COPY package.json package-lock.json next.config.ts postcss.config.mjs tsconfig.json eslint.config.mjs .
 RUN npm install
+WORKDIR /app/public
+COPY public .
 
 # Run
 FROM localhost/microservice-build

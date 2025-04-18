@@ -21,12 +21,10 @@ export const AuthMiddleware = new Middleware({
 
     const user = {
       id: 'a1b2c3',
-      token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMWIyYzMiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.G5wdYS1G5gfd14BnsXrZ0JcLW0kB5ItFd7M_9elzjUQ',
     };
-    if (user.id !== payload.sub || user.token !== token) throw createHttpError(422, 'Unauthorized');
+    if (user.id !== payload.sub) throw createHttpError(422, 'Unauthorized');
 
-    logger.info('User authenticated', { userId: user.id });
+    logger.info('User authenticated', { userId: payload.sub });
     return { user }; // provides endpoints with options.user
   },
 });

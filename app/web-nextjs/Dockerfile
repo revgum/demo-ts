@@ -1,14 +1,14 @@
 # Build
 FROM localhost/microservice-build as build
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 WORKDIR /app
-COPY package.json package-lock.json tsconfig.json .env .
-RUN npm install
+COPY package.json package-lock.json .
+RUN npm ci
 
 # Run
 FROM localhost/microservice-build
 WORKDIR /app
 COPY --from=build /app /app
 COPY /src /app/src
-EXPOSE 3001
-CMD [ "npm", "run", "dev" ]
+EXPOSE 3000
+CMD [ "npm", "run", "start" ]

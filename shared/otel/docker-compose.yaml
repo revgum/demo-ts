@@ -1,6 +1,6 @@
 version: '3.7'
 
-name: demo
+name: demo-ts
 
 services:
   # Grafana OTEL collector, metrics, traces and logs. TODO: update dapr/config.yaml to wire this up

@@ -6,7 +6,7 @@
 .PHONY: setup build up up-db up-migrations up-dapr up-otel up-infra down-otel debug down prune login shell psql redis-cli
 
 # Default target to bring up a fresh stack
-all: build up
+all: up
 
 # Build the microservice base image
 setup:

@@ -1,6 +1,6 @@
 version: '3.7'
 
-name: demo
+name: demo-ts
 
 services:
   # Shared db

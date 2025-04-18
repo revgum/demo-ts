@@ -5,33 +5,23 @@ services:
   ############################
   # backend app + Dapr sidecar
   ############################
-  <%= name %>:
+  web-nextjs:
     labels:
       - "sos.service-type=microservice"
     build:
-      context: ./app/<%= name %>
+      context: ./app/web-nextjs
       dockerfile: ./Dockerfile.dev
     ports:
-      - "3001:3001"
+      - "3000:3000"
     command: npm run dev
     environment:
-      # SEED_DATA: true # Load seed data on start
-      CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500
-      SERVER_HOST: 127.0.0.1
-      SERVER_PORT: 3001
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_NAME: postgres-ts
-      DB_PASSWORD: postgres
       OTLP_ENDPOINT: http://grafana-otel:4318
-      # DB_DEBUG: 1
-      # DB_SSL: postgres # Production
+      JWT_SECRET: secret
     volumes:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
-      - ./app/<%= name %>/src:/app/src
+      - ./app/web-nextjs/src:/app/src
     depends_on:
       - redis
       - placement
@@ -40,7 +30,7 @@ services:
     restart: on-failure:3
     networks:
       - dapr-net
-  <%= name %>-dapr:
+  web-nextjs-dapr:
     labels:
       - "sos.service-type=microservice"
       - "dapr.io/enabled=true"  # Enable Dapr for this service
@@ -48,8 +38,8 @@ services:
     image: "docker.io/daprio/daprd:edge"
     command: [
       "./daprd",
-      "--app-id", "<%= name %>",
-      "--app-port", "3001",
+      "--app-id", "web-nextjs",
+      "--app-port", "3000",
       "--config", "/configuration/config.yaml",
       "--dapr-http-port", "3500",
       "--enable-api-logging",
@@ -64,8 +54,8 @@ services:
       - "./shared/dapr/dapr/components/:/components"
       - "./shared/dapr/dapr/config/:/configuration"
     depends_on:
-      - <%= name %>
-    network_mode: "service:<%= name %>"
+      - web-nextjs
+    network_mode: "service:web-nextjs"
 
 networks:
   dapr-net: # here we set the network name

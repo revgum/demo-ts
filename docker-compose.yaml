@@ -1,13 +1,12 @@
 version: '3.7'
 
-name: demo
+name: demo-ts
 
 # Add a new microservice docker-compose to the full stack
 include:
   - shared/dapr/docker-compose.yaml
   - shared/db/docker-compose.yaml
-  # - app/web-nuxt/docker-compose.yaml
-  # - app/web-qwikjs/docker-compose.yaml
+  - app/web-nextjs/docker-compose.yaml
   - app/backend-ts/docker-compose.yaml
 
 services:

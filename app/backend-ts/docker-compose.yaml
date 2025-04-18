@@ -1,5 +1,5 @@
 version: '3.7'
-name: demo
+name: demo-ts
 
 services:
   ############################
@@ -17,9 +17,9 @@ services:
     environment:
       # SEED_DATA: true # Load seed data on start
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
-      DAPR_HOST: 127.0.0.1
+      DAPR_HOST: 0.0.0.0
       DAPR_PORT: 3500
-      SERVER_HOST: 127.0.0.1
+      SERVER_HOST: 0.0.0.0
       SERVER_PORT: 3001
       DB_HOST: postgres
       DB_PORT: 5432
