@@ -1,0 +1,27 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: daprConfig
+  namespace: default
+spec:
+  metrics:
+    enabled: true
+  tracing:
+    samplingRate: "1"
+    zipkin:
+      endpointAddress: "http://zipkin:9411/api/v2/spans"
+    otel:
+      endpointAddress: "grafana-otel:4318"
+      isSecure: false
+      protocol: http
+  policies:
+    retries:
+      noRetries:
+        policy: constant
+        maxRetries: 0
+  targets:
+    apps:
+      web-nuxt:
+        retry: noRetries
+      web-qwikjs:
+        retry: noRetries

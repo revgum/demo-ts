@@ -1,5 +1,3 @@
-version: '3.7'
-
 name: demo-ts
 
 # Add a new microservice docker-compose to the full stack

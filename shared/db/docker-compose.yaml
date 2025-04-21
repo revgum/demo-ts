@@ -1,5 +1,3 @@
-version: '3.7'
-
 name: demo-ts
 
 services:
@@ -25,7 +23,7 @@ services:
       POSTGRES_USER: postgres
       DB_NAMES: postgres-ts,postgres-another-ts
     volumes:
-      - ./shared/db/build-dbs.sh:/usr/local/bin/build-dbs.sh
+      - ./build-dbs.sh:/usr/local/bin/build-dbs.sh
     depends_on:
       - postgres
     networks:

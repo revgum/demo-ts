@@ -1,4 +1,3 @@
-version: '3.7'
 name: demo-ts
 
 services:
@@ -9,7 +8,6 @@ services:
     labels:
       - "sos.service-type=microservice"
     build:
-      context: ./app/web-nextjs
       dockerfile: ./Dockerfile.dev
     ports:
       - "3000:3000"
@@ -21,7 +19,7 @@ services:
       JWT_SECRET: secret
     volumes:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
-      - ./app/web-nextjs/src:/app/src
+      - ./src:/app/src
     depends_on:
       - redis
       - placement
@@ -50,9 +48,8 @@ services:
       "--resources-path", "/components"
       ]
     volumes:
-      # Volume mounts are relative from the root directory where dapr-net-compose is run from
-      - "./shared/dapr/dapr/components/:/components"
-      - "./shared/dapr/dapr/config/:/configuration"
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/configuration"
     depends_on:
       - web-nextjs
     network_mode: "service:web-nextjs"
