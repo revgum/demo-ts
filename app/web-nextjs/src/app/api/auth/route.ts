@@ -1,5 +1,5 @@
-import { createSession } from '@/app/lib/session';
 import { env } from '@/config';
+import { createSession } from '@/lib/session';
 import type { NextRequest } from 'next/server';
 
 /**

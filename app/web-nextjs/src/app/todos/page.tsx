@@ -1,15 +1,17 @@
-import { verifySession } from '@/app/lib/session';
-import { getAll } from '@/services/backend-ts';
+import TodoList from '@/components/todo/todo-list';
+import { getAll } from '@/services/todo';
+import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 
 export default async function Page() {
-  const { token } = await verifySession();
-  const allTodos = await getAll(token);
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ['todos'],
+    queryFn: getAll,
+  });
+
   return (
-    <ul>
-      <li>All Todos updates</li>
-      {allTodos.data.items.map((todo) => (
-        <li key={todo.id}>{todo.title}</li>
-      ))}
-    </ul>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <TodoList />
+    </HydrationBoundary>
   );
 }

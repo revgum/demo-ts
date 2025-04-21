@@ -31,8 +31,7 @@ export const createSession = async (userId: string) => {
     httpOnly: cookie.httpOnly,
     secure: env === 'development' ? false : cookie.secure,
     maxAge: cookie.maxAge,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sameSite: cookie.sameSite as any,
+    sameSite: cookie.sameSite as 'lax' | 'strict' | 'none',
     path: '/',
   });
 };
