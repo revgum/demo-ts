@@ -14,6 +14,7 @@ services:
     command: npm run dev
     environment:
       # SEED_DATA: true # Load seed data on start
+      JWT_SECRET_KEY: secret
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
       DAPR_HOST: 0.0.0.0
       DAPR_PORT: 3500

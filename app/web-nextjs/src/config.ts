@@ -17,7 +17,7 @@ const dapr = {
 };
 const env = getEnv();
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET_KEY;
 if (!jwtSecret) {
   throw new Error('Server configuration error, missing JWT signing key.');
 }

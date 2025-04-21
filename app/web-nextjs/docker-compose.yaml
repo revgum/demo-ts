@@ -16,7 +16,7 @@ services:
       DAPR_HOST: 127.0.0.1
       DAPR_PORT: 3500
       OTLP_ENDPOINT: http://grafana-otel:4318
-      JWT_SECRET: secret
+      JWT_SECRET_KEY: secret
     volumes:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
       - ./src:/app/src
