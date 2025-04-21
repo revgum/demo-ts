@@ -1,12 +1,7 @@
 # Local development
 
 ## Setup (TODO: Add details)
-- Install Podman and podman-compose
-- Install devcontainers extension, configure VSCode user settings:
-```
-  "dev.containers.dockerComposePath": "podman-compose",
-  "dev.containers.dockerPath": "podman"
-```
+- Install Podman and enable docker-compose compatibility
 - Can build base images without Zscaler, if necessary, using an ENV.. i.e. `NO_CERT="true" make`
 
 ## Running the full stack
@@ -88,15 +83,8 @@ postgres-dotnet=# \dt
 postgres-dotnet=# \q
 ```
 
-
-
 # Example application details
 ## [BackendTs](./app/backend-ts/README.md)
-An example Typescript/Node backend microservice with postgres and dapr integration.
-## [BackendDotnet](./app/backend-dotnet/README.md)
-An example ASP.Net API backend microservice with postgres and dapr integration.
-## [WebNuxt](./app/web-nuxt/README.md)
-An example Nuxt server-side rendering application with dapr integration for making microservice API calls.
-## [WebQwikjs](./app/web-qwikjs/README.md)
-An example QwikJs server-side rendering application with dapr integration for making microservice API calls.
+## [WebNext](./app/web-nextjs/README.md)
+An example NextJS server-side rendering application with dapr integration for making microservice API calls.
 
