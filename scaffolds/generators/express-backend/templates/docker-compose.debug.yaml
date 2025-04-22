@@ -4,5 +4,5 @@ services:
   <%= name %>:
     command: npm run debug
     ports:
-      - "3001:3001"
-      - "9229:9229"
+      - '3001:3001'
+      - '9229:9229'

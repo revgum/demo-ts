@@ -17,7 +17,11 @@ const counters = {
   deleteById: meter.createCounter('todo.delete'),
 };
 
-const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(context, 'todo', TodoSchema);
+const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
+  context,
+  'todo',
+  TodoSchema,
+);
 
 /**
  * example route: GET /api/v1/todos

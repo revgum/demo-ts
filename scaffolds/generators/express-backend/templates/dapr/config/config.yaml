@@ -7,11 +7,11 @@ spec:
   metrics:
     enabled: true
   tracing:
-    samplingRate: "1"
+    samplingRate: '1'
     zipkin:
-      endpointAddress: "http://zipkin:9411/api/v2/spans"
+      endpointAddress: 'http://zipkin:9411/api/v2/spans'
     otel:
-      endpointAddress: "grafana-otel:4318"
+      endpointAddress: 'grafana-otel:4318'
       isSecure: false
       protocol: http
   policies:

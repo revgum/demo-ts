@@ -52,7 +52,11 @@ export const create = async (context: Context, obj: Partial<CreateTodoModel>): P
   return asModel(rows[0]);
 };
 
-export const updateById = async (context: Context, id: Todo['id'], obj: Partial<UpdateTodoModel>): Promise<Todo> => {
+export const updateById = async (
+  context: Context,
+  id: Todo['id'],
+  obj: Partial<UpdateTodoModel>,
+): Promise<Todo> => {
   const todo = await getById(context, id);
   const { title, completed, dueAt } = obj;
 

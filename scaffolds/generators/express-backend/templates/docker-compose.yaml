@@ -6,11 +6,11 @@ services:
   ############################
   <%= name %>:
     labels:
-      - "sos.service-type=microservice"
+      - 'sos.service-type=microservice'
     build:
       dockerfile: ./Dockerfile.dev
     ports:
-      - "3001:3001"
+      - '3001:3001'
     command: npm run dev
     environment:
       # SEED_DATA: true # Load seed data on start
@@ -40,30 +40,39 @@ services:
       - dapr-net
   <%= name %>-dapr:
     labels:
-      - "sos.service-type=microservice"
-      - "dapr.io/enabled=true"  # Enable Dapr for this service
-      - "dapr.io/config=configstore"
-    image: "docker.io/daprio/daprd:edge"
-    command: [
-      "./daprd",
-      "--app-id", "<%= name %>",
-      "--app-port", "3001",
-      "--config", "/configuration/config.yaml",
-      "--dapr-http-port", "3500",
-      "--enable-api-logging",
-      "--enable-profiling",
-      "--log-as-json", "true",
-      "--placement-host-address", "placement:50005",
-      "--profile-port", "7777",
-      "--resources-path", "/components"
+      - 'sos.service-type=microservice'
+      - 'dapr.io/enabled=true' # Enable Dapr for this service
+      - 'dapr.io/config=configstore'
+    image: 'docker.io/daprio/daprd:edge'
+    command:
+      [
+        './daprd',
+        '--app-id',
+        '<%= name %>',
+        '--app-port',
+        '3001',
+        '--config',
+        '/configuration/config.yaml',
+        '--dapr-http-port',
+        '3500',
+        '--enable-api-logging',
+        '--enable-profiling',
+        '--log-as-json',
+        'true',
+        '--placement-host-address',
+        'placement:50005',
+        '--profile-port',
+        '7777',
+        '--resources-path',
+        '/components',
       ]
     volumes:
       # Volume mounts are relative from the root directory where dapr-net-compose is run from
-      - "./dapr/components/:/components"
-      - "./dapr/config/:/configuration"
+      - './dapr/components/:/components'
+      - './dapr/config/:/configuration'
     depends_on:
       - <%= name %>
-    network_mode: "service:<%= name %>"
+    network_mode: 'service:<%= name %>'
 
 networks:
   dapr-net: # here we set the network name

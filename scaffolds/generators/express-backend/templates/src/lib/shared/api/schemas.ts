@@ -18,7 +18,10 @@ const ErrorSchema = z.object({
     .nullish(),
 });
 
-export const createDataSchema = <T extends ZodTypeAny>(itemSchema: T, contextKinds: readonly [string, ...string[]]) =>
+export const createDataSchema = <T extends ZodTypeAny>(
+  itemSchema: T,
+  contextKinds: readonly [string, ...string[]],
+) =>
   z.union([
     z.object({
       id: z.string().nullish(),

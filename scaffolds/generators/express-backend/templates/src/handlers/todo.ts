@@ -19,7 +19,11 @@ const counters = {
   deleteById: meter.createCounter('todo.delete'),
 };
 
-const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(context, 'todo', TodoSchema);
+const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
+  context,
+  'todo',
+  TodoSchema,
+);
 
 /**
  * example route: GET /api/v1/todos
@@ -30,11 +34,17 @@ export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
   output: ApiPayloadSchema,
   handler: async ({ options: { context } }) => {
-    const doc = await getDaprClient().invoker.invoke('backend-ts', 'docs', HttpMethod.GET, undefined, {
-      headers: {
-        'dapr-app-id': 'backend-ts',
+    const doc = await getDaprClient().invoker.invoke(
+      'backend-ts',
+      'docs',
+      HttpMethod.GET,
+      undefined,
+      {
+        headers: {
+          'dapr-app-id': 'backend-ts',
+        },
       },
-    });
+    );
     console.log(doc);
     let success = false;
     try {

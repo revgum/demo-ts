@@ -34,7 +34,9 @@ export const buildItemsResponse = <T>(
   context: { api: { version: string; kind: string } },
   payload: T[],
 ): ApiDataPayload => {
-  const dataPayload = { data: { items: payload.map((p) => ({ kind: context.api.kind, ...p })) } };
+  const dataPayload = {
+    data: { items: payload.map((p) => ({ kind: context.api.kind, ...p })) },
+  };
   const dataSchema = DataResponseSchema(schema);
   const apiPayload = ApiPayloadSchema.parse({
     apiVersion: context.api.version,
@@ -45,7 +47,11 @@ export const buildItemsResponse = <T>(
 
 export const buildErrorResponse = (payload: ApiErrorPayload) => ApiPayloadSchema.parse(payload);
 
-export const buildServerErrorResponse = (context: { api: { version: string } }, message: string, code = 500) =>
+export const buildServerErrorResponse = (
+  context: { api: { version: string } },
+  message: string,
+  code = 500,
+) =>
   buildErrorResponse({
     apiVersion: context.api.version,
     error: {

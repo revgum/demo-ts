@@ -3,7 +3,11 @@ import { join } from 'node:path';
 import type { Context } from '@/types';
 import { type CommonConfig, Documentation, type Routing } from 'express-zod-api';
 
-export const buildOpenApiSpec = async (routing: Routing, config: CommonConfig, context: Context) => {
+export const buildOpenApiSpec = async (
+  routing: Routing,
+  config: CommonConfig,
+  context: Context,
+) => {
   const yamlString = new Documentation({
     routing,
     config,

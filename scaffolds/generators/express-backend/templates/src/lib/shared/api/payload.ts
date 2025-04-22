@@ -45,7 +45,11 @@ export const buildItemsResponse = <T>(
 
 export const buildErrorResponse = (payload: ApiErrorPayload) => ApiPayloadSchema.parse(payload);
 
-export const buildServerErrorResponse = (context: { api: { version: string } }, message: string, code = 500) =>
+export const buildServerErrorResponse = (
+  context: { api: { version: string } },
+  message: string,
+  code = 500,
+) =>
   buildErrorResponse({
     apiVersion: context.api.version,
     error: {

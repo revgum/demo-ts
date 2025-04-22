@@ -2,10 +2,22 @@ import 'dotenv/config';
 
 import { join } from 'node:path';
 import { context } from '@/context';
-import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from '@/handlers/todo';
+import {
+  createTodo,
+  deleteTodoById,
+  getAllTodo,
+  getTodoById,
+  updateTodoById,
+} from '@/handlers/todo';
 import { buildOpenApiSpec } from '@/openapi';
 import { loadSeedData } from '@/seed';
-import { DependsOnMethod, type Routing, ServeStatic, createConfig, createServer } from 'express-zod-api';
+import {
+  DependsOnMethod,
+  type Routing,
+  ServeStatic,
+  createConfig,
+  createServer,
+} from 'express-zod-api';
 import pino from 'pino';
 import ui from 'swagger-ui-express';
 

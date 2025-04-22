@@ -76,7 +76,9 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
         const { statusCode, expose } = ensureHttpError(error);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const shouldScrub = (context as any)?.env === 'production' && !expose;
-        const message = shouldScrub ? createHttpError(statusCode).message : getMessageFromError(error);
+        const message = shouldScrub
+          ? createHttpError(statusCode).message
+          : getMessageFromError(error);
         return void response.status(statusCode).json({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           apiVersion: (context as any)?.api.version,
@@ -106,7 +108,11 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
  *
  * @returns An instance of `EndpointsFactory` configured with the provided context, kind, and item schema.
  */
-export const endpointsFactory = <C, T extends ZodTypeAny>(context: C, kind: string, itemSchema: T) =>
+export const endpointsFactory = <C, T extends ZodTypeAny>(
+  context: C,
+  kind: string,
+  itemSchema: T,
+) =>
   new EndpointsFactory(apiResultsHandler(itemSchema, kind))
     .addExpressMiddleware(helmet())
     .addOptions<EndpointOptions<C>>(async () => {

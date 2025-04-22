@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "compile": "tsc",
-    "ci": "tsc --noEmit && npm run lint",
+    "ci": "tsc --noEmit && npm run lint && npm run prettier",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "prettier": "prettier -c .",
+    "prettier:fix": "prettier --write .",
     "dev": "npm run knex -- migrate:latest && tsx watch -r ./src/instrumentation.ts ./src/main.ts",
     "start": "tsx -r ./src/instrumentation.ts src/main.ts",
     "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
@@ -45,7 +47,9 @@
     "@types/node": "^22.13.0",
     "@types/swagger-ui-express": "^4.1.8",
     "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
     "globals": "^16.0.0",
+    "prettier": "3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.31.0"
