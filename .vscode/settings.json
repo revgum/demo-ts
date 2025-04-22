@@ -14,20 +14,5 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[csharp]": {
-    "editor.defaultFormatter": "ms-dotnettools.csharp"
-  },
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true
-  },
-  "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.updateBuildConfiguration": "interactive",
-  "java.autobuild.enabled": false,
-  "gradle.nestedProjects": true,
-  "[java]": {
-    "editor.defaultFormatter": "redhat.java"
-  },
-  "remote.autoForwardPortsFallback": 0
+  }
 }
