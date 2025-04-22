@@ -1,5 +1,4 @@
 import { context } from '@/context';
-import { METHODS } from '@/services/constants';
 import type { Todo } from '@/types';
 import { HttpMethod } from '@dapr/dapr';
 import { cache } from 'react';
@@ -11,6 +10,14 @@ const authHeaders = (token: string) => ({
 });
 
 const SERVICE_APP_ID = 'backend-ts';
+
+const METHODS = {
+  TodoGetAll: () => 'api/v1/todos',
+  TodoCreate: () => 'api/v1/todos',
+  TodoGetById: (id: string) => `api/v1/todos/${id}`,
+  TodoUpdateById: (id: string) => `api/v1/todos/${id}`,
+  TodoDeleteById: (id: string) => `api/v1/todos/${id}`,
+} as const;
 
 export const getById = cache(
   async (id: Todo['id']) =>

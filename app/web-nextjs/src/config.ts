@@ -17,18 +17,17 @@ const dapr = {
 };
 const env = getEnv();
 
-const jwtSecret = process.env.JWT_SECRET_KEY;
-if (!jwtSecret) {
+const jwtSecretKey = process.env.JWT_SECRET_KEY || '';
+if (!jwtSecretKey) {
   throw new Error('Server configuration error, missing JWT signing key.');
 }
 
 const cookie = {
   name: process.env.COOKIE_NAME || 'session',
-  jwtSecret,
   maxAge: process.env.COOKIE_MAX_AGE ? Number.parseInt(process.env.COOKIE_MAX_AGE) : 60 * 60 * 24 * 7, // 7 days
   httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
   secure: process.env.COOKIE_SECURE === 'true',
   sameSite: process.env.COOKIE_SAME_SITE || 'lax',
 };
 
-export { dapr, env, cookie };
+export { dapr, env, cookie, jwtSecretKey };

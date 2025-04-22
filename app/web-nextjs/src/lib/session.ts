@@ -1,5 +1,5 @@
 import 'server-only';
-import { cookie, env } from '@/config';
+import { cookie, env, jwtSecretKey } from '@/config';
 import type { Session } from '@/types';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
@@ -7,14 +7,14 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
 export const sign = (payload: string | Buffer | object) => {
-  return jwt.sign(payload, cookie.jwtSecret, {
+  return jwt.sign(payload, jwtSecretKey, {
     expiresIn: cookie.maxAge,
   });
 };
 
 export const verify = (session: string | undefined = '') => {
   try {
-    const { payload } = jwt.verify(session, cookie.jwtSecret, {
+    const { payload } = jwt.verify(session, jwtSecretKey, {
       complete: true,
     });
     return payload as JwtPayload;
