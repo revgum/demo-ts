@@ -17,7 +17,6 @@ npm install -g yo
     - `yo ./scaffolds/generators/express-backend {name}`
 2. The new service will be created using the provided scaffold and can be found in `app/{name}`.
 3. From the new services directory, perform the following steps:
-    - `cd app/{name}`
     - `npm install` to install the dependencies.
     - Modify `docker-compose.yaml` (and any other docker-compose files to set environment variables, ports, volumes, etc.
     - If it exists, copy the `.env.example` file to `.env` and set the environment variables for your service.
