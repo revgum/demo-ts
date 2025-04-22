@@ -1,7 +1,8 @@
+# [Create a new service](./docs/create-new-service.md)
 # Local development
 
 ## Setup
-- Install Podman and make sure the "Compose" extension is active.
+- Install Podman, Podman Desktop and make sure the "Compose" extension is active.
 
 ## Running the full stack
 The Makefile includes a target to launch the full stack (infrastructure, services) in `development` mode. In general, running `make` is the recommended way to build and launch a fresh stack everytime.

@@ -20,7 +20,7 @@ module.exports = class extends Generator {
     return {
       appStaticFiles() {
         const src = `${this.sourceRoot()}/**`;
-        const dest = this.destinationPath(this.name);
+        const destAppDir = this.destinationPath(`app/${this.name}`);
 
         const files = [
           'Bruno/Todo/Create Todo.bru',
@@ -41,21 +41,18 @@ module.exports = class extends Generator {
           },
         };
 
-        this.fs.copy(src, dest, copyOpts);
-        this.fs.copy(this.templatePath('.*'), dest, copyOpts);
+        this.fs.copy(src, destAppDir, copyOpts);
+        this.fs.copy(this.templatePath('.*'), destAppDir, copyOpts);
 
         const opts = {
           name: this.name,
         };
 
         for (const f of files) {
-          this.fs.copyTpl(this.templatePath(f), this.destinationPath(`${this.name}/${f}`), opts, copyOpts);
+          this.fs.copyTpl(this.templatePath(f), `${destAppDir}/${f}`, opts, copyOpts);
         }
 
-        this.fs.move(
-          this.destinationPath(`${this.name}`, 'gitignore'),
-          this.destinationPath(`${this.name}`, '.gitignore'),
-        );
+        this.fs.move(`${destAppDir}/gitignore`, `${destAppDir}/.gitignore`);
       },
     };
   }
