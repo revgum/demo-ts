@@ -2,7 +2,7 @@
   "recommendations": [
     "ms-vscode.js-debug",
     "ms-vscode.vscode-js-profile-table",
-    "biomejs.biome",
+    "dbaeumer.vscode-eslint",
     "redhat.vscode-yaml",
     "antfu.goto-alias"
   ]

@@ -2,7 +2,7 @@ import { ApiPayloadSchema } from '@/lib/shared/api/schemas';
 import type { ApiDataPayload, ApiErrorPayload } from '@/lib/shared/api/types';
 import { type ZodType, z } from 'zod';
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const DataResponseSchema = <T extends ZodType<any>>(itemSchema: T) =>
   z
     .object({

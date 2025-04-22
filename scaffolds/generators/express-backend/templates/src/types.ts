@@ -11,7 +11,7 @@ export type Context = {
     version: string;
     kind: ContextKind;
   };
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: Knex<any, unknown[]>;
   runtime: {
     debug: boolean;

@@ -1,4 +1,3 @@
-// biome-ignore lint/style/noVar: <explanation>
 var Generator = require('yeoman-generator');
 
 module.exports = class extends Generator {

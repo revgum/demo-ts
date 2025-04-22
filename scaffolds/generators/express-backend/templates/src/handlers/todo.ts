@@ -29,7 +29,7 @@ const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(contex
 export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
   output: ApiPayloadSchema,
-  handler: async ({ options: { context, user } }) => {
+  handler: async ({ options: { context } }) => {
     const doc = await getDaprClient().invoker.invoke('backend-ts', 'docs', HttpMethod.GET, undefined, {
       headers: {
         'dapr-app-id': 'backend-ts',

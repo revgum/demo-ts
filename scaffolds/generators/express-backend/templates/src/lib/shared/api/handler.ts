@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { AuthMiddleware } from '@/lib/shared/api/middlewares/auth';
 import { ErrorPayloadSchema, createSuccessPayloadSchema } from '@/lib/shared/api/schemas';
 import type { Response } from 'express';
@@ -11,6 +10,7 @@ import {
 } from 'express-zod-api';
 import helmet from 'helmet';
 import createHttpError from 'http-errors';
+import { randomUUID } from 'node:crypto';
 import type { ZodTypeAny } from 'zod';
 
 type EndpointOptions<C = unknown> = {
@@ -50,7 +50,7 @@ type EndpointOptions<C = unknown> = {
  * - In production, unhandled errors are sanitized to prevent leaking sensitive information.
  * - Explicitly setting `expose: true` when throwing an error with `createHttpError` will include the error message in the response.
  */
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: string) =>
   new ResultHandler({
     positive: (_) => {
@@ -74,11 +74,11 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
 
       if (error) {
         const { statusCode, expose } = ensureHttpError(error);
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const shouldScrub = (context as any)?.env === 'production' && !expose;
         const message = shouldScrub ? createHttpError(statusCode).message : getMessageFromError(error);
         return void response.status(statusCode).json({
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           apiVersion: (context as any)?.api.version,
           id: requestId,
           error: {
@@ -88,7 +88,7 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
         });
       }
 
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       response.json({ id: requestId, ...(output as any) });
     },
   });
@@ -115,7 +115,7 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(context: C, kind: stri
         context: {
           ...context,
           api: {
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(context as any).api,
             kind,
           },

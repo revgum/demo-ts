@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "compile": "tsc",
-    "ci": "biome ci",
+    "ci": "tsc --noEmit && npm run lint",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "dev": "tsx -r ./src/instrumentation.ts --watch src/main.ts",
     "start": "tsx -r ./src/instrumentation.ts src/main.ts",
-    "start:localhost": "LOCALHOST=1 DAPR_PORT=3500 dapr run --app-id <%= name %> --app-port 3001 --dapr-http-port 3500 --scheduler-host-address '' -- npm run dev",
     "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
-    "debug:localhost": "LOCALHOST=1 DAPR_PORT=3500 dapr run --app-id <%= name %> --app-port 3001 --dapr-http-port 3500 --scheduler-host-address '' -- npm run debug",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
   },
   "dependencies": {
@@ -37,14 +37,17 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.1",
     "@types/http-errors": "^2.0.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.0",
     "@types/swagger-ui-express": "^4.1.8",
-    "pino-pretty": "^13.0.0",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.31.0"
   }
 }

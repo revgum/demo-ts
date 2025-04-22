@@ -27,7 +27,7 @@ const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(contex
 export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
   output: ApiPayloadSchema,
-  handler: async ({ options: { context, user } }) => {
+  handler: async ({ options: { context } }) => {
     let success = false;
     try {
       const payload = await getAll(context);
