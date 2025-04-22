@@ -20,38 +20,6 @@
       "address": "localhost",
       "localRoot": "${workspaceFolder}/app/${input:appName}",
       "type": "node"
-    },
-    {
-      "name": "Podman: Python",
-      "request": "attach",
-      "connect": {
-        "host": "localhost",
-        "port": "${input:debuggerPort}"
-      },
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}/app/${input:appName}",
-          "remoteRoot": "/app"
-        }
-      ],
-      "type": "debugpy",
-      "justMyCode": false
-    },
-    {
-      "name": "Local: Python",
-      "request": "attach",
-      "connect": {
-        "host": "localhost",
-        "port": "${input:debuggerPort}"
-      },
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}/app/${input:appName}",
-          "remoteRoot": "${workspaceFolder}/app/${input:appName}"
-        }
-      ],
-      "type": "debugpy",
-      "justMyCode": false
     }
   ],
   "inputs": [
@@ -59,13 +27,13 @@
       "type": "pickString",
       "id": "appName",
       "description": "Which app do you want to debug?",
-      "options": ["backend-ts", "backend-flask", "web-nuxt", "web-qwikjs"]
+      "options": ["backend-ts", "web-nextjs"]
     },
     {
       "type": "pickString",
       "id": "debuggerPort",
       "description": "What is the debugger port?",
-      "options": ["9229", "10001"],
+      "options": ["9229"],
       "default": "9229"
     }
   ]

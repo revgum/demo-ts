@@ -29,7 +29,5 @@
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
   },
-  "remote.autoForwardPortsFallback": 0,
-  "dev.containers.dockerComposePath": "podman-compose",
-  "dev.containers.dockerPath": "podman"
+  "remote.autoForwardPortsFallback": 0
 }
