@@ -35,7 +35,7 @@ services:
       - placement
       - zipkin
       - postgres
-    restart: on-failure:3
+    restart: on-failure
     networks:
       - dapr-net
   <%= name %>-dapr:

@@ -60,7 +60,7 @@ debug: setup
 
 prune:
 	podman system prune
-	podman volume prune --filter label!=io.podman.compose.project=demo
+	podman volume prune --filter label!=io.podman.compose.project=demo-ts
 
 # Login to Dockerhub
 login:
