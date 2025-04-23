@@ -31,13 +31,14 @@ const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
 export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
   output: ApiPayloadSchema,
-  handler: async ({ options: { context } }) => {
+  handler: async ({ options: { context }, logger }) => {
     let success = false;
     try {
       const payload = await getAll(context);
       success = true;
       return buildItemsResponse(TodoSchema, context, payload);
     } catch (err) {
+      logger.error({ err }, 'Error fetching todos');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
       counters.get.add(1, { success });
@@ -55,13 +56,14 @@ export const createTodo = todoEndpointsFactory.build({
   method: 'post',
   input: TodoCreateSchema,
   output: ApiPayloadSchema,
-  handler: async ({ input, options: { context } }) => {
+  handler: async ({ input, options: { context }, logger }) => {
     let success = false;
     try {
       const payload = await create(context, input);
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
+      logger.error({ err }, 'Error creating todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
       counters.post.add(1, { success });
@@ -79,13 +81,14 @@ export const getTodoById = todoEndpointsFactory.build({
   method: 'get',
   input: UuidParamsSchema,
   output: ApiPayloadSchema,
-  handler: async ({ input, options: { context } }) => {
+  handler: async ({ input, options: { context }, logger }) => {
     let success = false;
     try {
       const payload = await getById(context, input.id);
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
+      logger.error({ err, id: input.id }, 'Error fetching todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
       counters.getById.add(1, { success });
@@ -103,7 +106,7 @@ export const updateTodoById = todoEndpointsFactory.build({
   method: ['put', 'patch'],
   input: UuidParamsSchema.merge(TodoUpdateSchema),
   output: ApiPayloadSchema,
-  handler: async ({ input, options: { context } }) => {
+  handler: async ({ input, options: { context }, logger }) => {
     let success = false;
     try {
       const { id, ...updatedTodo } = input;
@@ -111,6 +114,7 @@ export const updateTodoById = todoEndpointsFactory.build({
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
+      logger.error({ err, id: input.id }, 'Error updating todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
       counters.updateById.add(1, { success });
@@ -128,13 +132,14 @@ export const deleteTodoById = todoEndpointsFactory.build({
   method: 'delete',
   input: UuidParamsSchema,
   output: ApiPayloadSchema,
-  handler: async ({ input, options: { context } }) => {
+  handler: async ({ input, options: { context }, logger }) => {
     let success = false;
     try {
       const payload = await deleteById(context, input.id);
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
+      logger.error({ err, id: input.id }, 'Error deleting todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
       counters.deleteById.add(1, { success });
