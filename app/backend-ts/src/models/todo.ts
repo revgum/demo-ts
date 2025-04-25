@@ -1,6 +1,6 @@
-import { randomUUID } from 'node:crypto';
 import type { Context, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
 import createHttpError from 'http-errors';
+import { randomUUID } from 'node:crypto';
 
 export const TABLE_NAME = 'todo';
 
@@ -18,12 +18,18 @@ const asModel = (item: TodoDb): Todo => {
 };
 
 export const getAll = async (context: Context): Promise<Todo[]> => {
-  const rows = await context.db<TodoDb>(TABLE_NAME).whereNull('deleted_at');
+  const rows = await context
+    .db<TodoDb>(TABLE_NAME)
+    .where('deleted_at', null)
+    .returning<TodoDb[]>('*');
   return rows.map(asModel);
 };
 
 export const getById = async (context: Context, id: Todo['id']): Promise<Todo> => {
-  const rows = await context.db<TodoDb>(TABLE_NAME).where({ id }).whereNull('deleted_at');
+  const rows = await context
+    .db<TodoDb>(TABLE_NAME)
+    .where({ id, deleted_at: null })
+    .returning<TodoDb[]>('*');
 
   if (!rows.length) {
     throw createHttpError(404, `Todo ${id} not found.`);
@@ -81,8 +87,7 @@ export const updateById = async (
 export const deleteById = async (context: Context, id: Todo['id']): Promise<Todo> => {
   const rows = await context
     .db<TodoDb>(TABLE_NAME)
-    .where({ id })
-    .whereNull('deleted_at')
+    .where({ id, deleted_at: null })
     .update({
       deleted_at: new Date(),
     })

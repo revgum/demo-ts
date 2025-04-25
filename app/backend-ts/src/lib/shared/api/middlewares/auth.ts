@@ -1,7 +1,7 @@
-import { getUser } from '@/lib/shared/api/user';
 import { Middleware } from 'express-zod-api';
 import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken';
+import { getUser } from '../';
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 if (!JWT_SECRET_KEY) throw new Error('Server configuration error, missing JWT signing key.');

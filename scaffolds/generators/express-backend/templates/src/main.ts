@@ -33,18 +33,6 @@ const serverConfig = createConfig({
   compression: true,
   logger: pino({
     level: context.runtime.debug ? 'debug' : 'info',
-    transport:
-      context.env === 'production'
-        ? undefined
-        : {
-            target: 'pino-pretty',
-            options: {
-              translateTime: 'SYS:standard',
-              colorize: true,
-              ignore: 'pid,hostname',
-            },
-          },
-    //TODO: Add a formatter to capture 'meta' provided to log
   }),
   beforeRouting: ({ app }) => {
     app.use('/docs', ui.serve, ui.setup(null, { swaggerUrl: '/public/openapi.yaml' }));

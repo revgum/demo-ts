@@ -1,7 +1,11 @@
 import { context } from '@/context';
-import { endpointsFactory } from '@/lib/shared/api/handler';
-import { buildItemsResponse, buildResponse } from '@/lib/shared/api/payload';
-import { ApiPayloadSchema, UuidParamsSchema } from '@/lib/shared/api/schemas';
+import {
+  ApiPayloadSchema,
+  buildItemsResponse,
+  buildResponse,
+  endpointsFactory,
+  UuidParamsSchema,
+} from '@/lib/shared/api';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import type { Context } from '@/types';

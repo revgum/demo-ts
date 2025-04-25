@@ -1,6 +1,5 @@
-import { ApiPayloadSchema } from '@/lib/shared/api/schemas';
-import type { ApiDataPayload, ApiErrorPayload } from '@/lib/shared/api/types';
-import { type ZodType, z } from 'zod';
+import { z, type ZodType } from 'zod';
+import { ApiPayloadSchema, type ApiDataPayload, type ApiErrorPayload } from './';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const DataResponseSchema = <T extends ZodType<any>>(itemSchema: T) =>

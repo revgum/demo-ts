@@ -4,5 +4,17 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
-  test: {},
+  test: {
+    coverage: {
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        '**/instrumentation.ts',
+        '**/openapi.ts',
+        '**/seed.ts',
+        '**/vitest.config.ts',
+        '**/db/**',
+        '**/*.d.ts',
+      ],
+    },
+  },
 });

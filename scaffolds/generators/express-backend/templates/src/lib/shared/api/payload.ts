@@ -1,6 +1,5 @@
-import { ApiPayloadSchema } from '@/lib/shared/api/schemas';
-import type { ApiDataPayload, ApiErrorPayload } from '@/lib/shared/api/types';
-import { type ZodType, z } from 'zod';
+import { z, type ZodType } from 'zod';
+import { ApiPayloadSchema, type ApiDataPayload, type ApiErrorPayload } from './';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const DataResponseSchema = <T extends ZodType<any>>(itemSchema: T) =>
@@ -34,7 +33,9 @@ export const buildItemsResponse = <T>(
   context: { api: { version: string; kind: string } },
   payload: T[],
 ): ApiDataPayload => {
-  const dataPayload = { data: { items: payload.map((p) => ({ kind: context.api.kind, ...p })) } };
+  const dataPayload = {
+    data: { items: payload.map((p) => ({ kind: context.api.kind, ...p })) },
+  };
   const dataSchema = DataResponseSchema(schema);
   const apiPayload = ApiPayloadSchema.parse({
     apiVersion: context.api.version,

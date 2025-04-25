@@ -1,5 +1,3 @@
-import { AuthMiddleware } from '@/lib/shared/api/middlewares/auth';
-import { ErrorPayloadSchema, createSuccessPayloadSchema } from '@/lib/shared/api/schemas';
 import type { Response } from 'express';
 import {
   EndpointsFactory,
@@ -12,6 +10,12 @@ import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import { randomUUID } from 'node:crypto';
 import type { ZodTypeAny } from 'zod';
+import {
+  AuthMiddleware,
+  ErrorPayloadSchema,
+  buildServerErrorResponse,
+  createSuccessPayloadSchema,
+} from './';
 
 type EndpointOptions<C = unknown> = {
   context: C;
@@ -80,13 +84,8 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
           ? createHttpError(statusCode).message
           : getMessageFromError(error);
         return void response.status(statusCode).json({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          apiVersion: (context as any)?.api.version,
           id: requestId,
-          error: {
-            code: statusCode,
-            message,
-          },
+          ...buildServerErrorResponse(context as any, message, statusCode),
         });
       }
 
