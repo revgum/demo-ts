@@ -1,5 +1,7 @@
+import { context } from '@/lib/context';
+import * as Metrics from '@/lib/metrics';
 import * as ApiUser from '@/lib/shared/api/user';
-import { getAuthHeader } from '@/lib/test/utils';
+import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import type { Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
@@ -10,7 +12,8 @@ import * as todoHandlers from './todo';
 
 vi.mock('@/models/todo');
 vi.mock('@/lib/shared/api/user');
-vi.mock('@/context', () => ({
+vi.mock('@/lib/metrics');
+vi.mock('@/lib/context', () => ({
   context: {
     api: {
       version: '1.0',
@@ -20,6 +23,7 @@ vi.mock('@/context', () => ({
 }));
 
 const mockedApiUser = ApiUser as Mocked<typeof ApiUser>;
+const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
 describe('Todo Handlers', () => {
   const mockUser = {
@@ -35,8 +39,19 @@ describe('Todo Handlers', () => {
     },
   ];
 
+  let mockedCounter: Mocked<ReturnType<typeof mockedMetrics.createCounter>>;
+  let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
+
   beforeEach(() => {
     mockedApiUser.getUser.mockResolvedValue({ id: mockUser.id });
+    mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
+    mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
+    mockedCounter = mockedMetrics.createCounter(context, 'handlerName', 'counterName') as Mocked<
+      ReturnType<typeof mockedMetrics.createCounter>
+    >;
+    mockedTimer = mockedMetrics.createTimer(context, 'handlerName', 'counterName') as Mocked<
+      ReturnType<typeof mockedMetrics.createTimer>
+    >;
   });
 
   afterEach(() => {
@@ -59,31 +74,34 @@ describe('Todo Handlers', () => {
       vi.mocked(getAll).mockResolvedValue(mockTodos);
 
       const { responseMock, loggerMock } = await testGetAllEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        data: {
-          items: mockTodos,
-        },
-      });
+      expectApiDataResponse(responseMock, { items: mockTodos });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: true,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: true,
+      });
     });
 
     it('responds with an API error response', async () => {
       vi.mocked(getAll).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetAllEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        error: {
-          code: 500,
-          message: 'Database error',
-        },
-      });
+      expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: false,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: false,
+      });
     });
   });
 
@@ -108,31 +126,34 @@ describe('Todo Handlers', () => {
       vi.mocked(create).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testCreateEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        data: {
-          ...mockTodos[0],
-        },
-      });
+      expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: true,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: true,
+      });
     });
 
     it('responds with an API error response', async () => {
       vi.mocked(create).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testCreateEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        error: {
-          code: 500,
-          message: 'Database error',
-        },
-      });
+      expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: false,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: false,
+      });
     });
   });
 
@@ -159,32 +180,34 @@ describe('Todo Handlers', () => {
       vi.mocked(updateById).mockResolvedValue({ ...mockTodos[0], completed: false });
 
       const { responseMock, loggerMock } = await testUpdateEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        data: {
-          ...mockTodos[0],
-          completed: false,
-        },
-      });
+      expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: true,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: true,
+      });
     });
 
     it('responds with an API error response', async () => {
       vi.mocked(updateById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testUpdateEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        error: {
-          code: 500,
-          message: 'Database error',
-        },
-      });
+      expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: false,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: false,
+      });
     });
   });
 
@@ -207,31 +230,34 @@ describe('Todo Handlers', () => {
       vi.mocked(getById).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testGetEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        data: {
-          ...mockTodos[0],
-        },
-      });
+      expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: true,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: true,
+      });
     });
 
     it('responds with an API error response', async () => {
       vi.mocked(getById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        error: {
-          code: 500,
-          message: 'Database error',
-        },
-      });
+      expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: false,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: false,
+      });
     });
   });
 
@@ -254,31 +280,34 @@ describe('Todo Handlers', () => {
       vi.mocked(deleteById).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testGetEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        data: {
-          ...mockTodos[0],
-        },
-      });
+      expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: true,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: true,
+      });
     });
 
     it('responds with an API error response', async () => {
       vi.mocked(deleteById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetEndpoint();
-      expect(responseMock._getJSONData()).toEqual({
-        apiVersion: '1.0',
-        id: expect.any(String),
-        error: {
-          code: 500,
-          message: 'Database error',
-        },
-      });
+      expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(mockedMetrics.createCounter).toHaveBeenCalled();
+      expect(mockedMetrics.createTimer).toHaveBeenCalled();
+      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+        success: false,
+      });
+      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+        success: false,
+      });
     });
   });
 });

@@ -9,9 +9,9 @@
     "lint:fix": "eslint --fix",
     "prettier": "prettier -c .",
     "prettier:fix": "prettier --write .",
-    "dev": "npm run knex -- migrate:latest && tsx watch -r ./src/instrumentation.ts ./src/main.ts",
-    "start": "tsx -r ./src/instrumentation.ts src/main.ts",
-    "debug": "tsx -r ./src/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
+    "dev": "npm run knex -- migrate:latest && tsx watch -r ./src/lib/instrumentation.ts ./src/main.ts",
+    "start": "tsx -r ./src/lib/instrumentation.ts src/main.ts",
+    "debug": "tsx -r ./src/lib/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
     "test": "vitest --config src/lib/test/vitest.config.ts",
     "test:cov": "vitest --config src/lib/test/vitest.config.ts run --coverage",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"

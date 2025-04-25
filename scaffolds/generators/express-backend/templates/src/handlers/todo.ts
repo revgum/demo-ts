@@ -1,4 +1,5 @@
-import { context } from '@/context';
+import { context } from '@/lib/context';
+import { createCounter, createTimer } from '@/lib/metrics';
 import {
   ApiPayloadSchema,
   buildItemsResponse,
@@ -9,17 +10,7 @@ import {
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import type { Context } from '@/types';
-import opentelemetry from '@opentelemetry/api';
 import createHttpError from 'http-errors';
-
-const meter = opentelemetry.metrics.getMeter('todo-handler', '1.0.0');
-const counters = {
-  get: meter.createCounter('todo.getall'),
-  getById: meter.createCounter('todo.get'),
-  post: meter.createCounter('todo.create'),
-  updateById: meter.createCounter('todo.update'),
-  deleteById: meter.createCounter('todo.delete'),
-};
 
 const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
   context,
@@ -37,6 +28,9 @@ export const getAllTodo = todoEndpointsFactory.build({
   output: ApiPayloadSchema,
   handler: async ({ options: { context }, logger }) => {
     let success = false;
+    const counter = createCounter(context, 'todo', 'todo.get-all-todo');
+    const timer = createTimer(context, 'todo', 'todo.get-all-todo-ms');
+    const start = performance.now();
     try {
       const payload = await getAll(context);
       success = true;
@@ -45,7 +39,8 @@ export const getAllTodo = todoEndpointsFactory.build({
       logger.error({ err }, 'Error fetching todos');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
-      counters.get.add(1, { success });
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
     }
   },
 });
@@ -62,6 +57,9 @@ export const createTodo = todoEndpointsFactory.build({
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context }, logger }) => {
     let success = false;
+    const counter = createCounter(context, 'todo', 'todo.create-todo');
+    const timer = createTimer(context, 'todo', 'todo.create-todo-ms');
+    const start = performance.now();
     try {
       const payload = await create(context, input);
       success = true;
@@ -70,7 +68,8 @@ export const createTodo = todoEndpointsFactory.build({
       logger.error({ err }, 'Error creating todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
-      counters.post.add(1, { success });
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
     }
   },
 });
@@ -87,6 +86,9 @@ export const getTodoById = todoEndpointsFactory.build({
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context }, logger }) => {
     let success = false;
+    const counter = createCounter(context, 'todo', 'todo.get-todo-by-id');
+    const timer = createTimer(context, 'todo', 'todo.get-todo-by-id-ms');
+    const start = performance.now();
     try {
       const payload = await getById(context, input.id);
       success = true;
@@ -95,7 +97,8 @@ export const getTodoById = todoEndpointsFactory.build({
       logger.error({ err, id: input.id }, 'Error fetching todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
-      counters.getById.add(1, { success });
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
     }
   },
 });
@@ -112,6 +115,9 @@ export const updateTodoById = todoEndpointsFactory.build({
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context }, logger }) => {
     let success = false;
+    const counter = createCounter(context, 'todo', 'todo.update-todo-by-id');
+    const timer = createTimer(context, 'todo', 'todo.update-todo-by-id-ms');
+    const start = performance.now();
     try {
       const { id, ...updatedTodo } = input;
       const payload = await updateById(context, id, updatedTodo);
@@ -121,7 +127,8 @@ export const updateTodoById = todoEndpointsFactory.build({
       logger.error({ err, id: input.id }, 'Error updating todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
-      counters.updateById.add(1, { success });
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
     }
   },
 });
@@ -138,6 +145,9 @@ export const deleteTodoById = todoEndpointsFactory.build({
   output: ApiPayloadSchema,
   handler: async ({ input, options: { context }, logger }) => {
     let success = false;
+    const counter = createCounter(context, 'todo', 'todo.delete-todo-by-id');
+    const timer = createTimer(context, 'todo', 'todo.delete-todo-by-id-ms');
+    const start = performance.now();
     try {
       const payload = await deleteById(context, input.id);
       success = true;
@@ -146,7 +156,8 @@ export const deleteTodoById = todoEndpointsFactory.build({
       logger.error({ err, id: input.id }, 'Error deleting todo');
       throw createHttpError(500, err as Error, { expose: false });
     } finally {
-      counters.deleteById.add(1, { success });
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
     }
   },
 });

@@ -1,7 +1,7 @@
-import { writeFile as writeFileAsync } from 'node:fs/promises';
-import { join } from 'node:path';
 import type { Context } from '@/types';
 import { type CommonConfig, Documentation, type Routing } from 'express-zod-api';
+import { writeFile as writeFileAsync } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export const buildOpenApiSpec = async (
   routing: Routing,
@@ -17,7 +17,7 @@ export const buildOpenApiSpec = async (
     composition: 'inline', // optional, or "components" for keeping schemas in a separate dedicated section using refs
   }).getSpecAsYaml();
 
-  const openApiPath = join(__dirname, 'public', 'openapi.yaml');
+  const openApiPath = join(__dirname, '..', 'public', 'openapi.yaml');
 
   return await writeFileAsync(openApiPath, yamlString, 'utf-8');
 };

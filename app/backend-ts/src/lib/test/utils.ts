@@ -1,4 +1,7 @@
+import type { Response } from 'express';
 import jwt from 'jsonwebtoken';
+import * as node_mocks_http from 'node-mocks-http';
+import { expect } from 'vitest';
 
 export const getAuthHeader = (userId: string) => {
   const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -11,4 +14,26 @@ export const getAuthHeader = (userId: string) => {
   return {
     Authorization: `Bearer ${token}`,
   };
+};
+
+export const expectApiDataResponse = (
+  res: node_mocks_http.MockResponse<Response<any, Record<string, any>>>,
+  data: unknown,
+) => {
+  expect(res._getStatusCode()).toBe(200);
+  expect(res._getJSONData()).toMatchObject({
+    apiVersion: '1.0',
+    data,
+  });
+};
+
+export const expectApiError = (
+  res: node_mocks_http.MockResponse<Response<any, Record<string, any>>>,
+  code = 500,
+  message = 'Database error',
+) => {
+  expect(res._getStatusCode()).toBe(code);
+  expect(res._getJSONData()).toMatchObject({
+    error: { code, message },
+  });
 };

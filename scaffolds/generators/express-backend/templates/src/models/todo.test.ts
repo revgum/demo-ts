@@ -1,11 +1,11 @@
-import { context } from '@/context';
+import { context } from '@/lib/context';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { ContextKinds, type Todo, type TodoDb } from '@/types';
 import { randomUUID } from 'node:crypto';
 import { afterEach } from 'node:test';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-vi.mock('@/context', () => {
+vi.mock('@/lib/context', () => {
   return {
     context: {
       db: vi.fn(),
