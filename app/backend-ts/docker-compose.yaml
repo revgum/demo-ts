@@ -13,6 +13,7 @@ services:
       - '3001:3001'
     command: npm run dev
     environment:
+      NODE_ENV: development
       # SEED_DATA: true # Load seed data on start
       JWT_SECRET_KEY: secret
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
