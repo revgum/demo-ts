@@ -1,5 +1,6 @@
 import type { Context, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
 import createHttpError from 'http-errors';
+import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 
 export const TABLE_NAME = 'todo';
@@ -38,14 +39,17 @@ export const getById = async (context: Context, id: Todo['id']): Promise<Todo> =
   return asModel(rows[0]);
 };
 
-export const create = async (context: Context, obj: Partial<CreateTodoModel>): Promise<Todo> => {
-  const due_at = obj.dueAt ? new Date(obj.dueAt) : null;
-  const rows = await context
-    .db<TodoDb>(TABLE_NAME)
+export const create = async (
+  _context: Context,
+  trx: Knex.Transaction,
+  input: Partial<CreateTodoModel>,
+): Promise<Todo> => {
+  const due_at = input.dueAt ? new Date(input.dueAt) : null;
+  const rows = await trx<TodoDb>(TABLE_NAME)
     .insert({
       id: randomUUID(),
-      title: obj.title,
-      completed: obj.completed ?? false,
+      title: input.title,
+      completed: input.completed ?? false,
       due_at,
       created_at: new Date(),
     })
@@ -60,14 +64,14 @@ export const create = async (context: Context, obj: Partial<CreateTodoModel>): P
 
 export const updateById = async (
   context: Context,
+  trx: Knex.Transaction,
   id: Todo['id'],
-  obj: Partial<UpdateTodoModel>,
+  input: Partial<UpdateTodoModel>,
 ): Promise<Todo> => {
   const todo = await getById(context, id);
-  const { title, completed, dueAt } = obj;
+  const { title, completed, dueAt } = input;
 
-  const rows = await context
-    .db<TodoDb>(TABLE_NAME)
+  const rows = await trx<TodoDb>(TABLE_NAME)
     .where({ id })
     .update({
       title: title ?? todo.title,
@@ -84,9 +88,12 @@ export const updateById = async (
   return asModel(rows[0]);
 };
 
-export const deleteById = async (context: Context, id: Todo['id']): Promise<Todo> => {
-  const rows = await context
-    .db<TodoDb>(TABLE_NAME)
+export const deleteById = async (
+  _context: Context,
+  trx: Knex.Transaction,
+  id: Todo['id'],
+): Promise<Todo> => {
+  const rows = await trx<TodoDb>(TABLE_NAME)
     .where({ id, deleted_at: null })
     .update({
       deleted_at: new Date(),

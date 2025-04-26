@@ -2,7 +2,13 @@ import { context } from '@/lib/context';
 import * as Metrics from '@/lib/metrics';
 import * as ApiUser from '@/lib/shared/api/user';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
-import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
+import {
+  createTodo,
+  deleteTodoById,
+  getAllTodo,
+  getTodoById,
+  updateTodoById,
+} from '@/services/todo';
 import type { Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
@@ -10,18 +16,9 @@ import { afterEach } from 'node:test';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import * as todoHandlers from './todo';
 
-vi.mock('@/models/todo');
-vi.mock('@/lib/shared/api/user');
-vi.mock('@/lib/metrics');
-vi.mock('@/lib/context', () => ({
-  context: {
-    api: {
-      version: '1.0',
-      kind: 'todo',
-    },
-  },
-}));
+vi.mock('@/services/todo');
 
+// Mocked in vitest.setup.ts
 const mockedApiUser = ApiUser as Mocked<typeof ApiUser>;
 const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
@@ -71,7 +68,7 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(getAll).mockResolvedValue(mockTodos);
+      vi.mocked(getAllTodo).mockResolvedValue(mockTodos);
 
       const { responseMock, loggerMock } = await testGetAllEndpoint();
       expectApiDataResponse(responseMock, { items: mockTodos });
@@ -88,7 +85,7 @@ describe('Todo Handlers', () => {
     });
 
     it('responds with an API error response', async () => {
-      vi.mocked(getAll).mockRejectedValue(new Error('Database error'));
+      vi.mocked(getAllTodo).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetAllEndpoint();
       expectApiError(responseMock);
@@ -123,7 +120,7 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(create).mockResolvedValue(mockTodos[0]);
+      vi.mocked(createTodo).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testCreateEndpoint();
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
@@ -140,7 +137,7 @@ describe('Todo Handlers', () => {
     });
 
     it('responds with an API error response', async () => {
-      vi.mocked(create).mockRejectedValue(new Error('Database error'));
+      vi.mocked(createTodo).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testCreateEndpoint();
       expectApiError(responseMock);
@@ -177,7 +174,7 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(updateById).mockResolvedValue({ ...mockTodos[0], completed: false });
+      vi.mocked(updateTodoById).mockResolvedValue({ ...mockTodos[0], completed: false });
 
       const { responseMock, loggerMock } = await testUpdateEndpoint();
       expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
@@ -194,7 +191,7 @@ describe('Todo Handlers', () => {
     });
 
     it('responds with an API error response', async () => {
-      vi.mocked(updateById).mockRejectedValue(new Error('Database error'));
+      vi.mocked(updateTodoById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testUpdateEndpoint();
       expectApiError(responseMock);
@@ -227,7 +224,7 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(getById).mockResolvedValue(mockTodos[0]);
+      vi.mocked(getTodoById).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testGetEndpoint();
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
@@ -244,7 +241,7 @@ describe('Todo Handlers', () => {
     });
 
     it('responds with an API error response', async () => {
-      vi.mocked(getById).mockRejectedValue(new Error('Database error'));
+      vi.mocked(getTodoById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetEndpoint();
       expectApiError(responseMock);
@@ -277,7 +274,7 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(deleteById).mockResolvedValue(mockTodos[0]);
+      vi.mocked(deleteTodoById).mockResolvedValue(mockTodos[0]);
 
       const { responseMock, loggerMock } = await testGetEndpoint();
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
@@ -294,7 +291,7 @@ describe('Todo Handlers', () => {
     });
 
     it('responds with an API error response', async () => {
-      vi.mocked(deleteById).mockRejectedValue(new Error('Database error'));
+      vi.mocked(deleteTodoById).mockRejectedValue(new Error('Database error'));
 
       const { responseMock, loggerMock } = await testGetEndpoint();
       expectApiError(responseMock);

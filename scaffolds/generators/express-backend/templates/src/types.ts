@@ -1,3 +1,4 @@
+import type { UuidParamsSchema } from '@/lib/shared/api';
 import type {
   TodoApiDataSchema,
   TodoCreateSchema,
@@ -6,6 +7,7 @@ import type {
   TodoUpdateSchema,
 } from '@/schemas/todo';
 import type { Knex } from 'knex';
+import type { Logger } from 'pino';
 import type { z } from 'zod';
 
 export const ContextKinds = { UNKNOWN: 'unknown', TODO: 'todo' } as const;
@@ -19,6 +21,7 @@ export type Context = {
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: Knex<any, unknown[]>;
+  transaction?: Knex.Transaction;
   runtime: {
     debug: boolean;
     localhost: boolean;
@@ -33,6 +36,13 @@ export type Context = {
   };
 };
 
+export type ServiceParams<T> = {
+  context: Context;
+  logger: Logger;
+  input?: T;
+};
+
+export type Uuid = z.infer<typeof UuidParamsSchema>;
 export type TodoDb = z.infer<typeof TodoDbSchema>;
 export type Todo = z.infer<typeof TodoSchema>;
 export type CreateTodoModel = z.infer<typeof TodoCreateSchema>;

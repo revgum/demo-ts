@@ -1,0 +1,71 @@
+import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
+import type { CreateTodoModel, ServiceParams, Todo, UpdateTodoModel } from '@/types';
+
+export const getAllTodo = async ({ context }: ServiceParams<void>): Promise<Todo[]> => {
+  return getAll(context);
+};
+
+export const createTodo = async ({
+  context,
+  input,
+}: ServiceParams<CreateTodoModel>): Promise<Todo> => {
+  if (!input) {
+    throw new Error('Create todo input is missing.');
+  }
+
+  const trx = await context.db.transaction();
+  try {
+    const payload = await create(context, trx, input);
+    await trx.commit();
+    return payload;
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
+};
+
+export const getTodoById = async ({ context, input }: ServiceParams<Todo['id']>): Promise<Todo> => {
+  if (!input) {
+    throw new Error('Todo ID is missing.');
+  }
+
+  return getById(context, input);
+};
+
+export const updateTodoById = async ({
+  context,
+  input,
+}: ServiceParams<UpdateTodoModel & { id: Todo['id'] }>): Promise<Todo> => {
+  if (!input) {
+    throw new Error('Update todo input is missing.');
+  }
+
+  const trx = await context.db.transaction();
+  try {
+    const payload = await updateById(context, trx, input.id, input);
+    await trx.commit();
+    return payload;
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
+};
+
+export const deleteTodoById = async ({
+  context,
+  input,
+}: ServiceParams<Todo['id']>): Promise<Todo> => {
+  if (!input) {
+    throw new Error('Todo ID is missing.');
+  }
+
+  const trx = await context.db.transaction();
+  try {
+    const payload = await deleteById(context, trx, input);
+    await trx.commit();
+    return payload;
+  } catch (error) {
+    await trx.rollback();
+    throw error;
+  }
+};
