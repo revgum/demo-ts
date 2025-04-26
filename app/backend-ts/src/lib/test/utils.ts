@@ -1,7 +1,18 @@
 import type { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import * as node_mocks_http from 'node-mocks-http';
-import { expect } from 'vitest';
+import type { Logger } from 'pino';
+import { expect, vi } from 'vitest';
+
+export const logger: Logger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  fatal: vi.fn(),
+  trace: vi.fn(),
+  child: vi.fn(),
+} as unknown as Logger;
 
 export const getAuthHeader = (userId: string) => {
   const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;

@@ -1,122 +1,76 @@
 import { context } from '@/lib/context';
+import { buildMockDbChain } from '@/lib/test/db';
+import { buildTodos } from '@/lib/test/models/todo';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
-import { ContextKinds, type Todo, type TodoDb } from '@/types';
+import { type Todo, type TodoDb } from '@/types';
+import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 import { afterEach } from 'node:test';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-vi.mock('@/lib/context', () => {
-  return {
-    context: {
-      db: vi.fn(),
-    },
-  };
-});
-
 describe('Todo Model', () => {
-  const buildTodos = (
-    overrides: Partial<TodoDb> = {},
-    count = 1,
-  ): Array<{ todoDb: TodoDb; todo: Todo }> => {
-    const todos = [];
-    for (let i = 0; i < count; i++) {
-      const todoDb = {
-        id: randomUUID(),
-        title: 'Test Todo',
-        created_at: new Date(),
-        completed: true,
-        due_at: undefined,
-        deleted_at: undefined,
-        updated_at: undefined,
-        ...overrides,
-      };
-      todos.push({
-        todoDb,
-        todo: {
-          id: todoDb.id,
-          title: todoDb.title,
-          kind: ContextKinds.TODO,
-          createdAt: todoDb.created_at.toISOString(),
-          completed: todoDb.completed,
-          dueAt: todoDb.due_at?.toISOString() ?? undefined,
-          deletedAt: todoDb.deleted_at?.toISOString() ?? undefined,
-          updatedAt: todoDb.updated_at?.toISOString() ?? undefined,
-        },
-      });
-    }
-    return todos;
-  };
-
-  const invalidId = randomUUID();
+  const now = new Date();
+  vi.useFakeTimers().setSystemTime(now);
 
   const mockedContext = context as Mocked<typeof context>;
-  let mockedDb: Mocked<ReturnType<typeof mockedContext.db>>;
+  const invalidId = randomUUID();
+
+  let mockedTransaction: Mocked<Knex.Transaction>;
+  let mockDbChain: Mocked<Knex.QueryBuilder>;
+  let todoDb: TodoDb;
+  let todo: Todo;
 
   beforeEach(() => {
-    const mockDbChain = {
-      where: vi.fn().mockImplementation(() => mockDbChain),
-      andWhere: vi.fn().mockImplementation(() => mockDbChain),
-      update: vi.fn().mockImplementation(() => mockDbChain),
-      insert: vi.fn().mockImplementation(() => mockDbChain),
-      returning: vi.fn().mockImplementation(() => mockDbChain),
-    };
-
+    [{ todo, todoDb }] = buildTodos();
+    mockDbChain = buildMockDbChain();
+    mockedTransaction = vi.fn().mockReturnValue(mockDbChain) as unknown as Mocked<Knex.Transaction>;
     mockedContext.db.mockImplementation(
       () => mockDbChain as unknown as ReturnType<typeof mockedContext.db>,
     );
-    mockedDb = mockedContext.db() as Mocked<ReturnType<typeof mockedContext.db>>;
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('getAll', () => {
-    const [{ todo, todoDb }] = buildTodos();
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
     it('returns an array of records mapped to models', async () => {
-      mockedDb.returning.mockResolvedValue([todoDb]);
+      mockDbChain.returning.mockResolvedValue([todoDb]);
       const result = await getAll(mockedContext);
       expect(result).toEqual([todo]);
-      expect(mockedDb.where).toHaveBeenCalledWith('deleted_at', null);
+      expect(mockDbChain.where).toHaveBeenCalledWith('deleted_at', null);
     });
     it('throws an unhandled error', async () => {
-      mockedDb.returning.mockRejectedValue(new Error('Database error'));
+      mockDbChain.returning.mockRejectedValue(new Error('Database error'));
       await expect(() => getAll(mockedContext)).rejects.toThrow('Database error');
     });
   });
 
   describe('getById', () => {
-    const [{ todo, todoDb }] = buildTodos();
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
     it('returns a record mapped to the model', async () => {
-      mockedDb.returning.mockResolvedValue([todoDb]);
+      mockDbChain.returning.mockResolvedValue([todoDb]);
       const result = await getById(mockedContext, todoDb.id);
       expect(result).toEqual(todo);
-      expect(mockedDb.where).toHaveBeenCalledWith({ id: todoDb.id, deleted_at: null });
+      expect(mockDbChain.where).toHaveBeenCalledWith({ id: todoDb.id, deleted_at: null });
     });
     it('throws an error when the record is not found', async () => {
-      mockedDb.returning.mockResolvedValue([]);
+      mockDbChain.returning.mockResolvedValue([]);
       await expect(() => getById(mockedContext, invalidId)).rejects.toThrow(
         `Todo ${invalidId} not found.`,
       );
     });
     it('throws an unhandled error', async () => {
-      mockedDb.returning.mockRejectedValue(new Error('Database error'));
+      mockDbChain.returning.mockRejectedValue(new Error('Database error'));
       await expect(() => getById(mockedContext, invalidId)).rejects.toThrow('Database error');
     });
   });
 
   describe('create', () => {
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
     it('returns a record mapped to the model', async () => {
-      const [{ todo, todoDb }] = buildTodos();
-      mockedDb.returning.mockResolvedValue([todoDb]);
-      const result = await create(mockedContext, todoDb);
+      mockDbChain.returning.mockResolvedValue([todoDb]);
+      const result = await create(mockedContext, mockedTransaction, todoDb);
       expect(result).toEqual(todo);
-      expect(mockedDb.insert).toHaveBeenCalledWith({
+      expect(mockDbChain.insert).toHaveBeenCalledWith({
         id: expect.any(String),
         title: todoDb.title,
         completed: todoDb.completed,
@@ -125,32 +79,26 @@ describe('Todo Model', () => {
       });
     });
     it('throws an error when the record is not returned from the database', async () => {
-      const [{ todoDb }] = buildTodos();
-      mockedDb.returning.mockResolvedValue([]);
-      await expect(() => create(mockedContext, todoDb)).rejects.toThrow(
+      mockDbChain.returning.mockResolvedValue([]);
+      await expect(() => create(mockedContext, mockedTransaction, todoDb)).rejects.toThrow(
         `Created Todo not returned.`,
       );
     });
     it('throws an unhandled error', async () => {
-      const [{ todoDb }] = buildTodos();
-      mockedDb.returning.mockRejectedValue(new Error('Database error'));
-      await expect(() => create(mockedContext, todoDb)).rejects.toThrow('Database error');
+      mockDbChain.returning.mockRejectedValue(new Error('Database error'));
+      await expect(() => create(mockedContext, mockedTransaction, todoDb)).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 
   describe('updateById', () => {
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
     it('returns a record mapped to the model', async () => {
-      const [{ todo, todoDb }] = buildTodos();
-      const now = new Date();
-      vi.useFakeTimers().setSystemTime(now);
-      mockedDb.returning.mockResolvedValue([todoDb]);
-      const result = await updateById(mockedContext, todoDb.id, todoDb);
+      mockDbChain.returning.mockResolvedValue([todoDb]);
+      const result = await updateById(mockedContext, mockedTransaction, todoDb.id, todoDb);
       expect(result).toEqual(todo);
-      expect(mockedDb.where).toHaveBeenCalledWith({ id: todoDb.id });
-      expect(mockedDb.update).toHaveBeenCalledWith({
+      expect(mockDbChain.where).toHaveBeenCalledWith({ id: todoDb.id });
+      expect(mockDbChain.update).toHaveBeenCalledWith({
         title: todoDb.title,
         completed: todoDb.completed,
         due_at: todoDb.due_at ?? null,
@@ -158,47 +106,41 @@ describe('Todo Model', () => {
       });
     });
     it('throws an error when the record is not returned from the database', async () => {
-      const [{ todoDb }] = buildTodos();
-      mockedDb.returning.mockResolvedValueOnce([todoDb]);
-      mockedDb.returning.mockResolvedValue([]);
-      await expect(() => updateById(mockedContext, todoDb.id, todoDb)).rejects.toThrow(
-        `Updated Todo ${todoDb.id} not returned.`,
-      );
+      mockDbChain.returning.mockResolvedValueOnce([todoDb]);
+      mockDbChain.returning.mockResolvedValue([]);
+      await expect(() =>
+        updateById(mockedContext, mockedTransaction, todoDb.id, todoDb),
+      ).rejects.toThrow(`Updated Todo ${todoDb.id} not returned.`);
     });
     it('throws an unhandled error', async () => {
-      const [{ todoDb }] = buildTodos();
-      mockedDb.returning.mockRejectedValue(new Error('Database error'));
-      await expect(() => updateById(mockedContext, todoDb.id, todoDb)).rejects.toThrow(
-        'Database error',
-      );
+      mockDbChain.returning.mockRejectedValue(new Error('Database error'));
+      await expect(() =>
+        updateById(mockedContext, mockedTransaction, todoDb.id, todoDb),
+      ).rejects.toThrow('Database error');
     });
   });
 
   describe('deleteById', () => {
-    const [{ todo, todoDb }] = buildTodos();
-    afterEach(() => {
-      vi.resetAllMocks();
-    });
     it('returns a record mapped to the model', async () => {
-      const now = new Date();
-      vi.useFakeTimers().setSystemTime(now);
-      mockedDb.returning.mockResolvedValue([todoDb]);
-      const result = await deleteById(mockedContext, todoDb.id);
+      mockDbChain.returning.mockResolvedValue([todoDb]);
+      const result = await deleteById(mockedContext, mockedTransaction, todoDb.id);
       expect(result).toEqual(todo);
-      expect(mockedDb.where).toHaveBeenCalledWith({ id: todoDb.id, deleted_at: null });
-      expect(mockedDb.update).toHaveBeenCalledWith({
+      expect(mockDbChain.where).toHaveBeenCalledWith({ id: todoDb.id, deleted_at: null });
+      expect(mockDbChain.update).toHaveBeenCalledWith({
         deleted_at: now,
       });
     });
     it('throws an error when the record is not returned from the database', async () => {
-      mockedDb.returning.mockResolvedValue([]);
-      await expect(() => deleteById(mockedContext, todoDb.id)).rejects.toThrow(
+      mockDbChain.returning.mockResolvedValue([]);
+      await expect(() => deleteById(mockedContext, mockedTransaction, todoDb.id)).rejects.toThrow(
         `Todo ${todoDb.id} not found.`,
       );
     });
     it('throws an unhandled error', async () => {
-      mockedDb.returning.mockRejectedValue(new Error('Database error'));
-      await expect(() => deleteById(mockedContext, todoDb.id)).rejects.toThrow('Database error');
+      mockDbChain.returning.mockRejectedValue(new Error('Database error'));
+      await expect(() => deleteById(mockedContext, mockedTransaction, todoDb.id)).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 });

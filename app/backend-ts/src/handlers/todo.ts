@@ -7,8 +7,8 @@ import {
   endpointsFactory,
   UuidParamsSchema,
 } from '@/lib/shared/api';
-import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
+import * as TodoService from '@/services/todo';
 import type { Context } from '@/types';
 import createHttpError from 'http-errors';
 
@@ -32,7 +32,7 @@ export const getAllTodo = todoEndpointsFactory.build({
     const timer = createTimer(context, 'todo', 'todo.get-all-todo-ms');
     const start = performance.now();
     try {
-      const payload = await getAll(context);
+      const payload = await TodoService.getAllTodo({ context, logger });
       success = true;
       return buildItemsResponse(TodoSchema, context, payload);
     } catch (err) {
@@ -61,7 +61,7 @@ export const createTodo = todoEndpointsFactory.build({
     const timer = createTimer(context, 'todo', 'todo.create-todo-ms');
     const start = performance.now();
     try {
-      const payload = await create(context, input);
+      const payload = await TodoService.createTodo({ context, logger, input });
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
@@ -90,7 +90,7 @@ export const getTodoById = todoEndpointsFactory.build({
     const timer = createTimer(context, 'todo', 'todo.get-todo-by-id-ms');
     const start = performance.now();
     try {
-      const payload = await getById(context, input.id);
+      const payload = await TodoService.getTodoById({ context, logger, input: input.id });
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
@@ -119,8 +119,7 @@ export const updateTodoById = todoEndpointsFactory.build({
     const timer = createTimer(context, 'todo', 'todo.update-todo-by-id-ms');
     const start = performance.now();
     try {
-      const { id, ...updatedTodo } = input;
-      const payload = await updateById(context, id, updatedTodo);
+      const payload = await TodoService.updateTodoById({ context, logger, input });
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
@@ -149,7 +148,7 @@ export const deleteTodoById = todoEndpointsFactory.build({
     const timer = createTimer(context, 'todo', 'todo.delete-todo-by-id-ms');
     const start = performance.now();
     try {
-      const payload = await deleteById(context, input.id);
+      const payload = await TodoService.deleteTodoById({ context, logger, input: input.id });
       success = true;
       return buildResponse(TodoSchema, context, payload);
     } catch (err) {
