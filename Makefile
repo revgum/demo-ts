@@ -20,7 +20,7 @@ build:
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up:
 	echo "\n\n***Bringing up the stack***\n\n"
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman compose down; exit 1' SIGINT SIGTERM ERR; podman compose up --remove-orphans"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; echo ***Shutting down stack***; podman compose down; exit 1' SIGINT SIGTERM ERR; podman compose up"
 
 # Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up-db:

@@ -10,7 +10,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev
     ports:
-      - '3001:3001'
+      - '3500:3500'
     command: npm run dev
     environment:
       NODE_ENV: development

@@ -10,15 +10,16 @@ services:
     build:
       dockerfile: ./Dockerfile.dev
     ports:
-      - '3001:3001'
+      - '3500:3500'
     command: npm run dev
     environment:
       NODE_ENV: development
       # SEED_DATA: true # Load seed data on start
+      JWT_SECRET_KEY: secret
       CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
-      DAPR_HOST: 127.0.0.1
+      DAPR_HOST: 0.0.0.0
       DAPR_PORT: 3500
-      SERVER_HOST: 127.0.0.1
+      SERVER_HOST: 0.0.0.0
       SERVER_PORT: 3001
       DB_HOST: postgres
       DB_PORT: 5432

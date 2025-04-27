@@ -1,15 +1,13 @@
+import type { Context } from '@/types';
 import { DaprClient } from '@dapr/dapr';
-
-const daprHost = process.env.DAPR_HOST || 'localhost';
-const daprPort = process.env.DAPR_PORT || '3500';
 
 let client: DaprClient | null = null;
 
-export default (): DaprClient => {
+export const buildDaprClient = (context: Context): DaprClient => {
   if (!client) {
     client = new DaprClient({
-      daprHost,
-      daprPort,
+      daprHost: context.dapr.host,
+      daprPort: context.dapr.port,
     });
   }
   return client;

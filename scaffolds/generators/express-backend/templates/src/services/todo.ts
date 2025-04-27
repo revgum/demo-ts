@@ -1,5 +1,9 @@
+import { publish, PubSubNames } from '@/lib/shared/pubsub';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import type { CreateTodoModel, ServiceParams, Todo, UpdateTodoModel } from '@/types';
+
+const pubSubName = PubSubNames.REDIS;
+const pubSubTopic = 'todo-data';
 
 export const getAllTodo = async ({ context }: ServiceParams<void>): Promise<Todo[]> => {
   return getAll(context);
@@ -16,6 +20,7 @@ export const createTodo = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await create(context, trx, input);
+    await publish<Todo>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
   } catch (error) {
@@ -43,6 +48,7 @@ export const updateTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await updateById(context, trx, input.id, input);
+    await publish<Todo>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
   } catch (error) {
@@ -62,6 +68,7 @@ export const deleteTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await deleteById(context, trx, input);
+    await publish<Todo>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
   } catch (error) {
