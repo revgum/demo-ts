@@ -1,6 +1,5 @@
 import { context } from '@/lib/context';
 import * as Metrics from '@/lib/metrics';
-import * as ApiUser from '@/lib/shared/api/user';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
   createTodo,
@@ -9,6 +8,7 @@ import {
   getTodoById,
   updateTodoById,
 } from '@/services/todo';
+import * as UserService from '@/services/user';
 import type { Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
@@ -16,9 +16,10 @@ import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import * as todoHandlers from './todo';
 
 vi.mock('@/services/todo');
+vi.mock('@/services/user');
 
 // Mocked in vitest.setup.ts
-const mockedApiUser = ApiUser as Mocked<typeof ApiUser>;
+const mockedUserService = UserService as Mocked<typeof UserService>;
 const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
 describe('Todo Handlers', () => {
@@ -41,7 +42,7 @@ describe('Todo Handlers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockedApiUser.getUser.mockResolvedValue({ id: mockUser.id });
+    mockedUserService.getUser.mockResolvedValue({ user: { id: mockUser.id } });
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
     mockedCounter = mockedMetrics.createCounter(context, 'handlerName', 'counterName') as Mocked<

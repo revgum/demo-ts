@@ -4,7 +4,7 @@ import * as node_mocks_http from 'node-mocks-http';
 import type { Logger } from 'pino';
 import { expect, vi } from 'vitest';
 
-export const logger: Logger = {
+export const mockedLogger: Logger = {
   info: vi.fn(),
   error: vi.fn(),
   debug: vi.fn(),

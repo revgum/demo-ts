@@ -21,7 +21,6 @@ import {
 } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
-import pino from 'pino';
 import ui from 'swagger-ui-express';
 import { handleTodo } from './handlers/todo-consumer';
 
@@ -33,12 +32,11 @@ const serverConfig = createConfig({
   },
   cors: true,
   compression: true,
-  logger: pino({
-    level: context.runtime.debug ? 'debug' : 'info',
-  }),
+  logger: context.logger,
   beforeRouting: ({ app }) => {
-    // Support CloudEvent data from pubsub posted by Dapr
+    // Parse JSON to support CloudEvents data being posted by Dapr PubSub subscriptions to Consumer endpoints
     app.use(express.json({ type: ['application/cloudevents+json', 'application/json'] }));
+    // Route /docs to a SwaggerUI endpoint for improved developer experience
     app.use('/docs', ui.serve, ui.setup(null, { swaggerUrl: '/public/openapi.yaml' }));
   },
 });
@@ -59,7 +57,7 @@ const serverRouting: Routing = {
     },
   },
   consumer: {
-    // Example endpoint for consuming pubsub topic data
+    // Example endpoint for consuming a Dapr PubSub subscription
     todo: handleTodo,
   },
   // path /public serves static files from /public
@@ -74,17 +72,16 @@ const startServer = async () => {
   if (process.env.SEED_DATA) {
     await loadSeedData(context);
   }
-  await buildOpenApiSpec(serverRouting, serverConfig, context);
 
+  await buildOpenApiSpec(serverRouting, serverConfig, context);
   buildDaprClient(context);
 
   const { app } = await createServer(serverConfig, serverRouting);
   const daprServer = buildDaprServer(context, app);
-
   await daprServer.start();
 };
 
 startServer().catch((e) => {
-  console.error(e);
+  context.logger.error(e);
   process.exit(1);
 });

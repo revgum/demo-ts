@@ -21,7 +21,7 @@ export type Context = {
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: Knex<any, unknown[]>;
-  transaction?: Knex.Transaction;
+  logger: Logger;
   runtime: {
     debug: boolean;
     localhost: boolean;
@@ -40,6 +40,10 @@ export type ServiceParams<T> = {
   context: Context;
   logger: Logger;
   input?: T;
+};
+
+export type User = {
+  id: string;
 };
 
 export type Uuid = z.infer<typeof UuidParamsSchema>;

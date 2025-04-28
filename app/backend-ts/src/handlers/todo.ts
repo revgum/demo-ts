@@ -9,6 +9,7 @@ import {
 } from '@/lib/shared/api';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import * as TodoService from '@/services/todo';
+import { getUser } from '@/services/user';
 import type { Context } from '@/types';
 import createHttpError from 'http-errors';
 
@@ -16,6 +17,7 @@ const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
   context,
   'todo',
   TodoSchema,
+  getUser,
 );
 
 /**
