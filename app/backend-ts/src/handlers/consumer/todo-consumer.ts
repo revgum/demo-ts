@@ -23,7 +23,7 @@ import { z } from 'zod';
  *   b. "RETRY" marks the message for reprocessing
  *   c. "DROP" drops the message from the queue and will not retry processing
  */
-export const handleTodo = consumersFactory(context, 'todo').build({
+export const handleMessage = consumersFactory(context, 'todo').build({
   method: 'post',
   input: createDataSchema(TodoSchema),
   output: z.object({ status: ConsumerStatusEnum }),

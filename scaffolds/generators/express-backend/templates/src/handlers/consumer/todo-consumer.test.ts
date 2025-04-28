@@ -6,12 +6,12 @@ import type { Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
-import * as todoConsumerHandlers from './todo-consumer';
+import * as todoConsumer from './todo-consumer';
 
 // Mocked in vitest.setup.ts
 const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
-describe('Todo Consumer Handlers', () => {
+describe('Todo Consumer', () => {
   const mockTodos: Todo[] = [
     {
       id: randomUUID(),
@@ -56,7 +56,7 @@ describe('Todo Consumer Handlers', () => {
   describe('handleTodo', () => {
     const testHandleTodoEndpoint = async (body?: any) =>
       testEndpoint({
-        endpoint: todoConsumerHandlers.handleTodo,
+        endpoint: todoConsumer.handleMessage,
         requestProps: {
           method: 'POST',
           body: body || mockPubSubMessage,

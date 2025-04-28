@@ -1,13 +1,7 @@
 import 'dotenv/config';
 
-import {
-  createTodo,
-  deleteTodoById,
-  getAllTodo,
-  getTodoById,
-  updateTodoById,
-} from '@/handlers/todo';
-import { handleTodo } from '@/handlers/todo-consumer';
+import * as TodoApiHandlers from '@/handlers/api/todo';
+import * as TodoConsumer from '@/handlers/consumer/todo-consumer';
 import { context } from '@/lib/context';
 import { buildOpenApiSpec } from '@/lib/openapi';
 import { loadSeedData } from '@/lib/seed';
@@ -46,20 +40,20 @@ const serverRouting: Routing = {
   api: {
     v1: {
       todos: new DependsOnMethod({
-        get: getAllTodo,
-        post: createTodo,
+        get: TodoApiHandlers.getAllTodo,
+        post: TodoApiHandlers.createTodo,
       }).nest({
         ':id': new DependsOnMethod({
-          get: getTodoById,
-          put: updateTodoById,
-          delete: deleteTodoById,
+          get: TodoApiHandlers.getTodoById,
+          put: TodoApiHandlers.updateTodoById,
+          delete: TodoApiHandlers.deleteTodoById,
         }),
       }),
     },
   },
   consumer: {
     // Example endpoint for consuming a Dapr PubSub subscription
-    todo: handleTodo,
+    todo: TodoConsumer.handleMessage,
   },
   // path /public serves static files from /public
   public: new ServeStatic(join(__dirname, 'public'), {
