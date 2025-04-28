@@ -1,4 +1,5 @@
-import type { Context } from '@/types';
+import type { Context } from '@/lib/shared/types';
+import type { ContextKind } from '@/types';
 import { type CommonConfig, Documentation, type Routing } from 'express-zod-api';
 import { writeFile as writeFileAsync } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -6,7 +7,7 @@ import { join } from 'node:path';
 export const buildOpenApiSpec = async (
   routing: Routing,
   config: CommonConfig,
-  context: Context,
+  context: Context<ContextKind>,
 ) => {
   const yamlString = new Documentation({
     routing,

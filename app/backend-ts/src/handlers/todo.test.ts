@@ -1,5 +1,5 @@
 import { context } from '@/lib/context';
-import * as Metrics from '@/lib/metrics';
+import * as Metrics from '@/lib/shared/metrics';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
   createTodo,

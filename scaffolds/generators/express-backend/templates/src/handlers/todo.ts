@@ -1,5 +1,4 @@
 import { context } from '@/lib/context';
-import { createCounter, createTimer } from '@/lib/metrics';
 import {
   ApiPayloadSchema,
   buildItemsResponse,
@@ -7,15 +6,19 @@ import {
   endpointsFactory,
   UuidParamsSchema,
 } from '@/lib/shared/api';
+import { createCounter, createTimer } from '@/lib/shared/metrics';
+import type { Context } from '@/lib/shared/types';
 import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import * as TodoService from '@/services/todo';
-import type { Context } from '@/types';
+import { getUser } from '@/services/user';
+import type { ContextKind } from '@/types';
 import createHttpError from 'http-errors';
 
-const todoEndpointsFactory = endpointsFactory<Context, typeof TodoSchema>(
+const todoEndpointsFactory = endpointsFactory<Context<ContextKind>, typeof TodoSchema>(
   context,
   'todo',
   TodoSchema,
+  getUser,
 );
 
 /**

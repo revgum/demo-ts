@@ -1,12 +1,16 @@
-import type { Context } from '@/types';
-import opentelemetry from '@opentelemetry/api';
+import type { Context } from '@/lib/shared/types';
+import opentelemetry, { type AttributeValue } from '@opentelemetry/api';
 
-const baseAttributes = (context: Context) => ({
+const baseAttributes = <K extends AttributeValue>(context: Context<K>) => ({
   version: context.api.version,
   kind: context.api.kind,
 });
 
-export const createCounter = (context: Context, handlerName: string, counterName: string) => {
+export const createCounter = <K extends AttributeValue>(
+  context: Context<K>,
+  handlerName: string,
+  counterName: string,
+) => {
   const meter = opentelemetry.metrics.getMeter(handlerName, context.api.version);
   const counter = meter.createCounter(counterName, {
     description: `Counter for ${counterName}`,
@@ -21,7 +25,11 @@ export const createCounter = (context: Context, handlerName: string, counterName
   };
 };
 
-export const createTimer = (context: Context, handlerName: string, timerName: string) => {
+export const createTimer = <K extends AttributeValue>(
+  context: Context<K>,
+  handlerName: string,
+  timerName: string,
+) => {
   const meter = opentelemetry.metrics.getMeter(handlerName, context.api.version);
   const timer = meter.createHistogram(timerName, {
     description: `Duration of ${timerName}`,

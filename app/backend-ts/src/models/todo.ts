@@ -1,4 +1,5 @@
-import type { Context, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
+import type { Context } from '@/lib/shared/types';
+import type { ContextKind, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
 import createHttpError from 'http-errors';
 import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
@@ -18,7 +19,7 @@ const asModel = (item: TodoDb): Todo => {
   };
 };
 
-export const getAll = async (context: Context): Promise<Todo[]> => {
+export const getAll = async (context: Context<ContextKind>): Promise<Todo[]> => {
   const rows = await context
     .db<TodoDb>(TABLE_NAME)
     .where('deleted_at', null)
@@ -26,7 +27,7 @@ export const getAll = async (context: Context): Promise<Todo[]> => {
   return rows.map(asModel);
 };
 
-export const getById = async (context: Context, id: Todo['id']): Promise<Todo> => {
+export const getById = async (context: Context<ContextKind>, id: Todo['id']): Promise<Todo> => {
   const rows = await context
     .db<TodoDb>(TABLE_NAME)
     .where({ id, deleted_at: null })
@@ -40,7 +41,7 @@ export const getById = async (context: Context, id: Todo['id']): Promise<Todo> =
 };
 
 export const create = async (
-  _context: Context,
+  _context: Context<ContextKind>,
   trx: Knex.Transaction,
   input: Partial<CreateTodoModel>,
 ): Promise<Todo> => {
@@ -63,7 +64,7 @@ export const create = async (
 };
 
 export const updateById = async (
-  context: Context,
+  context: Context<ContextKind>,
   trx: Knex.Transaction,
   id: Todo['id'],
   input: Partial<UpdateTodoModel>,
@@ -89,7 +90,7 @@ export const updateById = async (
 };
 
 export const deleteById = async (
-  _context: Context,
+  _context: Context<ContextKind>,
   trx: Knex.Transaction,
   id: Todo['id'],
 ): Promise<Todo> => {

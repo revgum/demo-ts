@@ -1,9 +1,10 @@
 import { dapr, env, runtime, server } from '@/config';
 import { knex } from '@/db/db';
-import type { Context } from '@/types';
+import type { Context } from '@/lib/shared/types';
+import type { ContextKind } from '@/types';
 import pino from 'pino';
 
-export const context: Context = {
+export const context: Context<ContextKind> = {
   env,
   api: {
     version: '1.0',

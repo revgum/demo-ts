@@ -1,9 +1,11 @@
+import { context } from '@/lib/context';
 import {
   consumersFactory,
   ConsumerStatusEnum,
   ConsumerStatuses,
   createDataSchema,
 } from '@/lib/shared/consumer';
+import { createCounter, createTimer } from '@/lib/shared/metrics';
 import { TodoSchema } from '@/schemas/todo';
 import { z } from 'zod';
 
@@ -21,12 +23,26 @@ import { z } from 'zod';
  *   b. "RETRY" marks the message for reprocessing
  *   c. "DROP" drops the message from the queue and will not retry processing
  */
-export const handleTodo = consumersFactory().build({
+export const handleTodo = consumersFactory(context, 'todo').build({
   method: 'post',
   input: createDataSchema(TodoSchema),
   output: z.object({ status: ConsumerStatusEnum }),
   handler: async ({ input, logger }) => {
-    logger.info(input, 'Consumer handled data');
-    return { status: ConsumerStatuses.SUCCESS };
+    let success = false;
+    const counter = createCounter(context, 'todo', 'todo-consumer');
+    const timer = createTimer(context, 'todo', 'todo-consumer-ms');
+    const start = performance.now();
+    try {
+      success = true;
+      logger.info({ input }, 'Consumer handling message.');
+      // TODO: Do something with the message
+      return { status: ConsumerStatuses.SUCCESS };
+    } catch (err) {
+      logger.error({ err }, 'Error processing message.');
+      return { status: ConsumerStatuses.DROP };
+    } finally {
+      counter.add(1, { success });
+      timer.record(performance.now() - start, { success });
+    }
   },
 });

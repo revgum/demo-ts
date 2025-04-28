@@ -1,10 +1,10 @@
 import type { Response } from 'express';
 import {
   EndpointsFactory,
-  type FlatObject,
   ResultHandler,
   ensureHttpError,
   getMessageFromError,
+  type FlatObject,
 } from 'express-zod-api';
 import helmet from 'helmet';
 import createHttpError from 'http-errors';
@@ -15,6 +15,7 @@ import {
   ErrorPayloadSchema,
   buildServerErrorResponse,
   createSuccessPayloadSchema,
+  type GetJwtUser,
 } from './';
 
 type EndpointOptions<C = unknown> = {
@@ -111,9 +112,16 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
   context: C,
   kind: string,
   itemSchema: T,
+  getUser: GetJwtUser<C>,
 ) =>
   new EndpointsFactory(apiResultsHandler(itemSchema, kind))
+    // Add general API protections on every request
     .addExpressMiddleware(helmet())
+    /**
+     * For every request, inject options to every handler for downstream access;
+     * - requestId : A unique ID for this request to be used in logging or metrics
+     * - context.api.kind : The data "kind" for the handler built by the factory
+     */
     .addOptions<EndpointOptions<C>>(async () => {
       return {
         requestId: randomUUID(),
@@ -127,4 +135,5 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
         },
       };
     })
-    .addMiddleware(AuthMiddleware);
+    // Execute the authentication middleware on every request
+    .addMiddleware(AuthMiddleware(context, getUser));

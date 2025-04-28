@@ -1,16 +1,23 @@
 import type { Response } from 'express';
 import {
   EndpointsFactory,
+  getMessageFromError,
   InputValidationError,
   ResultHandler,
   type FlatObject,
 } from 'express-zod-api';
 import type { BaseLogger } from 'pino';
 import { z } from 'zod';
+import { createCounter } from '../metrics';
+import type { Context } from '../types';
+
+type ConsumerOptions<K> = {
+  context: Context<K>;
+};
 
 export const ConsumerStatuses = { SUCCESS: 'SUCCESS', RETRY: 'RETRY', DROP: 'DROP' } as const;
 
-const consumerResultsHandler = () =>
+const consumerResultsHandler = <K>(context: Context<K>) =>
   new ResultHandler({
     positive: () => {
       return {
@@ -31,15 +38,25 @@ const consumerResultsHandler = () =>
       logger: BaseLogger;
     }) => {
       const { error, output, response, input, logger } = params;
+      const {
+        api: { kind },
+      } = context;
 
       if (error) {
-        let message = error.message;
-        if (error instanceof InputValidationError) {
-          message = `Input validation failed, consumer received data payload with an invalid path. Error = ${error.message.replace(/^data\//, '')}`;
-        }
+        const counter = createCounter(
+          context as any,
+          kind as string,
+          `${kind}-consumer-handler-error`,
+        );
         const { id, traceid, traceparent, source, topic, pubsubname } = input as any;
-        logger.error({ id, traceid, traceparent, source, topic, pubsubname }, message);
-        // TODO: Emit metrics will require passing in context
+
+        const inputValidationError = error instanceof InputValidationError;
+        logger.error(
+          { id, traceid, traceparent, source, topic, pubsubname },
+          getMessageFromError(error),
+        );
+
+        counter.add(1, { success: false, inputValidationError, pubsubname, topic, source });
         return void response.json({
           status: ConsumerStatuses.DROP,
         });
@@ -50,4 +67,20 @@ const consumerResultsHandler = () =>
     },
   });
 
-export const consumersFactory = () => new EndpointsFactory(consumerResultsHandler());
+export const consumersFactory = <K>(context: Context<K>, kind: K) =>
+  new EndpointsFactory(consumerResultsHandler(context))
+    /**
+     * For every message, inject options to every handler for downstream access;
+     * - context.api.kind : The data "kind" for the handler built by the factory
+     */
+    .addOptions<ConsumerOptions<K>>(async () => {
+      return {
+        context: {
+          ...context,
+          api: {
+            ...context.api,
+            kind,
+          },
+        },
+      };
+    });

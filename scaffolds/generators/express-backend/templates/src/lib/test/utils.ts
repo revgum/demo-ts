@@ -4,7 +4,7 @@ import * as node_mocks_http from 'node-mocks-http';
 import type { Logger } from 'pino';
 import { expect, vi } from 'vitest';
 
-export const logger: Logger = {
+export const mockedLogger: Logger = {
   info: vi.fn(),
   error: vi.fn(),
   debug: vi.fn(),
@@ -46,5 +46,15 @@ export const expectApiError = (
   expect(res._getStatusCode()).toBe(code);
   expect(res._getJSONData()).toMatchObject({
     error: { code, message },
+  });
+};
+
+export const expectConsumerDataResponse = (
+  res: node_mocks_http.MockResponse<Response<any, Record<string, any>>>,
+  data: object,
+) => {
+  expect(res._getStatusCode()).toBe(200);
+  expect(res._getJSONData()).toMatchObject({
+    ...data,
   });
 };

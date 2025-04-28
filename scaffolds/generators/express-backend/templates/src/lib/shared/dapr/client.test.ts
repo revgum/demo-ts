@@ -1,16 +1,16 @@
-import type { Context } from '@/types';
 import { DaprClient } from '@dapr/dapr';
 import { describe, expect, it } from 'vitest';
+import type { Context } from '../types';
 import { buildDaprClient } from './client';
 
 describe('buildDaprClient', () => {
   it('should create a new DaprClient instance if none exists', () => {
-    const mockContext: Context = {
+    const mockContext = {
       dapr: {
         host: 'localhost',
         port: '3500',
       },
-    } as Context;
+    } as Context<unknown>;
 
     const client = buildDaprClient(mockContext);
 
@@ -22,12 +22,12 @@ describe('buildDaprClient', () => {
   });
 
   it('should return the existing DaprClient instance if already created', () => {
-    const mockContext: Context = {
+    const mockContext = {
       dapr: {
         host: 'localhost',
         port: '3500',
       },
-    } as Context;
+    } as Context<unknown>;
 
     const firstClient = buildDaprClient(mockContext);
     const secondClient = buildDaprClient(mockContext);

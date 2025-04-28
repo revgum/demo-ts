@@ -1,14 +1,14 @@
-import type { Context } from '@/types';
 import { CommunicationProtocolEnum, DaprServer } from '@dapr/dapr';
 import type { Express } from 'express';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import type { Context } from '../types';
 import { buildDaprServer } from './server';
 
 describe('buildDaprServer', () => {
-  const mockContext: Context = {
+  const mockContext = {
     server: { host: 'localhost', port: '3000' },
     dapr: { host: 'localhost', port: '3500' },
-  } as Context;
+  } as Context<unknown>;
 
   const mockApp = {} as Express;
 

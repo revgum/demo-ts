@@ -11,19 +11,7 @@ vi.mock('@dapr/dapr', () => {
     },
   };
 });
-vi.mock('@/lib/shared/api/user');
-/*
-vi.mock('@/lib/shared/dapr/client', () => {
-  return {
-    buildDaprClient: () => ({
-      pubsub: {
-        publish: vi.fn(),
-      },
-    }),
-  };
-});
-*/
-vi.mock('@/lib/metrics');
+vi.mock('@/lib/shared/metrics');
 vi.mock('@/lib/context', () => {
   return {
     context: {

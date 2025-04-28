@@ -7,10 +7,12 @@ import {
   getTodoById,
   updateTodoById,
 } from '@/handlers/todo';
+import { handleTodo } from '@/handlers/todo-consumer';
 import { context } from '@/lib/context';
 import { buildOpenApiSpec } from '@/lib/openapi';
 import { loadSeedData } from '@/lib/seed';
 import { buildDaprClient, buildDaprServer } from '@/lib/shared/dapr';
+import type { ContextKind } from '@/types';
 import express from 'express';
 import {
   DependsOnMethod,
@@ -22,7 +24,6 @@ import {
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import ui from 'swagger-ui-express';
-import { handleTodo } from './handlers/todo-consumer';
 
 const serverConfig = createConfig({
   startupLogo: false,
@@ -74,10 +75,10 @@ const startServer = async () => {
   }
 
   await buildOpenApiSpec(serverRouting, serverConfig, context);
-  buildDaprClient(context);
+  buildDaprClient<ContextKind>(context);
 
   const { app } = await createServer(serverConfig, serverRouting);
-  const daprServer = buildDaprServer(context, app);
+  const daprServer = buildDaprServer<ContextKind>(context, app);
   await daprServer.start();
 };
 

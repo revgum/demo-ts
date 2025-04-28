@@ -11,7 +11,7 @@ vi.mock('@dapr/dapr', () => {
     },
   };
 });
-vi.mock('@/lib/metrics');
+vi.mock('@/lib/shared/metrics');
 vi.mock('@/lib/context', () => {
   return {
     context: {

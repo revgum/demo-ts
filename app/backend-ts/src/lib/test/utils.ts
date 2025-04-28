@@ -48,3 +48,13 @@ export const expectApiError = (
     error: { code, message },
   });
 };
+
+export const expectConsumerDataResponse = (
+  res: node_mocks_http.MockResponse<Response<any, Record<string, any>>>,
+  data: object,
+) => {
+  expect(res._getStatusCode()).toBe(200);
+  expect(res._getJSONData()).toMatchObject({
+    ...data,
+  });
+};

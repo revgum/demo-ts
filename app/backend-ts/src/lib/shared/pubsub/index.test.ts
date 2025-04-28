@@ -1,7 +1,7 @@
 import { buildDaprClient } from '@/lib/shared/dapr';
-import type { Context } from '@/types';
 import type { PubSubPublishOptions } from '@dapr/dapr/types/pubsub/PubSubPublishOptions.type';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import type { Context } from '../types';
 import { publish, PubSubNames } from './index';
 
 vi.mock('@/lib/shared/dapr', () => ({
@@ -21,7 +21,7 @@ describe('publish', () => {
   });
 
   it('should call daprClient.pubsub.publish with correct arguments', async () => {
-    const context = {} as Context;
+    const context = {} as Context<unknown>;
     const pubSubName = PubSubNames.REDIS;
     const pubSubTopic = 'test-topic';
     const data = { key: 'value' };
@@ -45,7 +45,7 @@ describe('publish', () => {
   });
 
   it('should handle undefined data', async () => {
-    const context = {} as Context;
+    const context = {} as Context<unknown>;
     const pubSubName = PubSubNames.REDIS;
     const pubSubTopic = 'test-topic';
     const data = undefined;

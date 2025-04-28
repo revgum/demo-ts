@@ -1,10 +1,10 @@
-import type { Context } from '@/types';
 import { CommunicationProtocolEnum, DaprServer } from '@dapr/dapr';
 import type { Express } from 'express';
+import type { Context } from '../types';
 
 let server: DaprServer | null = null;
 
-export const buildDaprServer = (context: Context, app: Express): DaprServer => {
+export const buildDaprServer = <K>(context: Context<K>, app: Express): DaprServer => {
   if (!server) {
     server = new DaprServer({
       serverHost: context.server.host,
