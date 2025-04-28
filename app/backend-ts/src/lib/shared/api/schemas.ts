@@ -89,3 +89,16 @@ export const ErrorPayloadSchema = z
 export const ApiPayloadSchema = z.union([SuccessPayloadSchema, ErrorPayloadSchema]);
 
 export const UuidParamsSchema = z.object({ id: z.string().uuid() });
+
+export const QueryParamsSchema = z.object({
+  page: z.coerce.number().optional(),
+  pageSize: z.coerce.number().optional(),
+  orderDirection: z.enum(['asc', 'desc']).optional(),
+});
+
+export const createQueryParamsSchema = (orderByFields: readonly [string, ...string[]]) =>
+  QueryParamsSchema.merge(
+    z.object({
+      orderBy: z.enum(orderByFields).optional(),
+    }),
+  );

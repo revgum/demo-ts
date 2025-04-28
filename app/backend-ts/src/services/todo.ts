@@ -1,15 +1,26 @@
+import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
 import { publish, PubSubNames } from '@/lib/shared/pubsub';
 import type { ServiceParams } from '@/lib/shared/types';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
-import type { ContextKind, CreateTodoModel, Todo, UpdateTodoModel } from '@/types';
+import type { ContextKind, CreateTodoModel, Todo, TodoQueryField, UpdateTodoModel } from '@/types';
 
 const pubSubName = PubSubNames.REDIS;
 const pubSubTopic = 'todo-data';
 
-export const getAllTodo = async ({
-  context,
-}: ServiceParams<void, ContextKind>): Promise<Todo[]> => {
-  return getAll(context);
+export const getAllTodo = async (args: {
+  serviceParams: ServiceParams<void, ContextKind>;
+  queryParams?: QueryParams<TodoQueryField>;
+}): Promise<PaginatedQueryResults<Todo, TodoQueryField>> => {
+  const {
+    serviceParams: { context },
+    queryParams,
+  } = args;
+  const { items, ...rest } = await getAll(context, queryParams);
+  context.logger.info({ ...rest });
+  return {
+    items,
+    ...rest,
+  };
 };
 
 export const createTodo = async ({

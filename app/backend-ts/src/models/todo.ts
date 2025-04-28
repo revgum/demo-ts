@@ -1,5 +1,14 @@
+import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
 import type { Context } from '@/lib/shared/types';
-import type { ContextKind, CreateTodoModel, Todo, TodoDb, UpdateTodoModel } from '@/types';
+import { TodoQueryFields } from '@/schemas/todo';
+import type {
+  ContextKind,
+  CreateTodoModel,
+  Todo,
+  TodoDb,
+  TodoQueryField,
+  UpdateTodoModel,
+} from '@/types';
 import createHttpError from 'http-errors';
 import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
@@ -19,12 +28,46 @@ const asModel = (item: TodoDb): Todo => {
   };
 };
 
-export const getAll = async (context: Context<ContextKind>): Promise<Todo[]> => {
+export const getAll = async (
+  context: Context<ContextKind>,
+  queryParams?: QueryParams<TodoQueryField>,
+): Promise<PaginatedQueryResults<Todo, TodoQueryField>> => {
+  const {
+    page = 1,
+    pageSize = 50,
+    orderBy = 'created_at',
+    orderDirection = 'desc',
+  } = queryParams || {};
+
+  const totalCountResult = await context
+    .db<TodoDb>(TABLE_NAME)
+    .where('deleted_at', null)
+    .count<{ count: number }>('id as count')
+    .first();
+
+  const totalItems = Number.parseInt(totalCountResult?.count.toString() ?? '0');
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const orderByField = TodoQueryFields.includes(orderBy) ? orderBy : 'created_at';
+  const offset = (page - 1) * pageSize;
+
   const rows = await context
     .db<TodoDb>(TABLE_NAME)
     .where('deleted_at', null)
+    .orderBy(orderByField, orderDirection)
+    .offset(offset)
+    .limit(pageSize)
     .returning<TodoDb[]>('*');
-  return rows.map(asModel);
+
+  return {
+    orderBy: orderByField,
+    orderDirection,
+    pageIndex: page,
+    totalPages,
+    itemsPerPage: pageSize,
+    totalItems,
+    currentItemCount: rows.length,
+    items: rows.map(asModel),
+  };
 };
 
 export const getById = async (context: Context<ContextKind>, id: Todo['id']): Promise<Todo> => {

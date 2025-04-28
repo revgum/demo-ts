@@ -3,15 +3,16 @@ import {
   ApiPayloadSchema,
   buildItemsResponse,
   buildResponse,
+  createQueryParamsSchema,
   endpointsFactory,
   UuidParamsSchema,
 } from '@/lib/shared/api';
 import { createCounter, createTimer } from '@/lib/shared/metrics';
 import type { Context } from '@/lib/shared/types';
-import { TodoCreateSchema, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
+import { TodoCreateSchema, TodoQueryFields, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import * as TodoService from '@/services/todo';
 import { getUser } from '@/services/user';
-import type { ContextKind } from '@/types';
+import { type ContextKind } from '@/types';
 import createHttpError from 'http-errors';
 
 const todoEndpointsFactory = endpointsFactory<Context<ContextKind>, typeof TodoSchema>(
@@ -28,14 +29,21 @@ const todoEndpointsFactory = endpointsFactory<Context<ContextKind>, typeof TodoS
  */
 export const getAllTodo = todoEndpointsFactory.build({
   method: 'get',
+  input: createQueryParamsSchema(TodoQueryFields),
   output: ApiPayloadSchema,
-  handler: async ({ options: { context }, logger }) => {
+  handler: async ({ options: { context }, logger, input }) => {
     let success = false;
     const counter = createCounter(context, 'todo', 'todo.get-all-todo');
     const timer = createTimer(context, 'todo', 'todo.get-all-todo-ms');
     const start = performance.now();
     try {
-      const payload = await TodoService.getAllTodo({ context, logger });
+      const payload = await TodoService.getAllTodo({
+        serviceParams: { context, logger },
+        queryParams: {
+          ...input,
+          orderBy: input.orderBy as any, // Sadly, punting on getting type safety through this
+        },
+      });
       success = true;
       return buildItemsResponse(TodoSchema, context, payload);
     } catch (err) {
