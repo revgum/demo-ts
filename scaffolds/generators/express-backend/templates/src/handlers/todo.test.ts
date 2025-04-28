@@ -12,7 +12,6 @@ import {
 import type { Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
-import { afterEach } from 'node:test';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import * as todoHandlers from './todo';
 
@@ -40,6 +39,8 @@ describe('Todo Handlers', () => {
   let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
 
   beforeEach(() => {
+    vi.clearAllMocks();
+
     mockedApiUser.getUser.mockResolvedValue({ id: mockUser.id });
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
@@ -49,10 +50,6 @@ describe('Todo Handlers', () => {
     mockedTimer = mockedMetrics.createTimer(context, 'handlerName', 'counterName') as Mocked<
       ReturnType<typeof mockedMetrics.createTimer>
     >;
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
   });
 
   describe('getAllTodo', () => {

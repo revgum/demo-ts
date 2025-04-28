@@ -1,30 +1,31 @@
 import { context } from '@/lib/context';
+import * as PubSub from '@/lib/shared/pubsub';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildTodos } from '@/lib/test/models/todo';
 import { logger } from '@/lib/test/utils';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { type Todo } from '@/types';
 import type { Knex } from 'knex';
-import { afterEach } from 'node:test';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from './todo';
 
 vi.mock('@/models/todo');
+vi.mock('@/lib/shared/pubsub');
 
 describe('Todo Service', () => {
   const mockedContext = context as Mocked<typeof context>;
 
   let mockedTransaction: Mocked<Knex.Transaction>;
   let todo: Todo;
+  let mockedPubSub: Mocked<typeof PubSub>;
 
   beforeEach(() => {
+    vi.clearAllMocks();
+
     [{ todo }] = buildTodos();
     mockedTransaction = buildMockDbChain() as unknown as Mocked<Knex.Transaction>;
     mockedContext.db.transaction = vi.fn().mockResolvedValue(mockedTransaction);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
+    mockedPubSub = PubSub as Mocked<typeof PubSub>;
   });
 
   describe('getAllTodo', () => {
@@ -48,6 +49,7 @@ describe('Todo Service', () => {
       expect(result).toEqual(todo);
       expect(mockedTransaction.commit).toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).toHaveBeenCalled();
     });
     it('throws an error before the transaction is started if input is not provided', async () => {
       await expect(() => createTodo({ context: mockedContext, logger })).rejects.toThrow(
@@ -55,6 +57,7 @@ describe('Todo Service', () => {
       );
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
     it('throws an unhandled error', async () => {
       vi.mocked(create).mockRejectedValue(new Error('Database error'));
@@ -63,6 +66,7 @@ describe('Todo Service', () => {
       ).rejects.toThrow('Database error');
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
   });
 
@@ -94,6 +98,7 @@ describe('Todo Service', () => {
       expect(result).toEqual(todo);
       expect(mockedTransaction.commit).toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).toHaveBeenCalled();
     });
     it('throws an error before the transaction is started if input is not provided', async () => {
       await expect(() => updateTodoById({ context: mockedContext, logger })).rejects.toThrow(
@@ -101,6 +106,7 @@ describe('Todo Service', () => {
       );
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
     it('throws an unhandled error', async () => {
       vi.mocked(updateById).mockRejectedValue(new Error('Database error'));
@@ -109,6 +115,7 @@ describe('Todo Service', () => {
       ).rejects.toThrow('Database error');
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
   });
 
@@ -119,6 +126,7 @@ describe('Todo Service', () => {
       expect(result).toEqual(todo);
       expect(mockedTransaction.commit).toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).toHaveBeenCalled();
     });
     it('throws an error before the transaction is started if input is not provided', async () => {
       await expect(() => deleteTodoById({ context: mockedContext, logger })).rejects.toThrow(
@@ -126,6 +134,7 @@ describe('Todo Service', () => {
       );
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).not.toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
     it('throws an unhandled error', async () => {
       vi.mocked(deleteById).mockRejectedValue(new Error('Database error'));
@@ -134,6 +143,7 @@ describe('Todo Service', () => {
       ).rejects.toThrow('Database error');
       expect(mockedTransaction.commit).not.toHaveBeenCalled();
       expect(mockedTransaction.rollback).toHaveBeenCalled();
+      expect(mockedPubSub.publish).not.toHaveBeenCalled();
     });
   });
 });

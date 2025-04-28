@@ -6,9 +6,9 @@ spec:
   type: pubsub.redis
   version: v1
   metadata:
-  - name: redisHost
-    value: redis:6379
-  - name: consumerID
-    value: "{appID}"
-  - name: maxLenApprox
-    value: 1000
+    - name: redisHost
+      value: redis:6379
+    - name: consumerID
+      value: '{appID}'
+    - name: maxLenApprox
+      value: 1000
