@@ -3,6 +3,7 @@ import type {
   TodoApiDataSchema,
   TodoCreateSchema,
   TodoDbSchema,
+  TodoQueryFields,
   TodoSchema,
   TodoUpdateSchema,
 } from '@/schemas/todo';
@@ -13,6 +14,7 @@ export type ContextKind = (typeof ContextKinds)[keyof typeof ContextKinds];
 
 export type Uuid = z.infer<typeof UuidParamsSchema>;
 export type TodoDb = z.infer<typeof TodoDbSchema>;
+export type TodoQueryField = (typeof TodoQueryFields)[number];
 export type Todo = z.infer<typeof TodoSchema>;
 export type CreateTodoModel = z.infer<typeof TodoCreateSchema>;
 export type UpdateTodoModel = z.infer<typeof TodoUpdateSchema>;

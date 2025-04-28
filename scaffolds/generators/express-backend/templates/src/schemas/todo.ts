@@ -13,6 +13,14 @@ export const TodoDbSchema = z.object({
   updated_at: z.date().nullish(),
 });
 
+export const TodoQueryFields = [
+  'due_at',
+  'title',
+  'completed',
+  'created_at',
+  'updated_at',
+] as const;
+
 export const TodoSchema = z.object({
   id: z.string().uuid(),
   kind: z.literal('todo'),
