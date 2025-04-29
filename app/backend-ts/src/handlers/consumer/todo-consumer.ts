@@ -8,10 +8,11 @@ import {
 } from '@/lib/shared/consumer';
 import { createCounter, createTimer } from '@/lib/shared/metrics';
 import { TodoSchema } from '@/schemas/todo';
+import { ContextKinds, type ContextKind } from '@/types';
 import { z } from 'zod';
 
-const context = buildHandlerContext({
-  kind: 'todo',
+const context = buildHandlerContext<ContextKind>({
+  kind: ContextKinds.TODO,
   handlerName: 'todo-consumer',
 });
 
