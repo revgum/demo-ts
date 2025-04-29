@@ -34,11 +34,47 @@ describe('Todo Model', () => {
   });
 
   describe('getAll', () => {
-    it('returns an array of records mapped to models', async () => {
+    it('returns an array of paginated records mapped to models using default query parameters', async () => {
       mockDbChain.returning.mockResolvedValue([todoDb]);
+      mockDbChain.first.mockResolvedValue({ count: 1 });
       const result = await getAll(mockedContext);
-      expect(result).toEqual([todo]);
+      expect(result).toEqual({
+        currentItemCount: 1,
+        itemsPerPage: 50,
+        orderBy: 'created_at',
+        orderDirection: 'desc',
+        pageIndex: 1,
+        totalItems: 1,
+        totalPages: 1,
+        items: [todo],
+      });
       expect(mockDbChain.where).toHaveBeenCalledWith('deleted_at', null);
+    });
+    it('returns an array of paginated records mapped to models', async () => {
+      // Mock the result set with query params filters applied
+      mockDbChain.returning.mockResolvedValue([todoDb, todoDb]);
+      // Mock the count of the full result set as if the database had many more records
+      mockDbChain.first.mockResolvedValue({ count: 3000 });
+      const result = await getAll(mockedContext, {
+        pageSize: 2,
+        page: 2,
+        orderBy: 'title',
+        orderDirection: 'asc',
+      });
+      expect(result).toEqual({
+        currentItemCount: 2,
+        itemsPerPage: 2,
+        orderBy: 'title',
+        orderDirection: 'asc',
+        pageIndex: 2,
+        totalItems: 3000,
+        totalPages: 1500,
+        items: [todo, todo],
+      });
+      expect(mockDbChain.where).toHaveBeenCalledWith('deleted_at', null);
+      expect(mockDbChain.offset).toHaveBeenCalledWith(2);
+      expect(mockDbChain.limit).toHaveBeenCalledWith(2);
+      expect(mockDbChain.orderBy).toHaveBeenCalledWith('title', 'asc');
     });
     it('throws an unhandled error', async () => {
       mockDbChain.returning.mockRejectedValue(new Error('Database error'));

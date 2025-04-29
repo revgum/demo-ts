@@ -45,10 +45,10 @@ describe('Todo Consumer', () => {
 
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(context, 'handlerName', 'counterName') as Mocked<
+    mockedCounter = mockedMetrics.createCounter(context) as Mocked<
       ReturnType<typeof mockedMetrics.createCounter>
     >;
-    mockedTimer = mockedMetrics.createTimer(context, 'handlerName', 'counterName') as Mocked<
+    mockedTimer = mockedMetrics.createTimer(context) as Mocked<
       ReturnType<typeof mockedMetrics.createTimer>
     >;
   });
@@ -71,10 +71,16 @@ describe('Todo Consumer', () => {
       expect(mockedMetrics.createCounter).toHaveBeenCalled();
       expect(mockedMetrics.createTimer).toHaveBeenCalled();
       expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
+        status: ConsumerStatuses.SUCCESS,
+        pubsubname: 'redis-pubsub',
+        source: expect.any(String),
+        topic: 'todo-data',
       });
       expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
+        status: ConsumerStatuses.SUCCESS,
+        pubsubname: 'redis-pubsub',
+        source: expect.any(String),
+        topic: 'todo-data',
       });
     });
 
@@ -86,7 +92,7 @@ describe('Todo Consumer', () => {
       expect(mockedMetrics.createCounter).toHaveBeenCalled();
       expect(mockedMetrics.createTimer).toHaveBeenCalled();
       expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
+        status: ConsumerStatuses.DROP,
         inputValidationError: true,
       });
     });

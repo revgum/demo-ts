@@ -56,7 +56,7 @@ type EndpointOptions<C = unknown> = {
  * - Explicitly setting `expose: true` when throwing an error with `createHttpError` will include the error message in the response.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: string) =>
+const apiResultsHandler = <T extends ZodTypeAny, C = any>(kind: string, itemSchema: T) =>
   new ResultHandler({
     positive: () => {
       return {
@@ -103,18 +103,16 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(itemSchema: T, kind: s
  * @template T - The type of the item schema, extending `ZodTypeAny`.
  *
  * @param context - The base context object to be used in the endpoints.
- * @param kind - A string representing the kind or category of the endpoint.
  * @param itemSchema - A Zod schema defining the structure of the items handled by the endpoint.
  *
  * @returns An instance of `EndpointsFactory` configured with the provided context, kind, and item schema.
  */
 export const endpointsFactory = <C, T extends ZodTypeAny>(
   context: C,
-  kind: string,
   itemSchema: T,
   getUser: GetJwtUser<C>,
 ) =>
-  new EndpointsFactory(apiResultsHandler(itemSchema, kind))
+  new EndpointsFactory(apiResultsHandler((context as any).api.kind, itemSchema))
     // Add general API protections on every request
     .addExpressMiddleware(helmet())
     /**
@@ -125,14 +123,7 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
     .addOptions<EndpointOptions<C>>(async () => {
       return {
         requestId: randomUUID(),
-        context: {
-          ...context,
-          api: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(context as any).api,
-            kind,
-          },
-        },
+        context,
       };
     })
     // Execute the authentication middleware on every request

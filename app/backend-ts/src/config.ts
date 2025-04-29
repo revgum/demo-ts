@@ -10,6 +10,11 @@ const getEnv = () => {
       return 'development';
   }
 };
+const serviceName = process.env.SERVICE_NAME || '';
+if (!serviceName) {
+  throw new Error(`Service configuration error, missing SERVICE_NAME in ENV.`);
+}
+
 const dapr = {
   host: process.env.DAPR_HOST || 'localhost',
   port: process.env.DAPR_PORT || '3001',
@@ -35,4 +40,4 @@ const runtime = {
 
 const env = getEnv();
 
-export { dapr, server, db, env, runtime };
+export { dapr, db, env, runtime, server, serviceName };
