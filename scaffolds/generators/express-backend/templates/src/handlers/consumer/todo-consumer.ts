@@ -1,13 +1,20 @@
-import { context } from '@/lib/context';
+import { buildHandlerContext } from '@/lib/context';
 import {
   consumersFactory,
   ConsumerStatusEnum,
   ConsumerStatuses,
   createDataSchema,
+  type ConsumerStatus,
 } from '@/lib/shared/consumer';
 import { createCounter, createTimer } from '@/lib/shared/metrics';
 import { TodoSchema } from '@/schemas/todo';
+import { ContextKinds, type ContextKind } from '@/types';
 import { z } from 'zod';
+
+const context = buildHandlerContext<ContextKind>({
+  kind: ContextKinds.TODO,
+  handlerName: 'todo-consumer',
+});
 
 /**
  * Event message consumer endpoint.
@@ -23,26 +30,28 @@ import { z } from 'zod';
  *   b. "RETRY" marks the message for reprocessing
  *   c. "DROP" drops the message from the queue and will not retry processing
  */
-export const handleMessage = consumersFactory(context, 'todo').build({
+export const handleMessage = consumersFactory({ context }).build({
   method: 'post',
   input: createDataSchema(TodoSchema),
   output: z.object({ status: ConsumerStatusEnum }),
-  handler: async ({ input, logger }) => {
-    let success = false;
-    const counter = createCounter(context, 'todo', 'todo-consumer');
-    const timer = createTimer(context, 'todo', 'todo-consumer-ms');
+  handler: async ({ input, logger, options: { context } }) => {
+    const { pubsubname, topic, source } = input;
+    let status: ConsumerStatus = ConsumerStatuses.SUCCESS;
+    const counter = createCounter(context);
+    const timer = createTimer(context);
     const start = performance.now();
     try {
-      success = true;
       logger.info({ input }, 'Consumer handling message.');
       // TODO: Do something with the message
-      return { status: ConsumerStatuses.SUCCESS };
+      return { status };
     } catch (err) {
+      status = ConsumerStatuses.DROP;
       logger.error({ err }, 'Error processing message.');
-      return { status: ConsumerStatuses.DROP };
+      return { status };
     } finally {
-      counter.add(1, { success });
-      timer.record(performance.now() - start, { success });
+      const metricAttributes = { status, pubsubname, topic, source };
+      counter.add(1, metricAttributes);
+      timer.record(performance.now() - start, metricAttributes);
     }
   },
 });

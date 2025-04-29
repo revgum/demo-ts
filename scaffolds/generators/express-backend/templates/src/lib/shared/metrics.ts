@@ -1,44 +1,41 @@
 import type { Context } from '@/lib/shared/types';
-import opentelemetry, { type AttributeValue } from '@opentelemetry/api';
+import opentelemetry, { type Attributes } from '@opentelemetry/api';
 
-const baseAttributes = <K extends AttributeValue>(context: Context<K>) => ({
-  version: context.api.version,
-  kind: context.api.kind,
-});
+const baseAttributes = <K>(context: Context<K>) =>
+  ({
+    version: context.api.version,
+    kind: context.api.kind,
+    serviceName: context.serviceName,
+    handlerName: context.handlerName,
+  }) as Attributes;
 
-export const createCounter = <K extends AttributeValue>(
-  context: Context<K>,
-  handlerName: string,
-  counterName: string,
-) => {
-  const meter = opentelemetry.metrics.getMeter(handlerName, context.api.version);
-  const counter = meter.createCounter(counterName, {
-    description: `Counter for ${counterName}`,
+export const createCounter = <K>(context: Context<K>, counterName?: string) => {
+  const meter = opentelemetry.metrics.getMeter(context.handlerName, context.api.version);
+  const metricName = counterName || context.handlerName;
+  const counter = meter.createCounter(metricName, {
+    description: `Counter for ${metricName}`,
   });
   return {
-    add: (value: number, attributes: Record<string, unknown>) => {
+    add: (value: number, attributes: Attributes | Record<string, unknown>) => {
       counter.add(value, {
-        ...attributes,
+        ...(attributes as Attributes),
         ...baseAttributes(context),
       });
     },
   };
 };
 
-export const createTimer = <K extends AttributeValue>(
-  context: Context<K>,
-  handlerName: string,
-  timerName: string,
-) => {
-  const meter = opentelemetry.metrics.getMeter(handlerName, context.api.version);
-  const timer = meter.createHistogram(timerName, {
-    description: `Duration of ${timerName}`,
+export const createTimer = <K>(context: Context<K>, timerName?: string) => {
+  const meter = opentelemetry.metrics.getMeter(context.handlerName, context.api.version);
+  const metricName = timerName || `${context.handlerName}-ms`;
+  const timer = meter.createHistogram(metricName, {
+    description: `Duration of ${metricName}`,
     unit: 'ms',
   });
   return {
-    record: (duration: number, attributes: Record<string, unknown>) => {
+    record: (duration: number, attributes: Attributes | Record<string, unknown>) => {
       timer.record(duration, {
-        ...attributes,
+        ...(attributes as Attributes),
         ...baseAttributes(context),
       });
     },

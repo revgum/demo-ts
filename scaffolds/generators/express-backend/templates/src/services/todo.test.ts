@@ -1,7 +1,7 @@
 import { context } from '@/lib/context';
 import * as PubSub from '@/lib/shared/pubsub';
 import { buildMockDbChain } from '@/lib/test/db';
-import { buildTodos } from '@/lib/test/models/todo';
+import { buildPaginatedTodos, buildTodos } from '@/lib/test/models/todo';
 import { mockedLogger } from '@/lib/test/utils';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { type Todo } from '@/types';
@@ -30,14 +30,29 @@ describe('Todo Service', () => {
 
   describe('getAllTodo', () => {
     it('returns an array of records mapped to models', async () => {
-      vi.mocked(getAll).mockResolvedValue([todo]);
-      const result = await getAllTodo({ context: mockedContext, logger: mockedLogger });
-      expect(result).toEqual([todo]);
+      const paginatedTodos = buildPaginatedTodos({
+        pageSize: 12,
+        page: 3,
+        orderBy: 'title',
+        orderDirection: 'asc',
+      });
+      vi.mocked(getAll).mockResolvedValue(paginatedTodos);
+      const result = await getAllTodo({
+        serviceParams: { context: mockedContext, logger: mockedLogger },
+        queryParams: {
+          orderBy: 'title',
+          orderDirection: 'asc',
+          page: 3,
+          pageSize: 12,
+        },
+      });
+      expect(result).toEqual(paginatedTodos);
+      expect(mockedLogger.info).toBeCalled();
     });
     it('throws an unhandled error', async () => {
       vi.mocked(getAll).mockRejectedValue(new Error('Database error'));
       await expect(() =>
-        getAllTodo({ context: mockedContext, logger: mockedLogger }),
+        getAllTodo({ serviceParams: { context: mockedContext, logger: mockedLogger } }),
       ).rejects.toThrow('Database error');
     });
   });

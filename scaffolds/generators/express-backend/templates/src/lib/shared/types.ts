@@ -2,6 +2,8 @@ import type { Knex } from 'knex';
 import type { Logger } from 'pino';
 
 export type Context<K> = {
+  serviceName: string;
+  handlerName: string;
   env: 'development' | 'staging' | 'production';
   api: {
     version: string;

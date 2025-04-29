@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { mockedLogger } from './utils';
 
 process.env.NODE_ENV = 'test';
 
@@ -13,17 +14,22 @@ vi.mock('@dapr/dapr', () => {
 });
 vi.mock('@/lib/shared/metrics');
 vi.mock('@/lib/context', () => {
-  return {
-    context: {
-      api: {
-        version: '1.0',
-        kind: 'unknown',
-      },
-      db: vi.fn(),
-      dapr: {
-        host: '0.0.0.0',
-        port: '3001',
-      },
+  const context = {
+    serviceName: 'test-service',
+    handlerName: 'test-handler',
+    api: {
+      version: '1.0',
+      kind: 'unknown',
     },
+    db: vi.fn(),
+    dapr: {
+      host: '0.0.0.0',
+      port: '3001',
+    },
+    logger: mockedLogger,
+  };
+  return {
+    context,
+    buildHandlerContext: vi.fn().mockReturnValue(context),
   };
 });

@@ -6,6 +6,7 @@ services:
       dockerfile: ./Dockerfile.dev
     command: npm run knex -- migrate:latest
     environment:
+      SERVICE_NAME: <%= name %>
       NODE_ENV: development
       DB_HOST: postgres
       DB_PORT: 5432

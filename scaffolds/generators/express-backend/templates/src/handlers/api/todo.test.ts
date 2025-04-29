@@ -1,5 +1,6 @@
 import { context } from '@/lib/context';
 import * as Metrics from '@/lib/shared/metrics';
+import { buildPaginatedTodos } from '@/lib/test/models/todo';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
   createTodo,
@@ -45,10 +46,10 @@ describe('Todo Handlers', () => {
     mockedUserService.getUser.mockResolvedValue({ user: { id: mockUser.id } });
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(context, 'handlerName', 'counterName') as Mocked<
+    mockedCounter = mockedMetrics.createCounter(context) as Mocked<
       ReturnType<typeof mockedMetrics.createCounter>
     >;
-    mockedTimer = mockedMetrics.createTimer(context, 'handlerName', 'counterName') as Mocked<
+    mockedTimer = mockedMetrics.createTimer(context) as Mocked<
       ReturnType<typeof mockedMetrics.createTimer>
     >;
   });
@@ -66,10 +67,16 @@ describe('Todo Handlers', () => {
       });
 
     it('responds with an API data response', async () => {
-      vi.mocked(getAllTodo).mockResolvedValue(mockTodos);
+      const paginatedTodos = buildPaginatedTodos({
+        orderBy: 'title',
+        orderDirection: 'asc',
+        page: 2,
+        pageSize: 5,
+      });
+      vi.mocked(getAllTodo).mockResolvedValue(paginatedTodos);
 
       const { responseMock, loggerMock } = await testGetAllEndpoint();
-      expectApiDataResponse(responseMock, { items: mockTodos });
+      expectApiDataResponse(responseMock, paginatedTodos);
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(mockedMetrics.createCounter).toHaveBeenCalled();

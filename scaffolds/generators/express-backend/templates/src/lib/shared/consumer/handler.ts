@@ -15,9 +15,13 @@ type ConsumerOptions<K> = {
   context: Context<K>;
 };
 
+type ConsumerFactoryArgs<K> = {
+  context: Context<K>;
+};
+
 export const ConsumerStatuses = { SUCCESS: 'SUCCESS', RETRY: 'RETRY', DROP: 'DROP' } as const;
 
-const consumerResultsHandler = <K>(context: Context<K>) =>
+const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
   new ResultHandler({
     positive: () => {
       return {
@@ -37,26 +41,17 @@ const consumerResultsHandler = <K>(context: Context<K>) =>
       options: FlatObject;
       logger: BaseLogger;
     }) => {
-      const { error, output, response, input, logger } = params;
-      const {
-        api: { kind },
-      } = context;
+      const { error, output, response, logger } = params;
 
       if (error) {
-        const counter = createCounter(
-          context as any,
-          kind as string,
-          `${kind}-consumer-handler-error`,
-        );
-        const { id, traceid, traceparent, source, topic, pubsubname } = input as any;
-
         const inputValidationError = error instanceof InputValidationError;
-        logger.error(
-          { id, traceid, traceparent, source, topic, pubsubname },
-          getMessageFromError(error),
-        );
+        logger.error(getMessageFromError(error));
 
-        counter.add(1, { success: false, inputValidationError, pubsubname, topic, source });
+        const counter = createCounter(context as any);
+        counter.add(1, {
+          status: ConsumerStatuses.DROP,
+          inputValidationError,
+        });
         return void response.json({
           status: ConsumerStatuses.DROP,
         });
@@ -67,20 +62,12 @@ const consumerResultsHandler = <K>(context: Context<K>) =>
     },
   });
 
-export const consumersFactory = <K>(context: Context<K>, kind: K) =>
-  new EndpointsFactory(consumerResultsHandler(context))
+export const consumersFactory = <K>(args: ConsumerFactoryArgs<K>) =>
+  new EndpointsFactory(consumerResultsHandler(args))
     /**
      * For every message, inject options to every handler for downstream access;
-     * - context.api.kind : The data "kind" for the handler built by the factory
+     * - context : A context for this specific handler
      */
     .addOptions<ConsumerOptions<K>>(async () => {
-      return {
-        context: {
-          ...context,
-          api: {
-            ...context.api,
-            kind,
-          },
-        },
-      };
+      return { context: args.context };
     });

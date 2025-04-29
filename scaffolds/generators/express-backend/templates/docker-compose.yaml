@@ -13,6 +13,7 @@ services:
       - '3500:3500'
     command: npm run dev
     environment:
+      SERVICE_NAME: <%= name %>
       NODE_ENV: development
       # SEED_DATA: true # Load seed data on start
       JWT_SECRET_KEY: secret

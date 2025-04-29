@@ -1,7 +1,7 @@
 import { z, type ZodTypeAny } from 'zod';
 
 export const createDataSchema = <T extends ZodTypeAny>(itemSchema: T) =>
-  DataSchema.merge(z.object({ data: itemSchema }).passthrough());
+  DataSchema.merge(z.object({ data: itemSchema }));
 
 export const DataSchema = z.object({
   id: z.string(),
