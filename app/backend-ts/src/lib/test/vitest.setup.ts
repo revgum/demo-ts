@@ -29,7 +29,7 @@ vi.mock('@/lib/context', () => {
     logger: mockedLogger,
   };
   return {
-    context,
+    buildServiceContext: vi.fn().mockReturnValue(context),
     buildHandlerContext: vi.fn().mockReturnValue(context),
   };
 });

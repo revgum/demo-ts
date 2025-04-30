@@ -1,8 +1,9 @@
-import { context } from '@/lib/context';
+import { buildServiceContext } from '@/lib/context';
 import { ConsumerStatuses, type CloudEvent } from '@/lib/shared/consumer';
 import * as Metrics from '@/lib/shared/metrics';
+import type { Context } from '@/lib/shared/types';
 import { expectConsumerDataResponse } from '@/lib/test/utils';
-import type { Todo } from '@/types';
+import type { ContextKind, Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
@@ -37,18 +38,20 @@ describe('Todo Consumer', () => {
     data: mockTodos[0],
   };
 
+  let mockedContext: Mocked<Context<ContextKind>>;
   let mockedCounter: Mocked<ReturnType<typeof mockedMetrics.createCounter>>;
   let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
+    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(context) as Mocked<
+    mockedCounter = mockedMetrics.createCounter(mockedContext) as Mocked<
       ReturnType<typeof mockedMetrics.createCounter>
     >;
-    mockedTimer = mockedMetrics.createTimer(context) as Mocked<
+    mockedTimer = mockedMetrics.createTimer(mockedContext) as Mocked<
       ReturnType<typeof mockedMetrics.createTimer>
     >;
   });
@@ -56,7 +59,7 @@ describe('Todo Consumer', () => {
   describe('handleTodo', () => {
     const testHandleTodoEndpoint = async (body?: any) =>
       testEndpoint({
-        endpoint: todoConsumer.handleMessage,
+        endpoint: todoConsumer.handleMessage(mockedContext),
         requestProps: {
           method: 'POST',
           body: body || mockPubSubMessage,

@@ -1,6 +1,5 @@
-import config from '@/db/knexfile';
-import type { Context } from '@/lib/shared/types';
-import type { ContextKind } from '@/types';
+import { buildKnexConfig } from '@/db/knexfile';
+import type { ServiceSecrets } from '@/lib/shared/types';
 import Knex from 'knex';
 
-export const knex = (env: Context<ContextKind>['env']) => Knex(config[env]);
+export const knex = (serviceSecrets: ServiceSecrets) => Knex(buildKnexConfig(serviceSecrets));

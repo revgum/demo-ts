@@ -1,10 +1,11 @@
-import { context } from '@/lib/context';
+import { buildServiceContext } from '@/lib/context';
 import * as PubSub from '@/lib/shared/pubsub';
+import type { Context } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildPaginatedTodos, buildTodos } from '@/lib/test/models/todo';
 import { mockedLogger } from '@/lib/test/utils';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
-import { type Todo } from '@/types';
+import { type ContextKind, type Todo } from '@/types';
 import type { Knex } from 'knex';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from './todo';
@@ -13,15 +14,15 @@ vi.mock('@/models/todo');
 vi.mock('@/lib/shared/pubsub');
 
 describe('Todo Service', () => {
-  const mockedContext = context as Mocked<typeof context>;
-
+  let mockedContext: Mocked<Context<ContextKind>>;
   let mockedTransaction: Mocked<Knex.Transaction>;
   let todo: Todo;
   let mockedPubSub: Mocked<typeof PubSub>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
+    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
     [{ todo }] = buildTodos();
     mockedTransaction = buildMockDbChain() as unknown as Mocked<Knex.Transaction>;
     mockedContext.db.transaction = vi.fn().mockResolvedValue(mockedTransaction);

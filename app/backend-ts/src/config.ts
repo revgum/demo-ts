@@ -1,3 +1,5 @@
+import type { SecretStoreName } from './lib/shared/secrets/types';
+
 const getEnv = () => {
   switch (process.env.NODE_ENV) {
     case 'development':
@@ -26,9 +28,7 @@ const server = {
 const db = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT ? Number.parseInt(process.env.DB_PORT, 10) : 5432,
-  user: process.env.DB_USER || 'postgres',
   database: process.env.DB_NAME || 'postgres-ts',
-  password: process.env.DB_PASSWORD || 'postgres',
   ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   debug: !!process.env.DB_DEBUG,
 };
@@ -37,7 +37,11 @@ const runtime = {
   debug: !!process.env.DEBUG,
   logLevel: process.env.LOG_LEVEL || 'debug',
 };
+const secretsStore = {
+  key: process.env.SECRETS_KEY || 'serviceSecrets',
+  storeName: process.env.SECRETS_STORE_NAME || 'local-secretstore',
+} as { key: string; storeName: SecretStoreName };
 
 const env = getEnv();
 
-export { dapr, db, env, runtime, server, serviceName };
+export { dapr, db, env, runtime, secretsStore, server, serviceName };
