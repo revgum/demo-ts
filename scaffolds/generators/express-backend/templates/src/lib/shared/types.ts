@@ -32,6 +32,12 @@ export type ServiceParams<T, K> = {
   input?: T;
 };
 
+export type ServiceSecrets = {
+  JWT_SECRET: string;
+  DB_USER: string;
+  DB_PASSWORD: string;
+};
+
 export type User = {
   id: string;
 };

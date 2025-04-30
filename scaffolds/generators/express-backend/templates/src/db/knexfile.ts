@@ -1,14 +1,17 @@
-import { db } from '@/config';
-import type { Knex } from 'knex';
+import { db, secretsStore } from '@/config';
+import { buildServiceContext } from '@/lib/context';
+import { get } from '@/lib/shared/secrets';
+import type { ServiceSecrets } from '@/lib/shared/types';
+import type { ContextKind } from '@/types';
 
-const knexConfig: Knex.Config = {
+export const buildKnexConfig = (serviceSecrets: ServiceSecrets) => ({
   client: 'pg',
   connection: {
     host: db.host,
     port: db.port,
-    user: db.user,
+    user: serviceSecrets.DB_USER,
     database: db.database,
-    password: db.password,
+    password: serviceSecrets.DB_PASSWORD,
     ssl: db.ssl,
   },
   pool: {
@@ -20,19 +23,26 @@ const knexConfig: Knex.Config = {
     tableName: 'knex_migrations',
     extension: 'ts',
   },
+});
+
+async function buildConfigurationForEnv() {
+  const context = await buildServiceContext();
+  const serviceSecrets = await get<ContextKind, ServiceSecrets>({
+    context,
+    secretKey: secretsStore.key,
+    secretStoreName: secretsStore.storeName,
+  });
+
+  return {
+    [context.env]: buildKnexConfig(serviceSecrets),
+  };
+}
+
+export const knexConfig = async () => {
+  const configuration = await buildConfigurationForEnv();
+  return {
+    ...configuration,
+  };
 };
 
-const config: { [key: string]: Knex.Config } = {
-  development: {
-    ...knexConfig,
-  },
-  staging: {
-    ...knexConfig,
-  },
-  production: {
-    ...knexConfig,
-  },
-};
-
-module.exports = config;
-export default config;
+export default knexConfig;

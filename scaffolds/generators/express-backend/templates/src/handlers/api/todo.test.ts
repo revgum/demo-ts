@@ -1,5 +1,6 @@
-import { context } from '@/lib/context';
+import { buildServiceContext } from '@/lib/context';
 import * as Metrics from '@/lib/shared/metrics';
+import type { Context } from '@/lib/shared/types';
 import { buildPaginatedTodos } from '@/lib/test/models/todo';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
@@ -10,7 +11,7 @@ import {
   updateTodoById,
 } from '@/services/todo';
 import * as UserService from '@/services/user';
-import type { Todo } from '@/types';
+import type { ContextKind, Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
@@ -37,19 +38,21 @@ describe('Todo Handlers', () => {
     },
   ];
 
+  let mockedContext: Mocked<Context<ContextKind>>;
   let mockedCounter: Mocked<ReturnType<typeof mockedMetrics.createCounter>>;
   let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
+    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
     mockedUserService.getUser.mockResolvedValue({ user: { id: mockUser.id } });
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(context) as Mocked<
+    mockedCounter = mockedMetrics.createCounter(mockedContext) as Mocked<
       ReturnType<typeof mockedMetrics.createCounter>
     >;
-    mockedTimer = mockedMetrics.createTimer(context) as Mocked<
+    mockedTimer = mockedMetrics.createTimer(mockedContext) as Mocked<
       ReturnType<typeof mockedMetrics.createTimer>
     >;
   });
@@ -57,7 +60,7 @@ describe('Todo Handlers', () => {
   describe('getAllTodo', () => {
     const testGetAllEndpoint = async () =>
       testEndpoint({
-        endpoint: todoHandlers.getAllTodo,
+        endpoint: todoHandlers.getAllTodo(mockedContext),
         requestProps: {
           method: 'GET',
           headers: {
@@ -110,7 +113,7 @@ describe('Todo Handlers', () => {
   describe('createTodo', () => {
     const testCreateEndpoint = async () =>
       testEndpoint({
-        endpoint: todoHandlers.createTodo,
+        endpoint: todoHandlers.createTodo(mockedContext),
         requestProps: {
           method: 'POST',
           headers: {
@@ -162,7 +165,7 @@ describe('Todo Handlers', () => {
   describe('updateTodoById', () => {
     const testUpdateEndpoint = async () =>
       testEndpoint({
-        endpoint: todoHandlers.updateTodoById,
+        endpoint: todoHandlers.updateTodoById(mockedContext),
         requestProps: {
           method: 'PUT',
           params: {
@@ -216,7 +219,7 @@ describe('Todo Handlers', () => {
   describe('getTodoById', () => {
     const testGetEndpoint = async () =>
       testEndpoint({
-        endpoint: todoHandlers.getTodoById,
+        endpoint: todoHandlers.getTodoById(mockedContext),
         requestProps: {
           method: 'GET',
           params: {
@@ -266,7 +269,7 @@ describe('Todo Handlers', () => {
   describe('deleteTodoById', () => {
     const testGetEndpoint = async () =>
       testEndpoint({
-        endpoint: todoHandlers.deleteTodoById,
+        endpoint: todoHandlers.deleteTodoById(mockedContext),
         requestProps: {
           method: 'DELETE',
           params: {

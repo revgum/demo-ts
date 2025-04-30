@@ -2,7 +2,7 @@
 FROM localhost/microservice-build as build
 ENV NODE_ENV=development
 WORKDIR /app
-COPY package.json package-lock.json tsconfig.json .env .
+COPY package.json package-lock.json tsconfig.json .
 RUN npm install
 
 # Run

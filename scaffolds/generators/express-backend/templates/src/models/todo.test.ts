@@ -1,8 +1,9 @@
-import { context } from '@/lib/context';
+import { buildServiceContext } from '@/lib/context';
+import type { Context } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildTodos } from '@/lib/test/models/todo';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
-import { type Todo, type TodoDb } from '@/types';
+import { type ContextKind, type Todo, type TodoDb } from '@/types';
 import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 import { afterEach } from 'node:test';
@@ -12,15 +13,16 @@ describe('Todo Model', () => {
   const now = new Date();
   vi.useFakeTimers().setSystemTime(now);
 
-  const mockedContext = context as Mocked<typeof context>;
   const invalidId = randomUUID();
 
+  let mockedContext: Mocked<Context<ContextKind>>;
   let mockedTransaction: Mocked<Knex.Transaction>;
   let mockDbChain: Mocked<Knex.QueryBuilder>;
   let todoDb: TodoDb;
   let todo: Todo;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
     [{ todo, todoDb }] = buildTodos();
     mockDbChain = buildMockDbChain();
     mockedTransaction = vi.fn().mockReturnValue(mockDbChain) as unknown as Mocked<Knex.Transaction>;

@@ -1,34 +1,51 @@
-import { dapr, env, runtime, server, serviceName } from '@/config';
+import { dapr, env, runtime, secretsStore, server, serviceName } from '@/config';
 import { knex } from '@/db/db';
-import type { Context } from '@/lib/shared/types';
-import type { ContextKind } from '@/types';
+import { get } from '@/lib/shared/secrets';
+import type { Context, ServiceSecrets } from '@/lib/shared/types';
+import { ContextKinds, type ContextKind } from '@/types';
 import pino from 'pino';
 
-export const context: Context<ContextKind> = {
-  env,
-  serviceName,
-  handlerName: 'unknown',
-  api: {
-    version: '1.0',
-    kind: 'unknown',
-  },
-  db: knex(env),
-  logger: pino({
-    level: runtime.debug ? 'debug' : 'info',
-  }),
-  runtime,
-  server,
-  dapr,
+export const buildServiceContext = async (): Promise<Context<ContextKind>> => {
+  let context = {
+    env,
+    serviceName,
+    handlerName: 'unknown',
+    api: {
+      version: '1.0',
+      kind: ContextKinds.UNKNOWN,
+    },
+    logger: pino({
+      level: runtime.debug ? 'debug' : 'info',
+    }),
+    runtime,
+    server,
+    dapr,
+  } as unknown as Context<ContextKind>;
+
+  const serviceSecrets = await get<ContextKind, ServiceSecrets>({
+    context,
+    secretKey: secretsStore.key,
+    secretStoreName: secretsStore.storeName,
+  });
+
+  context.db = knex(serviceSecrets);
+
+  return context;
 };
 
-export const buildHandlerContext = <K>(overrides: {
-  kind: K;
-  handlerName: string;
-}): Context<K> => ({
-  ...context,
-  handlerName: overrides.handlerName,
-  api: {
-    ...context.api,
-    kind: overrides.kind,
+export const buildHandlerContext = (
+  overrides: {
+    kind: ContextKind;
+    handlerName: string;
   },
-});
+  context: Context<ContextKind>,
+): Context<ContextKind> => {
+  return {
+    ...context,
+    handlerName: overrides.handlerName,
+    api: {
+      ...context.api,
+      kind: overrides.kind,
+    },
+  };
+};
