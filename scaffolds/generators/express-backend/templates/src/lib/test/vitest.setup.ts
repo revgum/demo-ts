@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { mockedLogger } from './utils';
 
 process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET_KEY = 'test';
 
 vi.mock('@dapr/dapr', () => {
   return {
@@ -13,7 +14,7 @@ vi.mock('@dapr/dapr', () => {
   };
 });
 vi.mock('@/lib/shared/metrics');
-vi.mock('@/lib/context', () => {
+vi.mock('@/lib/shared/context', () => {
   const context = {
     serviceName: 'test-service',
     handlerName: 'test-handler',

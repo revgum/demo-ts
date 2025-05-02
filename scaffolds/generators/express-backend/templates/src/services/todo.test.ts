@@ -1,6 +1,6 @@
-import { buildServiceContext } from '@/lib/context';
+import { buildServiceContext } from '@/lib/shared/context';
 import * as PubSub from '@/lib/shared/pubsub';
-import type { Context } from '@/lib/shared/types';
+import type { Context, ContextConfig } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildPaginatedTodos, buildTodos } from '@/lib/test/models/todo';
 import { mockedLogger } from '@/lib/test/utils';
@@ -22,7 +22,9 @@ describe('Todo Service', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
+    mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
+      Context<ContextKind>
+    >;
     [{ todo }] = buildTodos();
     mockedTransaction = buildMockDbChain() as unknown as Mocked<Knex.Transaction>;
     mockedContext.db.transaction = vi.fn().mockResolvedValue(mockedTransaction);

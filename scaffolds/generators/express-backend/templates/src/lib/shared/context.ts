@@ -1,11 +1,18 @@
-import { dapr, env, runtime, secretsStore, server, serviceName } from '@/config';
-import { knex } from '@/db/db';
+import { knex } from '@/lib/shared/db';
 import { get } from '@/lib/shared/secrets';
-import type { Context, ServiceSecrets } from '@/lib/shared/types';
+import type { Context, ContextConfig, ServiceSecrets } from '@/lib/shared/types';
 import { ContextKinds, type ContextKind } from '@/types';
 import pino from 'pino';
 
-export const buildServiceContext = async (): Promise<Context<ContextKind>> => {
+export const buildServiceContext = async ({
+  dapr,
+  db,
+  env,
+  runtime,
+  secretsStore,
+  server,
+  serviceName,
+}: ContextConfig<ContextKind>): Promise<Context<ContextKind>> => {
   let context = {
     env,
     serviceName,
@@ -28,7 +35,7 @@ export const buildServiceContext = async (): Promise<Context<ContextKind>> => {
     secretStoreName: secretsStore.storeName,
   });
 
-  context.db = knex(serviceSecrets);
+  context.db = knex(serviceSecrets, { db, secretsStore });
 
   return context;
 };

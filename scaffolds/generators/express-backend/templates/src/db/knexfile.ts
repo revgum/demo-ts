@@ -1,40 +1,23 @@
-import { db, secretsStore } from '@/config';
-import { buildServiceContext } from '@/lib/context';
+import * as config from '@/config';
+import { buildServiceContext } from '@/lib/shared/context';
+import { buildKnexConfig } from '@/lib/shared/db/db';
 import { get } from '@/lib/shared/secrets';
 import type { ServiceSecrets } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
 
-export const buildKnexConfig = (serviceSecrets: ServiceSecrets) => ({
-  client: 'pg',
-  connection: {
-    host: db.host,
-    port: db.port,
-    user: serviceSecrets.DB_USER,
-    database: db.database,
-    password: serviceSecrets.DB_PASSWORD,
-    ssl: db.ssl,
-  },
-  pool: {
-    min: 0,
-    max: 10,
-  },
-  debug: db.debug,
-  migrations: {
-    tableName: 'knex_migrations',
-    extension: 'ts',
-  },
-});
-
 async function buildConfigurationForEnv() {
-  const context = await buildServiceContext();
+  const context = await buildServiceContext(config);
   const serviceSecrets = await get<ContextKind, ServiceSecrets>({
     context,
-    secretKey: secretsStore.key,
-    secretStoreName: secretsStore.storeName,
+    secretKey: config.secretsStore.key,
+    secretStoreName: config.secretsStore.storeName,
   });
 
   return {
-    [context.env]: buildKnexConfig(serviceSecrets),
+    [context.env]: buildKnexConfig(serviceSecrets, {
+      db: config.db,
+      secretsStore: config.secretsStore,
+    }),
   };
 }
 

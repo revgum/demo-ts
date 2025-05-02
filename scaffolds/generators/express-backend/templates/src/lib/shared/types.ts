@@ -1,5 +1,6 @@
 import type { Knex } from 'knex';
 import type { Logger } from 'pino';
+import type { DbConfig } from './db';
 
 export type Context<K> = {
   serviceName: string;
@@ -25,6 +26,9 @@ export type Context<K> = {
     port: string;
   };
 };
+
+export type ContextConfig<K> = DbConfig &
+  Pick<Context<K>, 'dapr' | 'env' | 'runtime' | 'server' | 'serviceName'>;
 
 export type ServiceParams<T, K> = {
   context: Context<K>;

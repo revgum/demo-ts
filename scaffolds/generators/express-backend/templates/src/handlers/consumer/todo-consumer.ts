@@ -1,4 +1,3 @@
-import { buildHandlerContext } from '@/lib/context';
 import {
   consumersFactory,
   ConsumerStatusEnum,
@@ -6,6 +5,7 @@ import {
   createDataSchema,
   type ConsumerStatus,
 } from '@/lib/shared/consumer';
+import { buildHandlerContext } from '@/lib/shared/context';
 import { createCounter, createTimer } from '@/lib/shared/metrics';
 import type { Context } from '@/lib/shared/types';
 import { TodoSchema } from '@/schemas/todo';

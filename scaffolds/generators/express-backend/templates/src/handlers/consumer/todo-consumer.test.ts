@@ -1,7 +1,7 @@
-import { buildServiceContext } from '@/lib/context';
 import { ConsumerStatuses, type CloudEvent } from '@/lib/shared/consumer';
+import { buildServiceContext } from '@/lib/shared/context';
 import * as Metrics from '@/lib/shared/metrics';
-import type { Context } from '@/lib/shared/types';
+import type { Context, ContextConfig } from '@/lib/shared/types';
 import { expectConsumerDataResponse } from '@/lib/test/utils';
 import type { ContextKind, Todo } from '@/types';
 import { testEndpoint } from 'express-zod-api';
@@ -45,7 +45,9 @@ describe('Todo Consumer', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
+    mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
+      Context<ContextKind>
+    >;
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
     mockedCounter = mockedMetrics.createCounter(mockedContext) as Mocked<
