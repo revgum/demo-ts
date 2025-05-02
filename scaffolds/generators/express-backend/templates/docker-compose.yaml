@@ -9,8 +9,10 @@ services:
       - 'sos.service-type=microservice'
     build:
       dockerfile: ./Dockerfile.dev
-    ports:
-      - '3500:3500'
+    # Uncomment and set a non-conflicting LOCAL_PORT to map this containers Dapr sidecar for direct access
+    # ie. ('LOCAL_PORT:REMOTE_PORT') => '3501:3500'
+    #ports:
+    #  - '3500:3500'
     command: npm run dev
     environment:
       SERVICE_NAME: <%= name %>
