@@ -1,4 +1,3 @@
-import { buildHandlerContext } from '@/lib/context';
 import {
   ApiPayloadSchema,
   buildItemsResponse,
@@ -7,6 +6,7 @@ import {
   endpointsFactory,
   UuidParamsSchema,
 } from '@/lib/shared/api';
+import { buildHandlerContext } from '@/lib/shared/context';
 import { createCounter, createTimer } from '@/lib/shared/metrics';
 import type { Context } from '@/lib/shared/types';
 import { TodoCreateSchema, TodoQueryFields, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';

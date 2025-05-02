@@ -1,8 +1,9 @@
+import * as serviceConfig from '@/config';
 import * as TodoApiHandlers from '@/handlers/api/todo';
 import * as TodoConsumer from '@/handlers/consumer/todo-consumer';
-import { buildServiceContext } from '@/lib/context';
 import { buildOpenApiSpec } from '@/lib/openapi';
 import { loadSeedData } from '@/lib/seed';
+import { buildServiceContext } from '@/lib/shared/context';
 import { buildDaprClient, buildDaprServer } from '@/lib/shared/dapr';
 import type { Context } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
@@ -65,7 +66,7 @@ const serverRouting = (context: Context<ContextKind>) =>
   }) as Routing;
 
 const startServer = async () => {
-  const context = await buildServiceContext();
+  const context = await buildServiceContext(serviceConfig);
   const config = serverConfig(context);
   const serverRoutes = serverRouting(context);
 

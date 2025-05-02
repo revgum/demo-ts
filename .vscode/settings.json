@@ -15,6 +15,9 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "workbench.editor.customLabels.patterns": {
     "**/route.ts": "${dirname}/${filename}.ts",
     "{**/layout.tsx,**/page.tsx,**/template.tsx}": "${dirname}/${filename}.tsx"

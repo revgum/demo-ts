@@ -14,7 +14,7 @@ vi.mock('@dapr/dapr', () => {
   };
 });
 vi.mock('@/lib/shared/metrics');
-vi.mock('@/lib/context', () => {
+vi.mock('@/lib/shared/context', () => {
   const context = {
     serviceName: 'test-service',
     handlerName: 'test-handler',

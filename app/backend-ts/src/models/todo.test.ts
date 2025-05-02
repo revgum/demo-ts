@@ -1,5 +1,5 @@
-import { buildServiceContext } from '@/lib/context';
-import type { Context } from '@/lib/shared/types';
+import { buildServiceContext } from '@/lib/shared/context';
+import type { Context, ContextConfig } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildTodos } from '@/lib/test/models/todo';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
@@ -22,7 +22,9 @@ describe('Todo Model', () => {
   let todo: Todo;
 
   beforeEach(async () => {
-    mockedContext = (await buildServiceContext()) as Mocked<Context<ContextKind>>;
+    mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
+      Context<ContextKind>
+    >;
     [{ todo, todoDb }] = buildTodos();
     mockDbChain = buildMockDbChain();
     mockedTransaction = vi.fn().mockReturnValue(mockDbChain) as unknown as Mocked<Knex.Transaction>;
