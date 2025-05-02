@@ -165,7 +165,7 @@ describe('Todo Handlers', () => {
   });
 
   describe('updateTodoById', () => {
-    const testUpdateEndpoint = async () =>
+    const testUpdateEndpoint = async (method: 'PUT' | 'PATCH') =>
       testEndpoint({
         endpoint: todoHandlers.updateTodoById(mockedContext),
         requestProps: {
@@ -183,37 +183,75 @@ describe('Todo Handlers', () => {
         },
       });
 
-    it('responds with an API data response', async () => {
-      vi.mocked(updateTodoById).mockResolvedValue({ ...mockTodos[0], completed: false });
+    describe('using HTTP PUT', () => {
+      it('responds with an API data response', async () => {
+        vi.mocked(updateTodoById).mockResolvedValue({ ...mockTodos[0], completed: false });
 
-      const { responseMock, loggerMock } = await testUpdateEndpoint();
-      expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
-      expect(loggerMock._getLogs().error).toHaveLength(0);
-      expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
+        const { responseMock, loggerMock } = await testUpdateEndpoint('PUT');
+        expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
+        expect(loggerMock._getLogs().error).toHaveLength(0);
+        expect(responseMock._getStatusCode()).toBe(200);
+        expect(mockedMetrics.createCounter).toHaveBeenCalled();
+        expect(mockedMetrics.createTimer).toHaveBeenCalled();
+        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+          success: true,
+        });
+        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+          success: true,
+        });
       });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
+
+      it('responds with an API error response', async () => {
+        vi.mocked(updateTodoById).mockRejectedValue(new Error('Database error'));
+
+        const { responseMock, loggerMock } = await testUpdateEndpoint('PUT');
+        expectApiError(responseMock);
+        expect(loggerMock._getLogs().error).toHaveLength(1);
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(mockedMetrics.createCounter).toHaveBeenCalled();
+        expect(mockedMetrics.createTimer).toHaveBeenCalled();
+        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+          success: false,
+        });
+        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+          success: false,
+        });
       });
     });
 
-    it('responds with an API error response', async () => {
-      vi.mocked(updateTodoById).mockRejectedValue(new Error('Database error'));
+    describe('using HTTP PATCH', () => {
+      it('responds with an API data response', async () => {
+        vi.mocked(updateTodoById).mockResolvedValue({ ...mockTodos[0], completed: false });
 
-      const { responseMock, loggerMock } = await testUpdateEndpoint();
-      expectApiError(responseMock);
-      expect(loggerMock._getLogs().error).toHaveLength(1);
-      expect(responseMock._getStatusCode()).toBe(500);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
+        const { responseMock, loggerMock } = await testUpdateEndpoint('PATCH');
+        expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
+        expect(loggerMock._getLogs().error).toHaveLength(0);
+        expect(responseMock._getStatusCode()).toBe(200);
+        expect(mockedMetrics.createCounter).toHaveBeenCalled();
+        expect(mockedMetrics.createTimer).toHaveBeenCalled();
+        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+          success: true,
+        });
+        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+          success: true,
+        });
       });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: false,
+
+      it('responds with an API error response', async () => {
+        vi.mocked(updateTodoById).mockRejectedValue(new Error('Database error'));
+
+        const { responseMock, loggerMock } = await testUpdateEndpoint('PATCH');
+        expectApiError(responseMock);
+        expect(loggerMock._getLogs().error).toHaveLength(1);
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(mockedMetrics.createCounter).toHaveBeenCalled();
+        expect(mockedMetrics.createTimer).toHaveBeenCalled();
+        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
+          success: false,
+        });
+        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
+          success: false,
+        });
       });
     });
   });
