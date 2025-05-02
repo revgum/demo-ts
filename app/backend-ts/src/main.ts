@@ -42,12 +42,19 @@ const serverRouting = (context: Context<ContextKind>) =>
     api: {
       v1: {
         todos: new DependsOnMethod({
+          // GET: /api/v1/todos
           get: TodoApiHandlers.getAllTodo(context),
+          // POST: /api/v1/todos
           post: TodoApiHandlers.createTodo(context),
         }).nest({
           ':id': new DependsOnMethod({
+            // GET: /api/v1/todos/{id}
             get: TodoApiHandlers.getTodoById(context),
+            // PUT: /api/v1/todos/{id}
             put: TodoApiHandlers.updateTodoById(context),
+            // PATCH : /api/v1/todos/{id}
+            patch: TodoApiHandlers.updateTodoById(context),
+            // DELETE: /api/v1/todos/{id}
             delete: TodoApiHandlers.deleteTodoById(context),
           }),
         }),
@@ -55,6 +62,7 @@ const serverRouting = (context: Context<ContextKind>) =>
     },
     consumer: {
       // Example endpoint for consuming a Dapr PubSub subscription
+      // POST: /consumer/todo
       todo: TodoConsumer.handleMessage(context),
     },
     // path /public serves static files from /public

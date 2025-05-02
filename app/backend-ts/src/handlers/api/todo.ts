@@ -31,7 +31,7 @@ const todoEndpointsFactory = (context: Context<ContextKind>) => {
 };
 
 /**
- * example route: GET /api/v1/todos
+ * example route: GET /api/v1/todos?page=2&pageSize=25
  * - Has no route params or request body
  * - Returns a list of todo records or an error according to the ApiPayloadSchema
  */
