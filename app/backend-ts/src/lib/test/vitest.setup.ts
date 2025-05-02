@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { mockedLogger } from './utils';
 
 process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET_KEY = 'test';
 
 vi.mock('@dapr/dapr', () => {
   return {
