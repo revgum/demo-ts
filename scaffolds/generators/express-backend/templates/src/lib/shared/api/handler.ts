@@ -10,6 +10,8 @@ import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import { randomUUID } from 'node:crypto';
 import type { ZodTypeAny } from 'zod';
+import { createCounter, createTimer } from '../metrics';
+import type { Context } from '../types';
 import {
   AuthMiddleware,
   ErrorPayloadSchema,
@@ -18,9 +20,10 @@ import {
   type GetJwtUser,
 } from './';
 
-type EndpointOptions<C = unknown> = {
+type EndpointOptions<C> = {
   context: C;
   requestId: string; // UUID v4 for this request
+  requestStart: number; // Start time for this request
 };
 
 /**
@@ -55,8 +58,7 @@ type EndpointOptions<C = unknown> = {
  * - In production, unhandled errors are sanitized to prevent leaking sensitive information.
  * - Explicitly setting `expose: true` when throwing an error with `createHttpError` will include the error message in the response.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const apiResultsHandler = <T extends ZodTypeAny, C = any>(kind: string, itemSchema: T) =>
+const apiResultsHandler = <T extends ZodTypeAny, C>(kind: string, itemSchema: T) =>
   new ResultHandler({
     positive: () => {
       return {
@@ -74,24 +76,36 @@ const apiResultsHandler = <T extends ZodTypeAny, C = any>(kind: string, itemSche
       response: Response;
       options: FlatObject;
     }) => {
-      const { context, requestId } = params.options as EndpointOptions<C>;
+      const { requestId, requestStart } = params.options as EndpointOptions<C>;
+      const context = params.options.context as Context<C>;
       const { error, output, response } = params;
+      const counter = createCounter(context, context.handlerEndpoint);
+      const timer = createTimer(context, context.handlerEndpoint);
+      const success = error ? false : true;
 
-      if (error) {
+      try {
+        if (error) {
+          throw error;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        response.json({ id: requestId, ...(output as any) });
+      } catch (err: unknown) {
+        const error = err as Error;
         const { statusCode, expose } = ensureHttpError(error);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const shouldScrub = (context as any)?.env === 'production' && !expose;
+        const shouldScrub = context.env === 'production' && !expose;
         const message = shouldScrub
           ? createHttpError(statusCode).message
           : getMessageFromError(error);
         return void response.status(statusCode).json({
           id: requestId,
-          ...buildServerErrorResponse(context as any, message, statusCode),
+          ...buildServerErrorResponse(context, message, statusCode),
         });
+      } finally {
+        counter.add(1, { success });
+        timer.record(performance.now() - requestStart, { success });
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response.json({ id: requestId, ...(output as any) });
     },
   });
 
@@ -120,11 +134,12 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
      * - requestId : A unique ID for this request to be used in logging or metrics
      * - context.api.kind : The data "kind" for the handler built by the factory
      */
+    // Execute the authentication middleware on every request
+    .addMiddleware(AuthMiddleware(context, getUser))
     .addOptions<EndpointOptions<C>>(async () => {
       return {
         requestId: randomUUID(),
+        requestStart: performance.now(),
         context,
       };
-    })
-    // Execute the authentication middleware on every request
-    .addMiddleware(AuthMiddleware(context, getUser));
+    });
