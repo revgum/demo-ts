@@ -6,17 +6,17 @@ import {
   type ConsumerStatus,
 } from '@/lib/shared/consumer';
 import { buildHandlerContext } from '@/lib/shared/context';
-import { createCounter, createTimer } from '@/lib/shared/metrics';
 import type { Context } from '@/lib/shared/types';
 import { TodoSchema } from '@/schemas/todo';
 import { ContextKinds, type ContextKind } from '@/types';
 import { z } from 'zod';
 
-const todoConsumerFactory = (context: Context<ContextKind>) => {
+const todoConsumerFactory = (context: Context<ContextKind>, handlerEndpoint: string) => {
   const consumerContext = buildHandlerContext(
     {
-      kind: ContextKinds.TODO,
+      apiKind: ContextKinds.TODO,
       handlerName: 'todo-consumer',
+      handlerEndpoint,
     },
     context,
   );
@@ -38,16 +38,12 @@ const todoConsumerFactory = (context: Context<ContextKind>) => {
  *   c. "DROP" drops the message from the queue and will not retry processing
  */
 export const handleMessage = (context: Context<ContextKind>) =>
-  todoConsumerFactory(context).build({
+  todoConsumerFactory(context, 'todo.handle-message').build({
     method: 'post',
     input: createDataSchema(TodoSchema),
     output: z.object({ status: ConsumerStatusEnum }),
-    handler: async ({ input, logger, options: { context } }) => {
-      const { pubsubname, topic, source } = input;
+    handler: async ({ input, logger }) => {
       let status: ConsumerStatus = ConsumerStatuses.SUCCESS;
-      const counter = createCounter(context);
-      const timer = createTimer(context);
-      const start = performance.now();
       try {
         logger.info({ input }, 'Consumer handling message.');
         // TODO: Do something with the message
@@ -56,10 +52,6 @@ export const handleMessage = (context: Context<ContextKind>) =>
         status = ConsumerStatuses.DROP;
         logger.error({ err }, 'Error processing message.');
         return { status };
-      } finally {
-        const metricAttributes = { status, pubsubname, topic, source };
-        counter.add(1, metricAttributes);
-        timer.record(performance.now() - start, metricAttributes);
       }
     },
   });

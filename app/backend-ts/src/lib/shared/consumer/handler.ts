@@ -8,11 +8,12 @@ import {
 } from 'express-zod-api';
 import type { BaseLogger } from 'pino';
 import { z } from 'zod';
-import { createCounter } from '../metrics';
+import { createCounter, createTimer } from '../metrics';
 import type { Context } from '../types';
 
 type ConsumerOptions<K> = {
   context: Context<K>;
+  consumerStart: number;
 };
 
 type ConsumerFactoryArgs<K> = {
@@ -42,8 +43,18 @@ const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
       logger: BaseLogger;
     }) => {
       const { error, output, response, logger } = params;
+      const { consumerStart } = params.options as ConsumerOptions<K>;
+      const counter = createCounter(context);
+      const timer = createTimer(context);
 
-      if (error) {
+      try {
+        if (error) {
+          throw error;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        response.json({ ...(output as any) });
+      } catch (err: unknown) {
+        const error = err as Error | InputValidationError;
         const inputValidationError = error instanceof InputValidationError;
         logger.error(getMessageFromError(error));
 
@@ -55,10 +66,16 @@ const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
         return void response.json({
           status: ConsumerStatuses.DROP,
         });
+      } finally {
+        const metricAttributes = {
+          status: params.output?.status,
+          pubsubname: params.input?.pubsubname,
+          topic: params.input?.topic,
+          source: params.input?.source,
+        };
+        counter.add(1, metricAttributes);
+        timer.record(performance.now() - consumerStart, metricAttributes);
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response.json({ ...(output as any) });
     },
   });
 
@@ -69,5 +86,5 @@ export const consumersFactory = <K>(args: ConsumerFactoryArgs<K>) =>
      * - context : A context for this specific handler
      */
     .addOptions<ConsumerOptions<K>>(async () => {
-      return { context: args.context };
+      return { context: args.context, consumerStart: performance.now() };
     });

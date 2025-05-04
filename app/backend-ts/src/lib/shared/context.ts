@@ -17,6 +17,7 @@ export const buildServiceContext = async ({
     env,
     serviceName,
     handlerName: 'unknown',
+    handlerEndpoint: 'unknown',
     api: {
       version: '1.0',
       kind: ContextKinds.UNKNOWN,
@@ -42,17 +43,21 @@ export const buildServiceContext = async ({
 
 export const buildHandlerContext = (
   overrides: {
-    kind: ContextKind;
+    apiKind: ContextKind;
+    apiVersion?: string;
     handlerName: string;
+    handlerEndpoint: string;
   },
   context: Context<ContextKind>,
 ): Context<ContextKind> => {
   return {
     ...context,
     handlerName: overrides.handlerName,
+    handlerEndpoint: overrides.handlerEndpoint,
     api: {
       ...context.api,
-      kind: overrides.kind,
+      kind: overrides.apiKind,
+      version: overrides.apiVersion || context.api.version,
     },
   };
 };

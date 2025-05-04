@@ -5,6 +5,7 @@ import type { DbConfig } from './db';
 export type Context<K> = {
   serviceName: string;
   handlerName: string;
+  handlerEndpoint: string;
   env: 'development' | 'staging' | 'production';
   api: {
     version: string;
