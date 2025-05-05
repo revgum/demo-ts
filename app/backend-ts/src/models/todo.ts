@@ -1,4 +1,5 @@
 import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
+import { getQueryParams } from '@/lib/shared/api/helpers';
 import type { Context } from '@/lib/shared/types';
 import { TodoQueryFields } from '@/schemas/todo';
 import type {
@@ -32,13 +33,6 @@ export const getAll = async (
   context: Context<ContextKind>,
   queryParams?: QueryParams<TodoQueryField>,
 ): Promise<PaginatedQueryResults<Todo, TodoQueryField>> => {
-  const {
-    page = 1,
-    pageSize = 50,
-    orderBy = 'created_at',
-    orderDirection = 'desc',
-  } = queryParams || {};
-
   const totalCountResult = await context
     .db<TodoDb>(TABLE_NAME)
     .where('deleted_at', null)
@@ -46,20 +40,22 @@ export const getAll = async (
     .first();
 
   const totalItems = Number.parseInt(totalCountResult?.count.toString() ?? '0');
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const orderByField = TodoQueryFields.includes(orderBy) ? orderBy : 'created_at';
-  const offset = (page - 1) * pageSize;
+  const { page, pageSize, orderBy, orderDirection, offset, totalPages } = getQueryParams(
+    TodoQueryFields,
+    queryParams,
+    totalItems,
+  );
 
   const rows = await context
     .db<TodoDb>(TABLE_NAME)
     .where('deleted_at', null)
-    .orderBy(orderByField, orderDirection)
+    .orderBy(orderBy, orderDirection)
     .offset(offset)
     .limit(pageSize)
     .returning<TodoDb[]>('*');
 
   return {
-    orderBy: orderByField,
+    orderBy,
     orderDirection,
     pageIndex: page,
     totalPages,

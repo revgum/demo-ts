@@ -20,6 +20,15 @@ type ConsumerFactoryArgs<K> = {
   context: Context<K>;
 };
 
+type HandlerParams = {
+  input: FlatObject | null;
+  error: Error | null;
+  output: FlatObject | null;
+  response: Response;
+  options: FlatObject;
+  logger: BaseLogger;
+};
+
 export const ConsumerStatuses = { SUCCESS: 'SUCCESS', RETRY: 'RETRY', DROP: 'DROP' } as const;
 
 const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
@@ -34,14 +43,7 @@ const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
       schema: z.object({ status: z.enum([ConsumerStatuses.DROP]) }),
       mimeType: 'application/json',
     }),
-    handler: (params: {
-      input: FlatObject | null;
-      error: Error | null;
-      output: FlatObject | null;
-      response: Response;
-      options: FlatObject;
-      logger: BaseLogger;
-    }) => {
+    handler: (params: HandlerParams) => {
       const { error, output, response, logger } = params;
       const { consumerStart } = params.options as ConsumerOptions<K>;
       const counter = createCounter(context);
@@ -55,13 +57,11 @@ const consumerResultsHandler = <K>({ context }: ConsumerFactoryArgs<K>) =>
         response.json({ ...(output as any) });
       } catch (err: unknown) {
         const error = err as Error | InputValidationError;
-        const inputValidationError = error instanceof InputValidationError;
         logger.error(getMessageFromError(error));
 
-        const counter = createCounter(context as any);
-        counter.add(1, {
+        createCounter(context as any).add(1, {
           status: ConsumerStatuses.DROP,
-          inputValidationError,
+          inputValidationError: error instanceof InputValidationError,
         });
         return void response.json({
           status: ConsumerStatuses.DROP,
@@ -84,6 +84,7 @@ export const consumersFactory = <K>(args: ConsumerFactoryArgs<K>) =>
     /**
      * For every message, inject options to every handler for downstream access;
      * - context : A context for this specific handler
+     * - consumerStart : The start time for this message being consumed
      */
     .addOptions<ConsumerOptions<K>>(async () => {
       return { context: args.context, consumerStart: performance.now() };
