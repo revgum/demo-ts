@@ -1,6 +1,5 @@
 import {
   ApiPayloadSchema,
-  buildItemsResponse,
   buildResponse,
   createQueryParamsSchema,
   endpointsFactory,
@@ -47,7 +46,7 @@ export const getAllTodo = (context: Context<ContextKind>) =>
           serviceParams: { context, logger },
           queryParams: input as QueryParams<TodoQueryField>,
         });
-        return buildItemsResponse(TodoSchema, context, payload);
+        return buildResponse(TodoSchema, context, payload);
       } catch (err) {
         logger.error({ err }, 'Error fetching todos');
         throw createHttpError(500, err as Error, { expose: false });

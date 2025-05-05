@@ -48,6 +48,8 @@ describe('Todo Handlers', () => {
     mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
       Context<ContextKind>
     >;
+    mockedContext.api.kind = 'todo';
+
     mockedUserService.getUser.mockResolvedValue({ user: { id: mockUser.id } });
     mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
     mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
