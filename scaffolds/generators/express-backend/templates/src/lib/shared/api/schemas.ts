@@ -1,4 +1,5 @@
 import { type ZodTypeAny, z } from 'zod';
+import { DEFAULT_ORDER_DIRECTION, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from './helpers';
 
 const ErrorSchema = z.object({
   code: z.number(),
@@ -91,14 +92,14 @@ export const ApiPayloadSchema = z.union([SuccessPayloadSchema, ErrorPayloadSchem
 export const UuidParamsSchema = z.object({ id: z.string().uuid() });
 
 export const QueryParamsSchema = z.object({
-  page: z.coerce.number().optional(),
-  pageSize: z.coerce.number().optional(),
-  orderDirection: z.enum(['asc', 'desc']).optional(),
+  page: z.coerce.number().min(1).default(DEFAULT_PAGE).optional(),
+  pageSize: z.coerce.number().max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE).optional(),
+  orderDirection: z.enum(['asc', 'desc']).default(DEFAULT_ORDER_DIRECTION).optional(),
 });
 
 export const createQueryParamsSchema = (orderByFields: readonly [string, ...string[]]) =>
   QueryParamsSchema.merge(
     z.object({
-      orderBy: z.enum(orderByFields).optional(),
+      orderBy: z.enum(orderByFields).default('created_at').optional(),
     }),
   );

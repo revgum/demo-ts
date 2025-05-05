@@ -26,6 +26,13 @@ type EndpointOptions<C> = {
   requestStart: number; // Start time for this request
 };
 
+type HandlerParams = {
+  error: Error | null;
+  output: FlatObject | null;
+  response: Response;
+  options: FlatObject;
+};
+
 /**
  * Creates a result handler for API responses, supporting both success and error scenarios.
  *
@@ -70,15 +77,11 @@ const apiResultsHandler = <T extends ZodTypeAny, C>(kind: string, itemSchema: T)
       schema: ErrorPayloadSchema,
       mimeType: 'application/json',
     }),
-    handler: (params: {
-      error: Error | null;
-      output: FlatObject | null;
-      response: Response;
-      options: FlatObject;
-    }) => {
-      const { requestId, requestStart } = params.options as EndpointOptions<C>;
-      const context = params.options.context as Context<C>;
-      const { error, output, response } = params;
+    handler: (params: HandlerParams) => {
+      const { error, output, response, options } = params;
+      const { requestId, requestStart } = options as EndpointOptions<C>;
+      const context = options.context as Context<C>;
+
       const counter = createCounter(context, context.handlerEndpoint);
       const timer = createTimer(context, context.handlerEndpoint);
       const success = error ? false : true;
@@ -132,6 +135,7 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
     /**
      * For every request, inject options to every handler for downstream access;
      * - requestId : A unique ID for this request to be used in logging or metrics
+     * - requestStart : The start time for this request
      * - context.api.kind : The data "kind" for the handler built by the factory
      */
     // Execute the authentication middleware on every request

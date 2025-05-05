@@ -5,13 +5,14 @@ import {
   createQueryParamsSchema,
   endpointsFactory,
   UuidParamsSchema,
+  type QueryParams,
 } from '@/lib/shared/api';
 import { buildHandlerContext } from '@/lib/shared/context';
 import type { Context } from '@/lib/shared/types';
 import { TodoCreateSchema, TodoQueryFields, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
 import * as TodoService from '@/services/todo';
 import { getUser } from '@/services/user';
-import { ContextKinds, type ContextKind } from '@/types';
+import { ContextKinds, type ContextKind, type TodoQueryField } from '@/types';
 import createHttpError from 'http-errors';
 
 const todoEndpointsFactory = (context: Context<ContextKind>, handlerEndpoint: string) => {
@@ -44,10 +45,7 @@ export const getAllTodo = (context: Context<ContextKind>) =>
       try {
         const payload = await TodoService.getAllTodo({
           serviceParams: { context, logger },
-          queryParams: {
-            ...input,
-            orderBy: input.orderBy as any, // Sadly, punting on getting type safety through this
-          },
+          queryParams: input as QueryParams<TodoQueryField>,
         });
         return buildItemsResponse(TodoSchema, context, payload);
       } catch (err) {
