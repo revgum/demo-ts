@@ -6,6 +6,10 @@ import {
   type PaginatedQueryResults,
 } from './';
 
+// Type guard to check if payload is a paginated result
+const isPaginated = <M, F>(payload: any): payload is PaginatedQueryResults<M, F> =>
+  Array.isArray(payload?.items);
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const DataResponseSchema = <T extends ZodType<any>>(itemSchema: T) =>
   z
@@ -26,37 +30,41 @@ const DataResponseSchema = <T extends ZodType<any>>(itemSchema: T) =>
     })
     .passthrough();
 
-export const buildResponse = <T>(
+/**
+ * Builds a standardized API response from a single object or a paginated list.
+ *
+ * @param schema - Zod schema to validate items
+ * @param context - Context containing API metadata (version and kind)
+ * @param payload - Either a paginated list of items or a single item
+ * @returns A validated API response object
+ */
+export const buildResponse = <T, M, F>(
   schema: ZodType<T>,
   context: { api: { version: string; kind: string } },
-  payload: T,
+  payload: PaginatedQueryResults<M, F> | T,
 ): ApiDataPayload => {
-  const dataPayload = { data: { kind: context.api.kind, ...payload } };
-  const dataSchema = DataResponseSchema(schema);
-  const apiPayload = ApiPayloadSchema.parse({
-    apiVersion: context.api.version,
-    ...dataSchema.parse(dataPayload),
-  });
-  return apiPayload as ApiDataPayload;
-};
+  const data = isPaginated<M, F>(payload)
+    ? {
+        ...payload,
+        items: payload.items.map((item) => ({
+          kind: context.api.kind,
+          ...item,
+        })),
+      }
+    : {
+        ...payload,
+        kind: context.api.kind,
+      };
 
-export const buildItemsResponse = <T, M, F>(
-  schema: ZodType<T>,
-  context: { api: { version: string; kind: string } },
-  payload: PaginatedQueryResults<M, F>,
-): ApiDataPayload => {
-  const dataPayload = {
-    data: {
-      ...payload,
-      items: payload.items.map((p) => ({ kind: context.api.kind, ...p })),
-    },
-  };
+  // Validate the inner data structure using the schema
   const dataSchema = DataResponseSchema(schema);
-  const apiPayload = ApiPayloadSchema.parse({
+  const validatedData = dataSchema.parse({ data });
+
+  // Wrap with API metadata and validate full structure
+  return ApiPayloadSchema.parse({
     apiVersion: context.api.version,
-    ...dataSchema.parse(dataPayload),
-  });
-  return apiPayload as ApiDataPayload;
+    ...validatedData,
+  }) as ApiDataPayload;
 };
 
 export const buildErrorResponse = (payload: ApiErrorPayload) => ApiPayloadSchema.parse(payload);
