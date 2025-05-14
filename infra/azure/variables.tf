@@ -135,20 +135,32 @@ variable "internal_load_balancer_enabled" {
   default     = false
 }
 
-variable "dapr_name" {
-  description = "(Required) Specifies the name of the dapr component."
+variable "dapr_state_name" {
+  description = "(Required) Specifies the name of the dapr state component."
   type        = string
   default     = "statestore"
 }
 
-variable "dapr_component_type" {
+variable "dapr_state_component_type" {
   description = "(Required) Specifies the type of the dapr component."
   type        = string
   default     = "state.azure.blobstorage"
 }
 
+variable "dapr_pubsub_name" {
+  description = "(Required) Specifies the name of the dapr pubsub component."
+  type        = string
+  default     = "redis-pusub"
+}
+
+variable "dapr_pubsub_component_type" {
+  description = "(Required) Specifies the type of the dapr component."
+  type        = string
+  default     = "pubsub.redis"
+}
+
 variable "dapr_ignore_errors" {
-  description = "(Required) Specifies  if the component errors are ignored."
+  description = "(Required) Specifies if the component errors are ignored."
   type        = bool
   default     = false
 }
@@ -168,7 +180,7 @@ variable "dapr_init_timeout" {
 variable "dapr_scopes" {
   description = "(Required) Specifies the init timeout of the dapr component."
   type        = list
-  default     = ["nodeapp"]
+  default     = ["webapp"]
 }
 
 variable "container_name" {

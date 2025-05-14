@@ -124,6 +124,40 @@ module "container_registry" {
   tags                             = var.tags
 }
 
+module "redis_cache_backend" {
+  source              = "./modules/redis_cache"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
+  cache_name          = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}backendcache"
+}
+
+module "redis_private_dns_zone" {
+  source                       = "./modules/private_dns_zone"
+  name                         = "privatelink.redis.cache.windows.net"
+  resource_group_name          = azurerm_resource_group.rg.name
+  virtual_networks_to_link     = {
+    (module.virtual_network.name) = {
+      subscription_id = data.azurerm_client_config.current.subscription_id
+      resource_group_name = azurerm_resource_group.rg.name
+    }
+  }
+}
+
+module "redis_private_endpoint" {
+  source                         = "./modules/private_endpoint"
+  name                           = "${title(module.redis_cache_backend.name)}PrivateEndpoint"
+  location                       = var.location
+  resource_group_name            = azurerm_resource_group.rg.name
+  subnet_id                      = module.virtual_network.subnet_ids[var.private_endpoint_subnet_name]
+  tags                           = var.tags
+  private_connection_resource_id = module.redis_cache_backend.id
+  is_manual_connection           = false
+  subresource_name               = "redisCache"
+  private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
+  private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
+}
+
 module "container_apps" {
   source                           = "./modules/container_apps"
   managed_environment_name         = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.managed_environment_name}"
@@ -133,33 +167,61 @@ module "container_apps" {
   infrastructure_subnet_id         = module.virtual_network.subnet_ids[var.aca_subnet_name]
   instrumentation_key              = module.application_insights.instrumentation_key
   workspace_id                     = module.log_analytics_workspace.id
-  dapr_components                  = [{
-                                      name            = var.dapr_name
-                                      component_type  = var.dapr_component_type
-                                      version         = var.dapr_version
-                                      ignore_errors   = var.dapr_ignore_errors
-                                      init_timeout    = var.dapr_init_timeout
-                                      secret          = [
-                                        {
-                                          name        = "storageaccountkey"
-                                          value       = module.storage_account.primary_access_key
-                                        }
-                                      ]
-                                      metadata: [
-                                        {
-                                          name        = "accountName"
-                                          value       = module.storage_account.name
-                                        },
-                                        {
-                                          name        = "containerName"
-                                          value       = var.container_name
-                                        },
-                                        {
-                                          name        = "accountKey"
-                                          secret_name = "storageaccountkey"
-                                        }
-                                      ]
-                                      scopes          = var.dapr_scopes
-                                     }]
+  dapr_components                  = [
+    {
+      name            = var.dapr_state_name
+      component_type  = var.dapr_state_component_type
+      version         = var.dapr_version
+      ignore_errors   = var.dapr_ignore_errors
+      init_timeout    = var.dapr_init_timeout
+      secret          = [
+        {
+          name        = "storageaccountkey"
+          value       = module.storage_account.primary_access_key
+        }
+      ]
+      metadata: [
+        {
+          name        = "accountName"
+          value       = module.storage_account.name
+        },
+        {
+          name        = "containerName"
+          value       = var.container_name
+        },
+        {
+          name        = "accountKey"
+          secret_name = "storageaccountkey"
+        }
+      ]
+      scopes          = var.dapr_scopes
+    },
+    {
+      name            = var.dapr_pubsub_name
+      component_type  = var.dapr_pubsub_component_type
+      version         = var.dapr_version
+      ignore_errors   = var.dapr_ignore_errors
+      init_timeout    = var.dapr_init_timeout
+      metadata: [
+        {
+          name        = "redisHost"
+          value       = "${module.redis_cache_backend.name}.${module.redis_private_dns_zone.name}:6379"
+        },
+        {
+          name        = "redisPassword"
+          value       = module.redis_cache_backend.primary_access_key
+        },
+        {
+          name        = "consumerID"
+          value       = "{appID}"
+        },
+        {
+          name        = "maxLenApprox"
+          value       = 1000
+        }
+      ]
+      scopes          = var.dapr_scopes
+    }
+  ]
   container_apps                   = var.container_apps
 }
