@@ -49,3 +49,7 @@ __pycache__
 
 openapi.yaml
 coverage
+
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
