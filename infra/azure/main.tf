@@ -117,6 +117,13 @@ module "storage_account" {
   replication_type                 = var.storage_account_replication_type
 }
 
+module "container_registry" {
+  source                           = "./modules/container_registry"
+  location                         = var.location
+  resource_group_name              = azurerm_resource_group.rg.name
+  tags                             = var.tags
+}
+
 module "container_apps" {
   source                           = "./modules/container_apps"
   managed_environment_name         = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.managed_environment_name}"

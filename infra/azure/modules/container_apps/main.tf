@@ -127,7 +127,7 @@ resource "azurerm_container_app" "container_app" {
   }
 
   dynamic "secret" {
-    for_each                     = each.value.secrets != null ? [each.value.secrets] : []
+    for_each                     = each.value.secrets != null ? each.value.secrets : []
     content {
       name                       = secret.value.name
       value                      = secret.value.value
