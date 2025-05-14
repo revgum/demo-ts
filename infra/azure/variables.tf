@@ -3,6 +3,7 @@ variable "AZURE_SUBSCRIPTION_ID" {} # from ENV TF_VAR_AZURE_SUBSCRIPTION_ID
 variable "resource_prefix" {
   description = "Specifies a prefix for all the resource names."
   type        = string
+  default     = "demots"
 }
 
 variable "location" {
