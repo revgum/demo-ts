@@ -2,7 +2,8 @@
 # Local development
 
 ## Setup
-- Install Podman, Podman Desktop and make sure the "Compose" extension is active.
+- (Windows) Install Podman, Podman Desktop and make sure the "Compose" extension is active.
+- (Not Windows) Install podman and docker-compose
 
 ## Running the full stack
 The Makefile includes a target to launch the full stack (infrastructure, services) in `development` mode. In general, running `make` is the recommended way to build and launch a fresh stack everytime.
