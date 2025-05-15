@@ -13,14 +13,14 @@ variable "location" {
 }
 
 variable "resource_group_name" {
-   description = "Name of the resource group in which the resources will be created"
-   default     = "RG"
+  description = "Name of the resource group in which the resources will be created"
+  default     = "RG"
 }
 
 variable "tags" {
   description = "(Optional) Specifies tags for all the resources"
-  default     = {
-    createdWith = "Terraform"
+  default = {
+    createdBy = "infrastructure"
   }
 }
 
@@ -56,7 +56,7 @@ variable "vnet_name" {
 
 variable "vnet_address_space" {
   description = "Specifies the address prefix of the virtual network"
-  default     =  ["10.0.0.0/16"]
+  default     = ["10.0.0.0/16"]
   type        = list(string)
 }
 
@@ -96,7 +96,7 @@ variable "storage_account_replication_type" {
   type        = string
 
   validation {
-    condition = contains(["LRS", "ZRS", "GRS", "GZRS", "RA-GRS", "RA-GZRS"], var.storage_account_replication_type)
+    condition     = contains(["LRS", "ZRS", "GRS", "GZRS", "RA-GRS", "RA-GZRS"], var.storage_account_replication_type)
     error_message = "The replication type of the storage account is invalid."
   }
 }
@@ -106,8 +106,8 @@ variable "storage_account_kind" {
   default     = "StorageV2"
   type        = string
 
-   validation {
-    condition = contains(["Storage", "StorageV2"], var.storage_account_kind)
+  validation {
+    condition     = contains(["Storage", "StorageV2"], var.storage_account_kind)
     error_message = "The account kind of the storage account is invalid."
   }
 }
@@ -117,8 +117,8 @@ variable "storage_account_tier" {
   default     = "Standard"
   type        = string
 
-   validation {
-    condition = contains(["Standard", "Premium"], var.storage_account_tier)
+  validation {
+    condition     = contains(["Standard", "Premium"], var.storage_account_tier)
     error_message = "The account tier of the storage account is invalid."
   }
 }
@@ -144,7 +144,7 @@ variable "dapr_state_name" {
 variable "dapr_state_component_type" {
   description = "(Required) Specifies the type of the dapr component."
   type        = string
-  default     = "state.azure.blobstorage"
+  default     = "state.redis"
 }
 
 variable "dapr_pubsub_name" {
@@ -179,7 +179,7 @@ variable "dapr_init_timeout" {
 
 variable "dapr_scopes" {
   description = "(Required) Specifies the init timeout of the dapr component."
-  type        = list
+  type        = list(any)
   default     = ["webapp"]
 }
 
@@ -195,54 +195,54 @@ variable "container_access_type" {
   default     = "private"
 }
 
-variable "container_apps" {
+variable "container_app" {
   description = "Specifies the container apps in the managed environment."
-  type = list(object({
-    name                           = string
-    revision_mode                  = optional(string)
-    ingress                        = optional(object({
-      allow_insecure_connections   = optional(bool)
-      external_enabled             = optional(bool)
-      target_port                  = optional(number)
-      transport                    = optional(string)
-      traffic_weight               = optional(list(object({
-        label                      = optional(string)
-        latest_revision            = optional(bool)
-        revision_suffix            = optional(string)
-        percentage                 = optional(number)
+  type = object({
+    name          = string
+    revision_mode = optional(string)
+    ingress = optional(object({
+      allow_insecure_connections = optional(bool)
+      external_enabled           = optional(bool)
+      target_port                = optional(number)
+      transport                  = optional(string)
+      traffic_weight = optional(list(object({
+        label           = optional(string)
+        latest_revision = optional(bool)
+        revision_suffix = optional(string)
+        percentage      = optional(number)
       })))
     }))
-    dapr                           = optional(object({
-      app_id                       = optional(string)
-      app_port                     = optional(number)
-      app_protocol                 = optional(string)
+    dapr = optional(object({
+      app_id       = optional(string)
+      app_port     = optional(number)
+      app_protocol = optional(string)
     }))
-    secrets                        = optional(list(object({
-      name                         = string
-      value                        = string
+    secrets = optional(list(object({
+      name  = string
+      value = string
     })))
-    template                       = object({
-      containers                   = list(object({
-        name                       = string
-        image                      = string
-        args                       = optional(list(string))
-        command                    = optional(list(string))
-        cpu                        = optional(number)
-        memory                     = optional(string)
-        env                        = optional(list(object({
-          name                     = string
-          secret_name              = optional(string)
-          value                    = optional(string)
+    template = object({
+      containers = list(object({
+        name    = string
+        image   = string
+        args    = optional(list(string))
+        command = optional(list(string))
+        cpu     = optional(number)
+        memory  = optional(string)
+        env = optional(list(object({
+          name        = string
+          secret_name = optional(string)
+          value       = optional(string)
         })))
       }))
-      min_replicas                 = optional(number)
-      max_replicas                 = optional(number)
-      revision_suffix              = optional(string)
-      volume                       = optional(list(object({
-        name                       = string
-        storage_name               = optional(string)
-        storage_type               = optional(string)
+      min_replicas    = optional(number)
+      max_replicas    = optional(number)
+      revision_suffix = optional(string)
+      volume = optional(list(object({
+        name         = string
+        storage_name = optional(string)
+        storage_type = optional(string)
       })))
     })
-  }))
+  })
 }

@@ -30,9 +30,7 @@ resource "azurerm_storage_account" "storage_account" {
   }
 
   lifecycle {
-    ignore_changes = [
-        tags
-    ]
+    prevent_destroy = true
   }
 }
 
@@ -48,7 +46,7 @@ resource "azurerm_storage_management_policy" "storage_policy" {
     }
     actions {
       base_blob {
-        delete_after_days_since_modification_greater_than          = var.log_analytics_retention_days
+        delete_after_days_since_modification_greater_than = var.log_analytics_retention_days
       }
     }
   }

@@ -27,7 +27,7 @@ resource "random_string" "resource_prefix" {
   length  = 6
   special = false
   upper   = false
-  numeric  = false
+  numeric = false
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -37,32 +37,32 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "log_analytics_workspace" {
-  source                           = "./modules/log_analytics"
-  name                             = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.log_analytics_workspace_name}"
-  location                         = var.location
-  resource_group_name              = azurerm_resource_group.rg.name
-  tags                             = var.tags
+  source              = "./modules/log_analytics"
+  name                = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.log_analytics_workspace_name}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
 }
 
 module "application_insights" {
-  source                           = "./modules/application_insights"
-  name                             = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.application_insights_name}"
-  location                         = var.location
-  resource_group_name              = azurerm_resource_group.rg.name
-  tags                             = var.tags
-  application_type                 = var.application_insights_application_type
-  workspace_id                     = module.log_analytics_workspace.id
+  source              = "./modules/application_insights"
+  name                = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.application_insights_name}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
+  application_type    = var.application_insights_application_type
+  workspace_id        = module.log_analytics_workspace.id
 }
 
 module "virtual_network" {
-  source                           = "./modules/virtual_network"
-  resource_group_name              = azurerm_resource_group.rg.name
-  vnet_name                        = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.vnet_name}"
-  location                         = var.location
-  address_space                    = var.vnet_address_space
-  tags                             = var.tags
-  log_analytics_workspace_id       = module.log_analytics_workspace.id
-  log_analytics_retention_days     = var.log_analytics_retention_days
+  source                       = "./modules/virtual_network"
+  resource_group_name          = azurerm_resource_group.rg.name
+  vnet_name                    = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.vnet_name}"
+  location                     = var.location
+  address_space                = var.vnet_address_space
+  tags                         = var.tags
+  log_analytics_workspace_id   = module.log_analytics_workspace.id
+  log_analytics_retention_days = var.log_analytics_retention_days
 
   subnets = [
     {
@@ -81,12 +81,12 @@ module "virtual_network" {
 }
 
 module "blob_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "privatelink.blob.core.windows.net"
-  resource_group_name          = azurerm_resource_group.rg.name
-  virtual_networks_to_link     = {
+  source              = "./modules/private_dns_zone"
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_networks_to_link = {
     (module.virtual_network.name) = {
-      subscription_id = data.azurerm_client_config.current.subscription_id
+      subscription_id     = data.azurerm_client_config.current.subscription_id
       resource_group_name = azurerm_resource_group.rg.name
     }
   }
@@ -107,21 +107,21 @@ module "blob_private_endpoint" {
 }
 
 module "storage_account" {
-  source                           = "./modules/storage_account"
-  name                             = "${random_string.resource_prefix.result}${var.storage_account_name}"
-  location                         = var.location
-  resource_group_name              = azurerm_resource_group.rg.name
-  tags                             = var.tags
-  account_kind                     = var.storage_account_kind
-  account_tier                     = var.storage_account_tier
-  replication_type                 = var.storage_account_replication_type
+  source              = "./modules/storage_account"
+  name                = "${random_string.resource_prefix.result}${var.storage_account_name}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
+  account_kind        = var.storage_account_kind
+  account_tier        = var.storage_account_tier
+  replication_type    = var.storage_account_replication_type
 }
 
 module "container_registry" {
-  source                           = "./modules/container_registry"
-  location                         = var.location
-  resource_group_name              = azurerm_resource_group.rg.name
-  tags                             = var.tags
+  source              = "./modules/container_registry"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
 }
 
 module "redis_cache_backend" {
@@ -133,12 +133,12 @@ module "redis_cache_backend" {
 }
 
 module "redis_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "privatelink.redis.cache.windows.net"
-  resource_group_name          = azurerm_resource_group.rg.name
-  virtual_networks_to_link     = {
+  source              = "./modules/private_dns_zone"
+  name                = "privatelink.redis.cache.windows.net"
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_networks_to_link = {
     (module.virtual_network.name) = {
-      subscription_id = data.azurerm_client_config.current.subscription_id
+      subscription_id     = data.azurerm_client_config.current.subscription_id
       resource_group_name = azurerm_resource_group.rg.name
     }
   }
@@ -158,70 +158,99 @@ module "redis_private_endpoint" {
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
 }
 
-module "container_apps" {
-  source                           = "./modules/container_apps"
-  managed_environment_name         = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.managed_environment_name}"
-  location                         = var.location
-  resource_group_name              = azurerm_resource_group.rg.name
-  tags                             = var.tags
-  infrastructure_subnet_id         = module.virtual_network.subnet_ids[var.aca_subnet_name]
-  instrumentation_key              = module.application_insights.instrumentation_key
-  workspace_id                     = module.log_analytics_workspace.id
-  dapr_components                  = [
+module "container_app_environment" {
+  source                   = "./modules/container_app_environment"
+  managed_environment_name = "${var.resource_prefix != "" ? var.resource_prefix : random_string.resource_prefix.result}${var.managed_environment_name}"
+  location                 = var.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  tags                     = var.tags
+  infrastructure_subnet_id = module.virtual_network.subnet_ids[var.aca_subnet_name]
+  workspace_id             = module.log_analytics_workspace.id
+}
+
+module "dapr_components" {
+  source                 = "./modules/dapr_components"
+  managed_environment_id = module.container_app_environment.managed_environment_id
+  dapr_components = [
+    #    {
+    #      name            = var.dapr_state_name
+    #      component_type  = var.dapr_state_component_type
+    #      version         = var.dapr_version
+    #      ignore_errors   = var.dapr_ignore_errors
+    #      init_timeout    = var.dapr_init_timeout
+    #      secret          = [
+    #        {
+    #          name        = "storageaccountkey"
+    #          value       = module.storage_account.primary_access_key
+    #        }
+    #      ]
+    #      metadata: [
+    #        {
+    #          name        = "accountName"
+    #          value       = module.storage_account.name
+    #        },
+    #        {
+    #          name        = "containerName"
+    #          value       = var.container_name
+    #        },
+    #        {
+    #          name        = "accountKey"
+    #          secret_name = "storageaccountkey"
+    #        }
+    #      ]
+    #      scopes          = var.dapr_scopes
+    #    },
     {
-      name            = var.dapr_state_name
-      component_type  = var.dapr_state_component_type
-      version         = var.dapr_version
-      ignore_errors   = var.dapr_ignore_errors
-      init_timeout    = var.dapr_init_timeout
-      secret          = [
+      name           = var.dapr_state_name
+      component_type = var.dapr_state_component_type
+      version        = var.dapr_version
+      ignore_errors  = var.dapr_ignore_errors
+      init_timeout   = var.dapr_init_timeout
+      metadata : [
         {
-          name        = "storageaccountkey"
-          value       = module.storage_account.primary_access_key
-        }
-      ]
-      metadata: [
-        {
-          name        = "accountName"
-          value       = module.storage_account.name
+          name  = "redisHost"
+          value = "${module.redis_cache_backend.name}.${module.redis_private_dns_zone.name}:6379"
         },
         {
-          name        = "containerName"
-          value       = var.container_name
-        },
-        {
-          name        = "accountKey"
-          secret_name = "storageaccountkey"
+          name  = "redisPassword"
+          value = module.redis_cache_backend.primary_access_key
         }
       ]
-      scopes          = var.dapr_scopes
+      scopes = var.dapr_scopes
     },
     {
-      name            = var.dapr_pubsub_name
-      component_type  = var.dapr_pubsub_component_type
-      version         = var.dapr_version
-      ignore_errors   = var.dapr_ignore_errors
-      init_timeout    = var.dapr_init_timeout
-      metadata: [
+      name           = var.dapr_pubsub_name
+      component_type = var.dapr_pubsub_component_type
+      version        = var.dapr_version
+      ignore_errors  = var.dapr_ignore_errors
+      init_timeout   = var.dapr_init_timeout
+      metadata : [
         {
-          name        = "redisHost"
-          value       = "${module.redis_cache_backend.name}.${module.redis_private_dns_zone.name}:6379"
+          name  = "redisHost"
+          value = "${module.redis_cache_backend.name}.${module.redis_private_dns_zone.name}:6379"
         },
         {
-          name        = "redisPassword"
-          value       = module.redis_cache_backend.primary_access_key
+          name  = "redisPassword"
+          value = module.redis_cache_backend.primary_access_key
         },
         {
-          name        = "consumerID"
-          value       = "{appID}"
+          name  = "consumerID"
+          value = "{appID}"
         },
         {
-          name        = "maxLenApprox"
-          value       = 1000
+          name  = "maxLenApprox"
+          value = 1000
         }
       ]
-      scopes          = var.dapr_scopes
+      scopes = var.dapr_scopes
     }
   ]
-  container_apps                   = var.container_apps
+}
+
+module "container_app" {
+  source                 = "./modules/container_app"
+  managed_environment_id = module.container_app_environment.managed_environment_id
+  resource_group_name    = azurerm_resource_group.rg.name
+  tags                   = var.tags
+  container_app          = var.container_app
 }

@@ -25,7 +25,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
 
   lifecycle {
     ignore_changes = [
-        tags
+      tags
     ]
   }
 }

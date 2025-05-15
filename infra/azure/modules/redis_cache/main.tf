@@ -20,4 +20,9 @@ resource "azurerm_redis_cache" "redis_cache" {
   minimum_tls_version           = "1.2"
 
   redis_configuration {}
+
+  lifecycle {
+    ignore_changes  = [tags]
+    prevent_destroy = true
+  }
 }

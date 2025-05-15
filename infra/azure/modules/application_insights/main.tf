@@ -25,7 +25,7 @@ resource "azurerm_application_insights" "resource" {
 
   lifecycle {
     ignore_changes = [
-        tags
+      tags
     ]
   }
 }

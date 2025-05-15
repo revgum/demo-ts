@@ -1,3 +1,17 @@
-output "container_registry_name" {
-   value = module.container_registry.name
+# These output values are used in *.tfvars files for individual microservices infra, see app/*/infra/azure/*.tfvars files
+
+output "container_registry_host" {
+  value = module.container_registry.login_server
+}
+
+output "resource_group_name" {
+  value = resource.azurerm_resource_group.rg.name
+}
+
+output "managed_environment_id" {
+  value = module.container_app_environment.managed_environment_id
+}
+
+output "tags" {
+  value = var.tags
 }

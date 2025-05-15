@@ -1,7 +1,7 @@
 
 variable "resource_group_name" {
   description = "(Required) Specifies the resource group name"
-  type = string
+  type        = string
 }
 
 variable "tags" {
