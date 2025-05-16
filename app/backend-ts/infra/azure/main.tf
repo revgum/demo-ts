@@ -26,7 +26,9 @@ data "azurerm_client_config" "current" {
 module "container_app" {
   source                 = "../../../../infra/azure/modules/container_app"
   managed_environment_id = var.managed_environment_id
+  container_registry_id  = var.container_registry_id
   resource_group_name    = var.resource_group_name
   tags                   = var.tags
   container_app          = var.container_app
+  location               = var.location
 }

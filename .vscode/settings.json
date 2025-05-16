@@ -25,5 +25,8 @@
   },
   "[terraform]": {
     "editor.defaultFormatter": "gamunu.opentofu"
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "gamunu.opentofu"
   }
 }

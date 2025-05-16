@@ -8,8 +8,16 @@ variable "managed_environment_id" {
   description = "Id of the managed environment"
 }
 
+variable "location" {
+  description = "Specifies the location"
+}
+
 variable "container_registry_host" {
   description = "Those hostname of the container registry"
+}
+
+variable "container_registry_id" {
+  description = "Those id of the container registry"
 }
 
 variable "tags" {
@@ -40,6 +48,9 @@ variable "container_app" {
       app_id       = optional(string)
       app_port     = optional(number)
       app_protocol = optional(string)
+    }))
+    registry = optional(object({
+      server = string
     }))
     secrets = optional(list(object({
       name  = string

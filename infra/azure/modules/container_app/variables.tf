@@ -4,6 +4,16 @@ variable "managed_environment_id" {
   type        = string
 }
 
+variable "location" {
+  description = "(Required) Specifies the location."
+  type        = string
+}
+
+variable "container_registry_id" {
+  description = "(Required) Specifies the id of the container registry."
+  type        = string
+}
+
 variable "resource_group_name" {
   description = "(Required) Specifies the resource group name"
   type        = string
@@ -36,6 +46,9 @@ variable "container_app" {
       app_id       = optional(string)
       app_port     = optional(number)
       app_protocol = optional(string)
+    }))
+    registry = optional(object({
+      server = string
     }))
     secrets = optional(list(object({
       name  = string

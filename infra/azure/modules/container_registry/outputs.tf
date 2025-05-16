@@ -7,3 +7,8 @@ output "login_server" {
   value       = azurerm_container_registry.container_registry.login_server
   description = "Specifies the login server FQDN of the container registry."
 }
+
+output "id" {
+  value       = azurerm_container_registry.container_registry.id
+  description = "Specifies the acr ID for the registry"
+}

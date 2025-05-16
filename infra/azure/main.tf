@@ -168,6 +168,7 @@ module "container_app_environment" {
   workspace_id             = module.log_analytics_workspace.id
 }
 
+# TODO: Define secret store component and tie it to azure keyvault component
 module "dapr_components" {
   source                 = "./modules/dapr_components"
   managed_environment_id = module.container_app_environment.managed_environment_id
@@ -247,10 +248,3 @@ module "dapr_components" {
   ]
 }
 
-module "container_app" {
-  source                 = "./modules/container_app"
-  managed_environment_id = module.container_app_environment.managed_environment_id
-  resource_group_name    = azurerm_resource_group.rg.name
-  tags                   = var.tags
-  container_app          = var.container_app
-}

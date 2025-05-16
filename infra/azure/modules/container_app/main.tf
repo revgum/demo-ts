@@ -8,12 +8,32 @@ terraform {
   }
 }
 
+resource "azurerm_user_assigned_identity" "containerapp_identity" {
+  name                = "${var.container_app.name}-identity"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+resource "azurerm_role_assignment" "acr_pull" {
+  principal_id         = azurerm_user_assigned_identity.containerapp_identity.principal_id
+  role_definition_name = "AcrPull"
+  scope                = var.container_registry_id
+  depends_on = [
+    azurerm_user_assigned_identity.containerapp_identity
+  ]
+}
+
 resource "azurerm_container_app" "container_app" {
   name                         = var.container_app.name
   resource_group_name          = var.resource_group_name
   container_app_environment_id = var.managed_environment_id
   tags                         = var.tags
   revision_mode                = var.container_app.revision_mode
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.containerapp_identity.id]
+  }
 
   template {
     dynamic "container" {
@@ -41,7 +61,7 @@ resource "azurerm_container_app" "container_app" {
     revision_suffix = try(var.container_app.template.revision_suffix, null)
 
     dynamic "volume" {
-      for_each = var.container_app.template.volume != null ? [var.container_app.template.volume] : []
+      for_each = coalesce(var.container_app.template.volume, [])
       content {
         name         = volume.value.name
         storage_name = try(volume.value.storage_name, null)
@@ -79,6 +99,14 @@ resource "azurerm_container_app" "container_app" {
     }
   }
 
+  dynamic "registry" {
+    for_each = var.container_app.registry != null ? [var.container_app.registry] : []
+    content {
+      server   = registry.value.server
+      identity = azurerm_user_assigned_identity.containerapp_identity.id
+    }
+  }
+
   dynamic "secret" {
     for_each = var.container_app.secrets != null ? var.container_app.secrets : []
     content {
@@ -90,4 +118,8 @@ resource "azurerm_container_app" "container_app" {
   lifecycle {
     create_before_destroy = false # default behavior, but good to be explicit
   }
+  depends_on = [
+    azurerm_role_assignment.acr_pull
+  ]
 }
+
