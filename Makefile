@@ -11,7 +11,7 @@ all: up
 # Build the microservice base image
 setup:
 	echo "\n\n***Building microservice base image***\n\n"
-	podman build ./shared/microservice -t microservice-build --build-arg NO_CERT=$$NO_CERT
+	podman build ./shared/microservice -t microservice-build --build-arg ADD_CERT=$$ADD_CERT
 
 # Build the stack
 build:
