@@ -20,7 +20,7 @@ build:
 # Bring up the stack, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up:
 	echo "\n\n***Bringing up the stack***\n\n"
-	podman compose up -V
+	podman compose up
 
 # Bring up the database, stopping containers and removing anonymous volumes when stopped using CTRL-C
 up-db:
@@ -51,7 +51,7 @@ down:
 # Bring up the stack, setting a single service in debug mode
 debug: setup
 	echo "\n\n***Bringing up a service in debug mode***\n\n"
-	bash -c "podman compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up -V"
+	bash -c "podman compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"
 
 prune:
 	podman system prune

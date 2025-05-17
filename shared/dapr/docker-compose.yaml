@@ -23,8 +23,9 @@ services:
     image: "docker.io/openzipkin/zipkin"
     ports:
       - "9411:9411"
-    environment:
-      - JAVA_OPTS=-XX:UseSVE=0
+    # TODO: Not working on Azure VM, causes service to crash
+    # environment:
+      # - JAVA_OPTS=-XX:UseSVE=0
     networks:
       - dapr-net
   # Dapr dashboard
