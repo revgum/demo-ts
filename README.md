@@ -1,3 +1,4 @@
+# [Setup an Azure Sandbox](./docs/setup-azure-sandbox.md)
 # [Create a new service](./docs/create-new-service.md)
 # Local development
 
