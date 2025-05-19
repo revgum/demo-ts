@@ -7,8 +7,13 @@ function create_database() {
 	local database=$1
 	echo "Creating database '$database' for '$POSTGRES_USER' if it doesn't already exist."
 	psql -h postgres -v ON_ERROR_STOP=0 --username "$POSTGRES_USER" <<-EOSQL
-	    CREATE DATABASE "$database";
+					CREATE DATABASE "$database";
 	    GRANT ALL PRIVILEGES ON DATABASE "$database" TO $POSTGRES_USER;
+EOSQL
+	echo "Creating test schema in '$database' if it doesn't already exist."
+	psql -h postgres --username "$POSTGRES_USER" -d "$database" <<-EOSQL
+		-- Create schemas
+		CREATE SCHEMA IF NOT EXISTS test;
 EOSQL
 }
 

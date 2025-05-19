@@ -1,5 +1,13 @@
 import type { PaginatedQueryResults, QueryOrderDirection } from '@/lib/shared/api';
-import { type Todo, type TodoDb, type TodoQueryField, ContextKinds } from '@/types';
+import type { Context } from '@/lib/shared/types';
+import { create } from '@/models/todo';
+import {
+  type ContextKind,
+  type Todo,
+  type TodoDb,
+  type TodoQueryField,
+  ContextKinds,
+} from '@/types';
 import { randomUUID } from 'crypto';
 
 export const buildTodos = (
@@ -58,4 +66,19 @@ export const buildPaginatedTodos = (args: {
     totalItems: todos.length,
     totalPages: Math.ceil(todos.length / pageSize),
   };
+};
+
+export const createTodos = async (
+  context: Context<ContextKind>,
+  overrides: Partial<TodoDb> = {},
+  count = 1,
+): Promise<Array<{ todoDb: TodoDb; todo: Todo }>> => {
+  const todos = buildTodos(overrides, count);
+  const trx = await context.db.transaction();
+  for await (const t of todos) {
+    t.todo = await create(context, trx, t.todo);
+  }
+  await trx.commit();
+
+  return todos;
 };

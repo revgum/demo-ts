@@ -1,4 +1,4 @@
-import type { SecretStoreName } from './lib/shared/secrets/types';
+import type { SecretStoreName } from '@/lib/shared/secrets/types';
 
 const getEnv = () => {
   switch (process.env.NODE_ENV) {
@@ -29,6 +29,7 @@ const db = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT ? Number.parseInt(process.env.DB_PORT, 10) : 5432,
   database: process.env.DB_NAME || 'postgres-ts',
+  schema: process.env.DB_SCHEMA || 'public',
   ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   debug: !!process.env.DB_DEBUG,
 };
