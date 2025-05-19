@@ -12,10 +12,10 @@
     "dev": "npm run knex -- migrate:latest && tsx watch --import ./src/lib/shared/instrumentation.ts ./src/main.ts",
     "start": "tsx --import ./src/lib/shared/instrumentation.ts src/main.ts",
     "debug": "tsx --import ./src/lib/shared/instrumentation.ts --inspect-brk=0.0.0.0 src/main.ts",
-    "test": "vitest --config src/lib/test/vitest.config.ts",
-    "test:cov": "vitest --config src/lib/test/vitest.config.ts run --coverage",
-    "test:integration": "DB_SCHEMA=test npm run knex -- migrate:latest && vitest --config src/lib/test/vitest.integration.config.ts",
-    "test:integration:cov": "DB_SCHEMA=test npm run knex -- migrate:latest && vitest --config src/lib/test/vitest.integration.config.ts run --coverage",
+    "test": "NODE_ENV=test vitest --config src/lib/test/vitest.config.ts",
+    "test:cov": "NODE_ENV=test vitest --config src/lib/test/vitest.config.ts run --coverage",
+    "test:integration": "NODE_ENV=test npm run knex -- migrate:latest && NODE_ENV=test vitest --config src/lib/test/vitest.integration.config.ts",
+    "test:integration:cov": "NODE_ENV=test npm run knex -- migrate:latest && NODE_ENV=test vitest --config src/lib/test/vitest.integration.config.ts run --coverage",
     "knex": "tsx ./node_modules/knex/bin/cli.js --knexfile ./src/db/knexfile.ts"
   },
   "dependencies": {

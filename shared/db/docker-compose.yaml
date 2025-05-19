@@ -21,7 +21,8 @@ services:
     environment:
       PGPASSWORD: postgres
       POSTGRES_USER: postgres
-      DB_NAMES: postgres-ts,postgres-another-ts
+      DB_NAMES: postgres
+      SCHEMA_NAMES: backend_ts,another_service
     volumes:
       - ./build-dbs.sh:/usr/local/bin/build-dbs.sh
     depends_on:

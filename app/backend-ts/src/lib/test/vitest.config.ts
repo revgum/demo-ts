@@ -1,8 +1,6 @@
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
-process.env.DB_SCHEMA = 'test';
-
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
