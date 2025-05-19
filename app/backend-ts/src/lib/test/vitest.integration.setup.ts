@@ -3,7 +3,7 @@ import type { Context } from '@/lib/shared/types';
 import { buildServer } from '@/server';
 import type { ContextKind } from '@/types';
 import type { Express } from 'express';
-import { afterEach, beforeAll } from 'vitest';
+import { beforeAll, beforeEach } from 'vitest';
 
 let server: { server: { app: Express }; context: Context<ContextKind> };
 
@@ -11,7 +11,7 @@ beforeAll(async () => {
   await getServer();
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   const startTime = Date.now();
 
   // Disable foreign key checks temporarily
