@@ -5,6 +5,7 @@ module.exports = class extends Generator {
     super(args, opts);
     this.argument("appname", { type: String, required: true });
     this.name = this.options.appname || "myapp";
+    this.schema = this.name.replace("-", "_");
   }
 
   initializing() {}
@@ -44,6 +45,7 @@ module.exports = class extends Generator {
 
         const opts = {
           name: this.name,
+          schema: this.schema,
         };
 
         for (const f of files) {

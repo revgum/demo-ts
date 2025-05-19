@@ -4,11 +4,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    maxConcurrency: 1, // Safest because of db truncation between tests
     globals: true,
     environment: 'node',
-    setupFiles: ['./src/lib/test/vitest.setup.ts'],
-    include: ['**/*.test.{ts,tsx}'],
-    exclude: ['**/*.integration.test.*', '**/node_modules'],
+    setupFiles: ['./src/lib/test/vitest.integration.setup.ts'],
+    include: ['**/*.integration.test.*'],
     coverage: {
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
