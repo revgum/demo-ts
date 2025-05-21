@@ -104,7 +104,6 @@ const apiResultsHandler = <T extends ZodTypeAny, C>(kind: string, itemSchema: T)
       const timer = createTimer(context, context.handlerEndpoint);
       const success = error ? false : true;
 
-      console.log(error);
       try {
         if (error) {
           throw error;
