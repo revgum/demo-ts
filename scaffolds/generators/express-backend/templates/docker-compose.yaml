@@ -29,6 +29,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: postgres-ts
+      DB_SCHEMA: <%= schema %>
       OTLP_ENDPOINT: http://grafana-otel:4318
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production

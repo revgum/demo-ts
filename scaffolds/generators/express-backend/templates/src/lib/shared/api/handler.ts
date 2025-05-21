@@ -33,6 +33,24 @@ type HandlerParams = {
   options: FlatObject;
 };
 
+export const defaultErrorHandler = new ResultHandler({
+  positive: () => ({
+    schema: ErrorPayloadSchema,
+    mimeType: 'application/json',
+  }),
+  negative: () => ({
+    schema: ErrorPayloadSchema,
+    mimeType: 'application/json',
+  }),
+  handler: ({ error, response }: HandlerParams) => {
+    const { statusCode } = ensureHttpError(error as Error);
+    return void response.status(statusCode).json({
+      id: randomUUID(),
+      ...buildServerErrorResponse({ api: { version: '1.0' } }, 'Not found', statusCode),
+    });
+  },
+});
+
 /**
  * Creates a result handler for API responses, supporting both success and error scenarios.
  *
@@ -86,6 +104,7 @@ const apiResultsHandler = <T extends ZodTypeAny, C>(kind: string, itemSchema: T)
       const timer = createTimer(context, context.handlerEndpoint);
       const success = error ? false : true;
 
+      console.log(error);
       try {
         if (error) {
           throw error;
@@ -139,11 +158,11 @@ export const endpointsFactory = <C, T extends ZodTypeAny>(
      * - context.api.kind : The data "kind" for the handler built by the factory
      */
     // Execute the authentication middleware on every request
-    .addMiddleware(AuthMiddleware(context, getUser))
     .addOptions<EndpointOptions<C>>(async () => {
       return {
         requestId: randomUUID(),
         requestStart: performance.now(),
         context,
       };
-    });
+    })
+    .addMiddleware(AuthMiddleware(context, getUser));
