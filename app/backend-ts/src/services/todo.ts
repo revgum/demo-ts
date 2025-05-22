@@ -2,11 +2,12 @@ import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
 import { publish, PubSubNames } from '@/lib/shared/pubsub';
 import { destroy, save, StateNames } from '@/lib/shared/state';
 import type { ServiceParams } from '@/lib/shared/types';
-import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
+import { cacheKey, create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import type { ContextKind, CreateTodoModel, Todo, TodoQueryField, UpdateTodoModel } from '@/types';
 
 const pubSubName = PubSubNames.REDIS;
 const pubSubTopic = 'todo-data';
+const stateName = StateNames.REDIS;
 
 export const getAllTodo = async (args: {
   serviceParams: ServiceParams<void, ContextKind>;
@@ -35,7 +36,9 @@ export const createTodo = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await create(context, trx, input);
-    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
+    // Delete the todo item from the state store, causing the read-through cache to be invalidated.
+    await destroy({ context, stateName, key: cacheKey(stateName, payload.id) });
+    // Publish the created todo item to the specified topic for downstream subscribers to consume.
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
@@ -54,12 +57,14 @@ export const getTodoById = async ({
   }
   const todo = await getById(context, input);
 
+  // Read-through cache pattern: When another service requests the todo item, it first checks the state store.
+  // If the item is not found, it fetches it from this service which saves it to the state store for future requests.
   await save({
     context,
-    stateName: StateNames.REDIS,
-    stateObjects: [{ key: todo.id, value: todo }],
+    stateName,
+    stateObjects: [{ key: cacheKey(stateName, todo.id), value: todo }],
   }).catch((error) => {
-    context.logger.error({ error }, `Failed to save todo to statestore: ${StateNames.REDIS}`);
+    context.logger.error({ error }, `Failed to save todo to statestore: ${stateName}`);
   });
 
   return todo;
@@ -76,7 +81,9 @@ export const updateTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await updateById(context, trx, input.id, input);
-    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
+    // Delete the todo item from the state store, causing the read-through cache to be invalidated.
+    await destroy({ context, stateName, key: cacheKey(stateName, payload.id) });
+    // Publish the updated todo item to the specified topic for downstream subscribers to consume.
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
@@ -97,7 +104,9 @@ export const deleteTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await deleteById(context, trx, input);
-    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
+    // Delete the todo item from the state store, causing the read-through cache to be invalidated.
+    await destroy({ context, stateName, key: cacheKey(stateName, payload.id) });
+    // Publish the deleted todo item to the specified topic for downstream subscribers to consume.
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;

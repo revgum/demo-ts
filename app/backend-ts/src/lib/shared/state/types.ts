@@ -1,5 +1,6 @@
 import type { KeyValuePairType } from '@dapr/dapr/types/KeyValuePair.type';
 import type { StateDeleteOptions } from '@dapr/dapr/types/state/StateDeleteOptions.type';
+import type { StateGetOptions } from '@dapr/dapr/types/state/StateGetOptions.type';
 import type { StateSaveOptions } from '@dapr/dapr/types/state/StateSaveOptions.type';
 import type { StateNames } from '.';
 import type { Context } from '../types';
@@ -15,7 +16,13 @@ export type StateSaveArgs<K> = StateArgs<K> & {
   stateObjects: KeyValuePairType[];
   options?: StateSaveOptions;
 };
+
+export type StateGetArgs<K> = StateArgs<K> & {
+  key: string;
+  options?: StateGetOptions;
+};
+
 export type StateDeleteArgs<K> = StateArgs<K> & {
-  id: string;
+  key: string;
   options?: StateDeleteOptions;
 };

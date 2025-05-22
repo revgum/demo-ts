@@ -2,7 +2,7 @@ import { buildDaprClient } from '@/lib/shared/dapr';
 import type { KeyValuePairType } from '@dapr/dapr/types/KeyValuePair.type';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import type { Context } from '../types';
-import { destroy, save, StateNames } from './index';
+import { destroy, get, save, StateNames } from './index';
 
 vi.mock('@/lib/shared/dapr', () => ({
   buildDaprClient: vi.fn(),
@@ -12,6 +12,7 @@ const mockDaprClient = {
   state: {
     save: vi.fn(),
     delete: vi.fn(),
+    get: vi.fn(),
   },
 };
 
@@ -38,7 +39,7 @@ describe('State', () => {
       expect(buildDaprClient).toHaveBeenCalledWith(context);
       expect(mockDaprClient.state.save).toHaveBeenCalledWith(
         stateName,
-        [{ key: `redis-state:${key}`, value, metadata }],
+        [{ key, value, metadata }],
         undefined,
       );
     });
@@ -53,15 +54,28 @@ describe('State', () => {
       await destroy({
         context,
         stateName,
-        id: key,
+        key,
       });
 
       expect(buildDaprClient).toHaveBeenCalledWith(context);
-      expect(mockDaprClient.state.delete).toHaveBeenCalledWith(
+      expect(mockDaprClient.state.delete).toHaveBeenCalledWith(stateName, key, undefined);
+    });
+  });
+
+  describe('get', () => {
+    it('calls daprClient.state.get with correct arguments', async () => {
+      const context = {} as Context<unknown>;
+      const stateName = StateNames.REDIS;
+      const key = 'test-key';
+
+      await get({
+        context,
         stateName,
-        `redis-state:${key}`,
-        undefined,
-      );
+        key,
+      });
+
+      expect(buildDaprClient).toHaveBeenCalledWith(context);
+      expect(mockDaprClient.state.get).toHaveBeenCalledWith(stateName, key, undefined);
     });
   });
 });

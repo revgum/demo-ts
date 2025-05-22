@@ -1,5 +1,6 @@
 import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
 import { getQueryParams } from '@/lib/shared/api/helpers';
+import type { StateName } from '@/lib/shared/state/types';
 import type { Context } from '@/lib/shared/types';
 import { TodoQueryFields } from '@/schemas/todo';
 import type {
@@ -15,6 +16,8 @@ import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 
 export const TABLE_NAME = 'todo';
+
+export const cacheKey = (stateName: StateName, id: string) => `${stateName}:${TABLE_NAME}:${id}`;
 
 const asModel = (item: TodoDb): Todo => {
   return {
