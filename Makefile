@@ -53,6 +53,11 @@ debug: setup
 	echo "\n\n***Bringing up a service in debug mode***\n\n"
 	bash -c "podman compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"
 
+# Launch a shell in the specified service container
+# Example: make terminal SERVICE=service-name
+terminal:
+	podman compose exec -it $$SERVICE /bin/sh
+
 prune:
 	podman system prune
 	podman volume prune --filter label!=io.podman.compose.project=demo-ts
