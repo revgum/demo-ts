@@ -1,5 +1,6 @@
 import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
 import { publish, PubSubNames } from '@/lib/shared/pubsub';
+import { destroy, save, StateNames } from '@/lib/shared/state';
 import type { ServiceParams } from '@/lib/shared/types';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import type { ContextKind, CreateTodoModel, Todo, TodoQueryField, UpdateTodoModel } from '@/types';
@@ -34,6 +35,7 @@ export const createTodo = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await create(context, trx, input);
+    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
@@ -50,8 +52,17 @@ export const getTodoById = async ({
   if (!input) {
     throw new Error('Todo ID is missing.');
   }
+  const todo = await getById(context, input);
 
-  return getById(context, input);
+  await save({
+    context,
+    stateName: StateNames.REDIS,
+    stateObjects: [{ key: todo.id, value: todo }],
+  }).catch((error) => {
+    context.logger.error({ error }, `Failed to save todo to statestore: ${StateNames.REDIS}`);
+  });
+
+  return todo;
 };
 
 export const updateTodoById = async ({
@@ -65,6 +76,7 @@ export const updateTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await updateById(context, trx, input.id, input);
+    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;
@@ -85,6 +97,7 @@ export const deleteTodoById = async ({
   const trx = await context.db.transaction();
   try {
     const payload = await deleteById(context, trx, input);
+    await destroy({ context, stateName: StateNames.REDIS, id: payload.id });
     await publish<Todo, ContextKind>({ context, pubSubName, pubSubTopic, data: payload });
     await trx.commit();
     return payload;

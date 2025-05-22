@@ -135,6 +135,19 @@ variable "internal_load_balancer_enabled" {
   default     = false
 }
 
+variable "container_name" {
+  description = "Specifies the name of the container in the storage account."
+  type        = string
+  default     = "state"
+}
+
+variable "container_access_type" {
+  description = "Specifies the access type of the container in the storage account."
+  type        = string
+  default     = "private"
+}
+
+#{# Dapr variables #}
 variable "dapr_state_name" {
   description = "(Required) Specifies the name of the dapr state component."
   type        = string
@@ -181,16 +194,4 @@ variable "dapr_scopes" {
   description = "(Required) Specifies the init timeout of the dapr component."
   type        = list(any)
   default     = ["webapp"]
-}
-
-variable "container_name" {
-  description = "Specifies the name of the container in the storage account."
-  type        = string
-  default     = "state"
-}
-
-variable "container_access_type" {
-  description = "Specifies the access type of the container in the storage account."
-  type        = string
-  default     = "private"
 }

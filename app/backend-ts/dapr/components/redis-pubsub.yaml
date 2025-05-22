@@ -1,3 +1,4 @@
+# https://docs.dapr.io/reference/components-reference/supported-pubsub/setup-redis-pubsub/
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:

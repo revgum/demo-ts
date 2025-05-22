@@ -64,12 +64,12 @@ login:
 # Run psql to connect to local postgres, default password is "postgres"
 psql:
 	echo "\n\n***Default user 'postgres' has default password 'postgres'***\n\n"
-	podman run -it --rm --network demo_dapr-net postgres:17-alpine psql -h postgres -U postgres
+	podman run -it --rm --network demo-ts_dapr-net postgres:17-alpine psql -h postgres -U postgres
 
 redis-cli:
-	podman run -it --rm --network demo_dapr-net redis:7-alpine redis-cli -h redis
+	podman run -it --rm --network demo-ts_dapr-net redis:7-alpine redis-cli -h redis
 
 # Run an alpine shell for very basic access to the dapr-net network to use tools like nc and ping
 shell:
-	podman run -it --rm --network demo_dapr-net alpine:latest
+	podman run -it --rm --network demo-ts_dapr-net alpine:latest
 
