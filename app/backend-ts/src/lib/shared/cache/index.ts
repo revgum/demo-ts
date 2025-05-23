@@ -16,6 +16,34 @@ export type FetchArgs<K, A extends string> = {
   serviceArgs: Omit<InvokeArgs<K, A>, 'context'>;
 };
 
+/**
+ * Fetch data from cache and fallback to a service invocation endpoint. The idea here is that
+ * the service invocation endpoint would query the data from persistence and save it in cache
+ * before returning data in the response.
+ *
+ * Example usage:
+ * - `fetched` is null if data is not found in cache or service invocation
+ *
+ *  const todoId = 'ec59f080-3227-4db9-af61-c39f6284f8f6';
+ *  const stateName = StateNames.REDIS;
+ *  const fetched = await fetch<ContextKind, AppId, Todo>({
+ *    context,
+ *    cacheArgs: {
+ *      stateName,
+ *      key: cacheKey(stateName, todoId),
+ *    },
+ *    serviceArgs: {
+ *      appId: 'backend-ts',
+ *      method: HttpMethod.GET,
+ *      methodName: `/api/v1/todos/${todoId}`,
+ *      options: {
+ *        headers: {
+ *          Authorization: `Bearer ${context.requestToken}`,
+ *        },
+ *      },
+ *    },
+ *  });
+ */
 export const fetch = async <K, A extends string, V extends ItemWithId>({
   context,
   cacheArgs,
