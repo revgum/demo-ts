@@ -6,6 +6,7 @@ export type Context<K> = {
   serviceName: string;
   handlerName: string;
   handlerEndpoint: string;
+  requestToken?: string;
   env: 'test' | 'development' | 'staging' | 'production';
   api: {
     version: string;

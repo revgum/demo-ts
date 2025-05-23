@@ -12,6 +12,9 @@ import type { z } from 'zod';
 export const ContextKinds = { UNKNOWN: 'unknown', TODO: 'todo' } as const;
 export type ContextKind = (typeof ContextKinds)[keyof typeof ContextKinds];
 
+export const AppIds = { BACKEND_TS: 'backend-ts' } as const;
+export type AppId = (typeof AppIds)[keyof typeof AppIds];
+
 export type Uuid = z.infer<typeof UuidParamsSchema>;
 export type TodoDb = z.infer<typeof TodoDbSchema>;
 export type TodoQueryField = (typeof TodoQueryFields)[number];
