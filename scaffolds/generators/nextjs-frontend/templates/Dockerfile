@@ -2,7 +2,7 @@
 FROM localhost/microservice-build as build
 ENV NODE_ENV=production
 WORKDIR /app
-COPY package.json package-lock.json .
+COPY package.json .
 RUN npm ci
 
 # Run

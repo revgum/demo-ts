@@ -32,11 +32,13 @@ module.exports = class extends Generator {
           "package.json",
           "docker-compose.debug.yaml",
           "docker-compose.yaml",
+          "Dockerfile.dev",
           "src/lib/instrumentation.ts",
         ];
 
         const copyOpts = {
           globOptions: {
+            dot: true,
             ignore: [],
           },
         };
