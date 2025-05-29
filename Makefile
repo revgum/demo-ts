@@ -12,6 +12,7 @@ all: up
 setup:
 	echo "\n\n***Building microservice base image***\n\n"
 	podman build ./shared/microservice -t microservice-build --build-arg ADD_CERT=$$ADD_CERT
+	podman build -f Dockerfile.dev -t microservice-sdk-build .
 
 # Build the stack
 build:

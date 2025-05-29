@@ -1,20 +1,17 @@
 import * as config from '@/config';
-import { buildServiceContext } from '@/lib/shared/context';
-import { buildKnexConfig } from '@/lib/shared/db/db';
-import { get } from '@/lib/shared/secrets';
-import type { ServiceSecrets } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
+import { buildServiceContext, Db, Secrets, type ServiceSecrets } from '@sos/sdk';
 
 async function buildConfigurationForEnv() {
-  const context = await buildServiceContext(config);
-  const serviceSecrets = await get<ContextKind, ServiceSecrets>({
+  const context = await buildServiceContext<ContextKind>(config);
+  const serviceSecrets = await Secrets.get<ContextKind, ServiceSecrets>({
     context,
     secretKey: config.secretsStore.key,
     secretStoreName: config.secretsStore.storeName,
   });
 
   return {
-    [context.env]: buildKnexConfig(serviceSecrets, {
+    [context.env]: Db.buildKnexConfig(serviceSecrets, {
       db: config.db,
       secretsStore: config.secretsStore,
     }),

@@ -1,8 +1,8 @@
-import type { Context } from '@/lib/shared/types';
 import { createTodos } from '@/lib/test/models/todo';
 import { getAuthHeader } from '@/lib/test/utils';
 import { getServer } from '@/lib/test/vitest.integration.setup';
 import type { ContextKind, Todo, TodoDb } from '@/types';
+import type { Context } from '@sos/sdk';
 import { randomUUID } from 'crypto';
 import type { Express } from 'express';
 import request from 'supertest';

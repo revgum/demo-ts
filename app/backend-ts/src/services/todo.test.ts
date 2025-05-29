@@ -1,20 +1,22 @@
-import { buildServiceContext } from '@/lib/shared/context';
-import * as PubSub from '@/lib/shared/pubsub';
-import * as State from '@/lib/shared/state';
-import type { Context, ContextConfig } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildPaginatedTodos, buildTodos } from '@/lib/test/models/todo';
 import { mockedLogger } from '@/lib/test/utils';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
+import {
+  createTodo,
+  deleteTodoById,
+  getAllTodo,
+  getTodoById,
+  updateTodoById,
+} from '@/services/todo';
 import { type ContextKind, type Todo } from '@/types';
 import type { StateSaveResponseType } from '@dapr/dapr/types/state/StateSaveResponseType';
+import { buildServiceContext, PubSub, State, type Context, type ContextConfig } from '@sos/sdk';
 import type { Knex } from 'knex';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
-import { createTodo, deleteTodoById, getAllTodo, getTodoById, updateTodoById } from './todo';
 
 vi.mock('@/models/todo');
-vi.mock('@/lib/shared/pubsub');
-vi.mock('@/lib/shared/state');
+vi.mock('@sos/sdk');
 
 describe('Todo Service', () => {
   let mockedContext: Mocked<Context<ContextKind>>;

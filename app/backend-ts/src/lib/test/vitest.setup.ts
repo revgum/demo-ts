@@ -12,8 +12,7 @@ vi.mock('@dapr/dapr', async (importOriginal) => {
     DaprServer: vi.fn(),
   };
 });
-vi.mock('@/lib/shared/metrics');
-vi.mock('@/lib/shared/context', () => {
+vi.mock('@sos/sdk', () => {
   const context = {
     serviceName: 'test-service',
     handlerName: 'test-handler',

@@ -28,5 +28,17 @@
   },
   "[terraform-vars]": {
     "editor.defaultFormatter": "gamunu.opentofu"
+  },
+  "files.exclude": {
+    "**/node_modules": false,
+    "**/build": false
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/build/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/build": true
   }
 }

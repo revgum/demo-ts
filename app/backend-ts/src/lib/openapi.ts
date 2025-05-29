@@ -1,5 +1,5 @@
-import type { Context } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
+import type { Context } from '@sos/sdk';
 import { type CommonConfig, Documentation, type Routing } from 'express-zod-api';
 import { writeFile as writeFileAsync } from 'node:fs/promises';
 import { join } from 'node:path';

@@ -1,4 +1,4 @@
-import type { SecretStoreName } from '@/lib/shared/secrets/types';
+import { Secrets } from '@sos/sdk';
 
 const getEnv = () => {
   switch (process.env.NODE_ENV) {
@@ -46,6 +46,6 @@ const runtime = {
 const secretsStore = {
   key: process.env.SECRETS_KEY || 'serviceSecrets',
   storeName: process.env.SECRETS_STORE_NAME || 'local-secretstore',
-} as { key: string; storeName: SecretStoreName };
+} as { key: string; storeName: Secrets.SecretStoreName };
 
 export { dapr, db, env, runtime, secretsStore, server, serviceName };

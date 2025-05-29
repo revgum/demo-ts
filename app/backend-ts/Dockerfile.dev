@@ -1,14 +1,15 @@
 # Build
-FROM localhost/microservice-build as build
+FROM localhost/microservice-sdk-build as build
 ENV NODE_ENV=development
-WORKDIR /app
+WORKDIR /workspace/app/backend-ts
 COPY package.json package-lock.json tsconfig.json .
 RUN npm install
 
 # Run
-FROM localhost/microservice-build
-WORKDIR /app
-COPY --from=build /app /app
-COPY /src /app/src
+FROM localhost/microservice-sdk-build
+WORKDIR /workspace/app/backend-ts
+COPY --from=build /workspace/app/backend-ts /workspace/app/backend-ts
+COPY /src /workspace/app/backend-ts/src
 EXPOSE 3001
-CMD [ "npm", "run", "dev" ]
+WORKDIR /workspace
+CMD [ "npm", "run", "dev", "-w", "app/backend-ts" ]

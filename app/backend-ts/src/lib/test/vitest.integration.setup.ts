@@ -1,7 +1,7 @@
 import { db } from '@/config';
-import type { Context } from '@/lib/shared/types';
 import { buildServer } from '@/server';
 import type { ContextKind } from '@/types';
+import type { Context } from '@sos/sdk';
 import type { Express } from 'express';
 import { beforeAll, beforeEach } from 'vitest';
 

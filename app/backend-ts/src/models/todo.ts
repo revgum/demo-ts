@@ -1,7 +1,3 @@
-import type { PaginatedQueryResults, QueryParams } from '@/lib/shared/api';
-import { getQueryParams } from '@/lib/shared/api/helpers';
-import type { StateName } from '@/lib/shared/state/types';
-import type { Context } from '@/lib/shared/types';
 import { TodoQueryFields } from '@/schemas/todo';
 import type {
   ContextKind,
@@ -11,13 +7,15 @@ import type {
   TodoQueryField,
   UpdateTodoModel,
 } from '@/types';
+import { Api, State, type Context } from '@sos/sdk';
 import createHttpError from 'http-errors';
 import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 
 export const TABLE_NAME = 'todo';
 
-export const cacheKey = (stateName: StateName, id: string) => `${stateName}:${TABLE_NAME}:${id}`;
+export const cacheKey = (stateName: State.StateName, id: string) =>
+  `${stateName}:${TABLE_NAME}:${id}`;
 
 const asModel = (item: TodoDb): Todo => {
   return {
@@ -34,8 +32,8 @@ const asModel = (item: TodoDb): Todo => {
 
 export const getAll = async (
   context: Context<ContextKind>,
-  queryParams?: QueryParams<TodoQueryField>,
-): Promise<PaginatedQueryResults<Todo, TodoQueryField>> => {
+  queryParams?: Api.QueryParams<TodoQueryField>,
+): Promise<Api.PaginatedQueryResults<Todo, TodoQueryField>> => {
   const totalCountResult = await context
     .db<TodoDb>(TABLE_NAME)
     .where('deleted_at', null)
@@ -43,7 +41,7 @@ export const getAll = async (
     .first();
 
   const totalItems = Number.parseInt(totalCountResult?.count.toString() ?? '0');
-  const { page, pageSize, orderBy, orderDirection, offset, totalPages } = getQueryParams(
+  const { page, pageSize, orderBy, orderDirection, offset, totalPages } = Api.getQueryParams(
     TodoQueryFields,
     queryParams,
     totalItems,

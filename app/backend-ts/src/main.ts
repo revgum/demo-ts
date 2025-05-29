@@ -1,10 +1,10 @@
-import { buildDaprServer } from '@/lib/shared/dapr';
 import { buildServer } from '@/server';
 import type { ContextKind } from '@/types';
+import { Dapr } from '@sos/sdk';
 
 const startServer = async () => {
   const { server, context } = await buildServer();
-  const daprServer = buildDaprServer<ContextKind>(context, server.app);
+  const daprServer = Dapr.buildDaprServer<ContextKind>(context, server.app);
   await daprServer.start();
 };
 

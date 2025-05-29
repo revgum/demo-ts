@@ -1,13 +1,12 @@
-import type { PaginatedQueryResults, QueryOrderDirection } from '@/lib/shared/api';
-import type { Context } from '@/lib/shared/types';
 import { create } from '@/models/todo';
 import {
+  ContextKinds,
   type ContextKind,
   type Todo,
   type TodoDb,
   type TodoQueryField,
-  ContextKinds,
 } from '@/types';
+import { Api, type Context } from '@sos/sdk';
 import { randomUUID } from 'crypto';
 
 export const buildTodos = (
@@ -45,8 +44,8 @@ export const buildPaginatedTodos = (args: {
   pageSize: number;
   page: number;
   orderBy: TodoQueryField;
-  orderDirection: QueryOrderDirection;
-}): PaginatedQueryResults<Todo, TodoQueryField> => {
+  orderDirection: Api.QueryOrderDirection;
+}): Api.PaginatedQueryResults<Todo, TodoQueryField> => {
   const { pageSize, page, orderBy, orderDirection } = args;
 
   const todos = buildTodos({}, pageSize * page);

@@ -11,7 +11,7 @@ services:
       dockerfile: ./Dockerfile.dev
     ports:
       - '3500:3500'
-    command: npm run dev
+    command: npm run dev -w app/backend-ts
     environment:
       SERVICE_NAME: backend-ts
       NODE_ENV: development
