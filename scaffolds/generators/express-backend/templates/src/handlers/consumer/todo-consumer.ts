@@ -1,15 +1,9 @@
-import {
-  consumersFactory,
-  ConsumerStatusEnum,
-  ConsumerStatuses,
-  createDataSchema,
-  type ConsumerStatus,
-} from '@/lib/shared/consumer';
-import { buildHandlerContext } from '@/lib/shared/context';
-import type { Context } from '@/lib/shared/types';
 import { TodoSchema } from '@/schemas/todo';
 import { ContextKinds, type ContextKind } from '@/types';
+import { Consumer, buildHandlerContext, type Context } from '@sos/sdk';
 import { z } from 'zod';
+
+const { consumersFactory, ConsumerStatusEnum, ConsumerStatuses, createDataSchema } = Consumer;
 
 const todoConsumerFactory = (context: Context<ContextKind>, handlerEndpoint: string) => {
   const consumerContext = buildHandlerContext(
@@ -43,7 +37,7 @@ export const handleMessage = (context: Context<ContextKind>) =>
     input: createDataSchema(TodoSchema),
     output: z.object({ status: ConsumerStatusEnum }),
     handler: async ({ input, logger }) => {
-      let status: ConsumerStatus = ConsumerStatuses.SUCCESS;
+      let status: Consumer.ConsumerStatus = ConsumerStatuses.SUCCESS;
       try {
         logger.info({ input }, 'Consumer handling message.');
         // TODO: Do something with the message

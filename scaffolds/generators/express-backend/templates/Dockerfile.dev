@@ -1,14 +1,15 @@
 # Build
-FROM localhost/microservice-build as build
+FROM localhost/microservice-sdk-build as build
 ENV NODE_ENV=development
-WORKDIR /app
+WORKDIR /workspace/app/<%= name %>
 COPY package.json package-lock.json tsconfig.json .
 RUN npm install
 
 # Run
-FROM localhost/microservice-build
-WORKDIR /app
-COPY --from=build /app /app
-COPY /src /app/src
+FROM localhost/microservice-sdk-build
+WORKDIR /workspace/app/<%= name %>
+COPY --from=build /workspace/app/<%= name %> /workspace/app/<%= name %>
+COPY /src /workspace/app/<%= name %>/src
 EXPOSE 3001
-CMD [ "npm", "run", "dev" ]
+WORKDIR /workspace
+CMD [ "npm", "run", "dev", "-w", "app/<%= name %>" ]

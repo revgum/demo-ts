@@ -1,18 +1,17 @@
-import {
+import { TodoCreateSchema, TodoQueryFields, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
+import * as TodoService from '@/services/todo';
+import { getUser } from '@/services/user';
+import { ContextKinds, type ContextKind, type TodoQueryField } from '@/types';
+import { Api, buildHandlerContext, type Context } from '@sos/sdk';
+import createHttpError from 'http-errors';
+
+const {
   ApiPayloadSchema,
   buildResponse,
   createQueryParamsSchema,
   endpointsFactory,
   UuidParamsSchema,
-  type QueryParams,
-} from '@/lib/shared/api';
-import { buildHandlerContext } from '@/lib/shared/context';
-import type { Context } from '@/lib/shared/types';
-import { TodoCreateSchema, TodoQueryFields, TodoSchema, TodoUpdateSchema } from '@/schemas/todo';
-import * as TodoService from '@/services/todo';
-import { getUser } from '@/services/user';
-import { ContextKinds, type ContextKind, type TodoQueryField } from '@/types';
-import createHttpError from 'http-errors';
+} = Api;
 
 const todoEndpointsFactory = (context: Context<ContextKind>, handlerEndpoint: string) => {
   const handlerContext = buildHandlerContext(
@@ -23,11 +22,7 @@ const todoEndpointsFactory = (context: Context<ContextKind>, handlerEndpoint: st
     },
     context,
   );
-  return endpointsFactory<Context<ContextKind>, typeof TodoSchema>(
-    handlerContext,
-    TodoSchema,
-    getUser,
-  );
+  return endpointsFactory<ContextKind, typeof TodoSchema>(handlerContext, TodoSchema, getUser);
 };
 
 /**
@@ -44,7 +39,7 @@ export const getAllTodo = (context: Context<ContextKind>) =>
       try {
         const payload = await TodoService.getAllTodo({
           serviceParams: { context, logger },
-          queryParams: input as QueryParams<TodoQueryField>,
+          queryParams: input as Api.QueryParams<TodoQueryField>,
         });
         return buildResponse(TodoSchema, context, payload);
       } catch (err) {

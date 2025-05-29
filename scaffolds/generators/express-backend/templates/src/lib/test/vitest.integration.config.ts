@@ -15,7 +15,7 @@ export default defineConfig({
         '**/instrumentation.ts',
         '**/openapi.ts',
         '**/seed.ts',
-        '**/vitest.config.ts',
+        '**/vitest.*.ts',
         '**/db/**',
         '**/*.d.ts',
       ],

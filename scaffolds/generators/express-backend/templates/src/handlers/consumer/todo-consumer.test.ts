@@ -1,9 +1,6 @@
-import { ConsumerStatuses, type CloudEvent } from '@/lib/shared/consumer';
-import { buildServiceContext } from '@/lib/shared/context';
-import * as Metrics from '@/lib/shared/metrics';
-import type { Context, ContextConfig } from '@/lib/shared/types';
 import { expectConsumerDataResponse } from '@/lib/test/utils';
 import type { ContextKind, Todo } from '@/types';
+import { buildServiceContext, Consumer, Metrics, type Context, type ContextConfig } from '@sos/sdk';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
@@ -23,7 +20,7 @@ describe('Todo Consumer', () => {
     },
   ];
 
-  const mockPubSubMessage: CloudEvent & { data: Todo } = {
+  const mockPubSubMessage: Consumer.CloudEvent & { data: Todo } = {
     id: randomUUID(),
     datacontenttype: 'application/cloudevent+json',
     pubsubname: 'redis-pubsub',
@@ -70,19 +67,19 @@ describe('Todo Consumer', () => {
 
     it('responds with a consumer data success response', async () => {
       const { responseMock, loggerMock } = await testHandleTodoEndpoint();
-      expectConsumerDataResponse(responseMock, { status: ConsumerStatuses.SUCCESS });
+      expectConsumerDataResponse(responseMock, { status: Consumer.ConsumerStatuses.SUCCESS });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(mockedMetrics.createCounter).toHaveBeenCalled();
       expect(mockedMetrics.createTimer).toHaveBeenCalled();
       expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        status: ConsumerStatuses.SUCCESS,
+        status: Consumer.ConsumerStatuses.SUCCESS,
         pubsubname: 'redis-pubsub',
         source: expect.any(String),
         topic: 'todo-data',
       });
       expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        status: ConsumerStatuses.SUCCESS,
+        status: Consumer.ConsumerStatuses.SUCCESS,
         pubsubname: 'redis-pubsub',
         source: expect.any(String),
         topic: 'todo-data',
@@ -91,13 +88,13 @@ describe('Todo Consumer', () => {
 
     it('responds with a consumer data drop response for malformed messages', async () => {
       const { responseMock, loggerMock } = await testHandleTodoEndpoint({ invalid_field: 'field' });
-      expectConsumerDataResponse(responseMock, { status: ConsumerStatuses.DROP });
+      expectConsumerDataResponse(responseMock, { status: Consumer.ConsumerStatuses.DROP });
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(mockedMetrics.createCounter).toHaveBeenCalled();
       expect(mockedMetrics.createTimer).toHaveBeenCalled();
       expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        status: ConsumerStatuses.DROP,
+        status: Consumer.ConsumerStatuses.DROP,
         inputValidationError: true,
       });
     });

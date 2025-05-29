@@ -1,9 +1,8 @@
-import type { GetJwtUser } from '@/lib/shared/api';
-import type { Context, User } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
+import { type Context, type User, Api } from '@sos/sdk';
 import type { JwtPayload } from 'jsonwebtoken';
 
-export const getUser: GetJwtUser<Context<ContextKind>> = async (
+export const getUser: Api.GetJwtUser<Context<ContextKind>> = async (
   context: Context<ContextKind>,
   payload: JwtPayload,
 ): Promise<{ user: User }> => {

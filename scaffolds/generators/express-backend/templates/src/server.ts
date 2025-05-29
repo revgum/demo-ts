@@ -3,22 +3,19 @@ import * as TodoApiHandlers from '@/handlers/api/todo';
 import * as TodoConsumer from '@/handlers/consumer/todo-consumer';
 import { buildOpenApiSpec } from '@/lib/openapi';
 import { loadSeedData } from '@/lib/seed';
-import { buildServiceContext } from '@/lib/shared/context';
-import { buildDaprClient } from '@/lib/shared/dapr';
-import type { Context } from '@/lib/shared/types';
 import type { ContextKind } from '@/types';
+import { Api, Dapr, buildServiceContext, type Context } from '@sos/sdk';
 import express from 'express';
 import {
   DependsOnMethod,
-  type Routing,
   ServeStatic,
   createConfig,
   createServer,
+  type Routing,
 } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import ui from 'swagger-ui-express';
-import { defaultErrorHandler } from './lib/shared/api';
 
 const serverConfig = (context: Context<ContextKind>) =>
   createConfig({
@@ -30,7 +27,7 @@ const serverConfig = (context: Context<ContextKind>) =>
     cors: true,
     compression: true,
     logger: context.logger,
-    errorHandler: defaultErrorHandler,
+    errorHandler: Api.defaultErrorHandler,
     beforeRouting: ({ app }) => {
       // Parse JSON to support CloudEvents data being posted by Dapr PubSub subscriptions to Consumer endpoints
       app.use(express.json({ type: ['application/cloudevents+json', 'application/json'] }));
@@ -76,7 +73,7 @@ const serverRouting = (context: Context<ContextKind>) =>
   }) as Routing;
 
 export const buildServer = async () => {
-  const context = await buildServiceContext(serviceConfig);
+  const context = await buildServiceContext<ContextKind>(serviceConfig);
 
   const config = serverConfig(context);
   const serverRoutes = serverRouting(context);
@@ -86,7 +83,7 @@ export const buildServer = async () => {
   }
 
   await buildOpenApiSpec(serverRoutes, config, context);
-  buildDaprClient<ContextKind>(context);
+  Dapr.buildDaprClient<ContextKind>(context);
 
   const server = await createServer(config, serverRoutes);
   return { server, context };

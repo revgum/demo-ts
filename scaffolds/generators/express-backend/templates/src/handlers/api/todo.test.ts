@@ -1,6 +1,4 @@
-import { buildServiceContext } from '@/lib/shared/context';
-import * as Metrics from '@/lib/shared/metrics';
-import type { Context, ContextConfig } from '@/lib/shared/types';
+import * as todoHandlers from '@/handlers/api/todo';
 import { buildPaginatedTodos } from '@/lib/test/models/todo';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
@@ -12,10 +10,10 @@ import {
 } from '@/services/todo';
 import * as UserService from '@/services/user';
 import type { ContextKind, Todo } from '@/types';
+import { buildServiceContext, Metrics, type Context, type ContextConfig } from '@sos/sdk';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
-import * as todoHandlers from './todo';
 
 vi.mock('@/services/todo');
 vi.mock('@/services/user');

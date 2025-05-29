@@ -11,7 +11,7 @@ const otlpEndpoint = process.env.OTLP_ENDPOINT;
 if (otlpEndpoint) {
   const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({
-      [ATTR_SERVICE_NAME]: 'backend-ts',
+      [ATTR_SERVICE_NAME]: '<%= name %>',
       [ATTR_SERVICE_VERSION]: '1.0',
     }),
     traceExporter: new OTLPTraceExporter({
