@@ -29,6 +29,7 @@ module.exports = class extends Generator {
           "Bruno/Todo/Get Todo.bru",
           "Bruno/Todo/Update Todo.bru",
           "Bruno/bruno.json",
+          "infra/azure/main.tf",
           "package.json",
           "docker-compose.debug.yaml",
           "docker-compose.yaml",
