@@ -11,7 +11,7 @@ import {
 } from '@/services/todo';
 import { type ContextKind, type Todo } from '@/types';
 import type { StateSaveResponseType } from '@dapr/dapr/types/state/StateSaveResponseType';
-import { buildServiceContext, PubSub, State, type Context, type ContextConfig } from '@sos/sdk';
+import { PubSub, State, type Context } from '@sos/sdk';
 import type { Knex } from 'knex';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
@@ -28,9 +28,21 @@ describe('Todo Service', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
-      Context<ContextKind>
-    >;
+    mockedContext = {
+      serviceName: 'test-service',
+      handlerName: 'test-handler',
+      api: {
+        version: '1.0',
+        kind: 'unknown',
+      },
+      db: vi.fn(),
+      dapr: {
+        host: '0.0.0.0',
+        port: '3001',
+      },
+      logger: mockedLogger,
+    } as unknown as Mocked<Context<ContextKind>>;
+
     [{ todo }] = buildTodos();
     mockedTransaction = buildMockDbChain() as unknown as Mocked<Knex.Transaction>;
     mockedContext.db.transaction = vi.fn().mockResolvedValue(mockedTransaction);

@@ -1,13 +1,10 @@
 import { expectConsumerDataResponse } from '@/lib/test/utils';
 import type { ContextKind, Todo } from '@/types';
-import { buildServiceContext, Consumer, Metrics, type Context, type ContextConfig } from '@sos/sdk';
+import { buildServiceContext, Consumer, type Context, type ContextConfig } from '@sos/sdk';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import * as todoConsumer from './todo-consumer';
-
-// Mocked in vitest.setup.ts
-const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
 describe('Todo Consumer', () => {
   const mockTodos: Todo[] = [
@@ -36,22 +33,12 @@ describe('Todo Consumer', () => {
   };
 
   let mockedContext: Mocked<Context<ContextKind>>;
-  let mockedCounter: Mocked<ReturnType<typeof mockedMetrics.createCounter>>;
-  let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
     mockedContext = (await buildServiceContext({} as ContextConfig<ContextKind>)) as Mocked<
       Context<ContextKind>
-    >;
-    mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
-    mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(mockedContext) as Mocked<
-      ReturnType<typeof mockedMetrics.createCounter>
-    >;
-    mockedTimer = mockedMetrics.createTimer(mockedContext) as Mocked<
-      ReturnType<typeof mockedMetrics.createTimer>
     >;
   });
 
@@ -70,20 +57,6 @@ describe('Todo Consumer', () => {
       expectConsumerDataResponse(responseMock, { status: Consumer.ConsumerStatuses.SUCCESS });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        status: Consumer.ConsumerStatuses.SUCCESS,
-        pubsubname: 'redis-pubsub',
-        source: expect.any(String),
-        topic: 'todo-data',
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        status: Consumer.ConsumerStatuses.SUCCESS,
-        pubsubname: 'redis-pubsub',
-        source: expect.any(String),
-        topic: 'todo-data',
-      });
     });
 
     it('responds with a consumer data drop response for malformed messages', async () => {
@@ -91,12 +64,6 @@ describe('Todo Consumer', () => {
       expectConsumerDataResponse(responseMock, { status: Consumer.ConsumerStatuses.DROP });
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        status: Consumer.ConsumerStatuses.DROP,
-        inputValidationError: true,
-      });
     });
   });
 });

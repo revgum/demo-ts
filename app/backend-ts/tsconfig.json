@@ -18,7 +18,7 @@
     "paths": {
       "@sos/sdk/*": ["../sdk/src/*"],
       "@/*": ["./src/*"]
-    },
+    }
   },
   "ts-node": {
     "compilerOptions": {
