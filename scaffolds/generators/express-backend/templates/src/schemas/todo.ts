@@ -1,5 +1,3 @@
-import { ContextKinds } from '@/types';
-import { Api } from '@sos/sdk';
 import { ez } from 'express-zod-api';
 import { z } from 'zod';
 
@@ -46,5 +44,3 @@ export const TodoCreateSchema = TodoSchema.pick({
   .strict();
 
 export const TodoUpdateSchema = TodoCreateSchema;
-
-export const TodoApiDataSchema = Api.createDataSchema(TodoSchema, [ContextKinds.TODO]);
