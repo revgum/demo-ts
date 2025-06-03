@@ -12,6 +12,7 @@ all: up
 setup:
 	echo "\n\n***Building microservice base image***\n\n"
 	podman build ./shared/microservice -t microservice-build --build-arg ADD_CERT=$$ADD_CERT
+	podman build -f Dockerfile.dev -t microservice-sdk-build .
 
 # Build the stack
 build:
@@ -53,6 +54,11 @@ debug: setup
 	echo "\n\n***Bringing up a service in debug mode***\n\n"
 	bash -c "podman compose -f docker-compose.yaml -f app/$$SERVICE/docker-compose.debug.yaml up"
 
+# Launch a shell in the specified service container
+# Example: make terminal SERVICE=service-name
+terminal:
+	podman compose exec -it $$SERVICE /bin/sh
+
 prune:
 	podman system prune
 	podman volume prune --filter label!=io.podman.compose.project=demo-ts
@@ -64,12 +70,12 @@ login:
 # Run psql to connect to local postgres, default password is "postgres"
 psql:
 	echo "\n\n***Default user 'postgres' has default password 'postgres'***\n\n"
-	podman run -it --rm --network demo_dapr-net postgres:17-alpine psql -h postgres -U postgres
+	podman run -it --rm --network demo-ts_dapr-net postgres:17-alpine psql -h postgres -U postgres
 
 redis-cli:
-	podman run -it --rm --network demo_dapr-net redis:7-alpine redis-cli -h redis
+	podman run -it --rm --network demo-ts_dapr-net redis:7-alpine redis-cli -h redis
 
 # Run an alpine shell for very basic access to the dapr-net network to use tools like nc and ping
 shell:
-	podman run -it --rm --network demo_dapr-net alpine:latest
+	podman run -it --rm --network demo-ts_dapr-net alpine:latest
 

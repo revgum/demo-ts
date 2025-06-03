@@ -1,10 +1,10 @@
-var Generator = require('yeoman-generator');
+var Generator = require("yeoman-generator");
 
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
-    this.argument('appname', { type: String, required: true });
-    this.name = this.options.appname || 'myapp';
+    this.argument("appname", { type: String, required: true });
+    this.name = this.options.appname || "myapp";
   }
 
   initializing() {}
@@ -21,23 +21,29 @@ module.exports = class extends Generator {
         const src = `${this.sourceRoot()}/**`;
         const destAppDir = this.destinationPath(`app/${this.name}`);
 
-        const files = ['package.json', 'docker-compose.yaml'];
+        const files = ["package.json", "docker-compose.yaml"];
 
         const copyOpts = {
           globOptions: {
+            dot: true,
             ignore: [],
           },
         };
 
         this.fs.copy(src, destAppDir, copyOpts);
-        this.fs.copy(this.templatePath('.*'), destAppDir, copyOpts);
+        this.fs.copy(this.templatePath(".*"), destAppDir, copyOpts);
 
         const opts = {
           name: this.name,
         };
 
         for (const f of files) {
-          this.fs.copyTpl(this.templatePath(f), `${destAppDir}/${f}`, opts, copyOpts);
+          this.fs.copyTpl(
+            this.templatePath(f),
+            `${destAppDir}/${f}`,
+            opts,
+            copyOpts
+          );
         }
 
         this.fs.move(`${destAppDir}/gitignore`, `${destAppDir}/.gitignore`);

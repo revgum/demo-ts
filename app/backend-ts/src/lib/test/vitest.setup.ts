@@ -4,17 +4,16 @@ import { mockedLogger } from './utils';
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET_KEY = 'test';
 
-vi.mock('@dapr/dapr', () => {
+vi.mock('@dapr/dapr', async (importOriginal) => {
+  const original = await importOriginal();
   return {
+    ...(original as unknown as object),
     DaprClient: vi.fn(),
     DaprServer: vi.fn(),
-    CommunicationProtocolEnum: {
-      HTTP: 'HTTP',
-    },
   };
 });
-vi.mock('@/lib/shared/metrics');
-vi.mock('@/lib/shared/context', () => {
+vi.mock('@sos/sdk', async (importOriginal) => {
+  const actual = await importOriginal();
   const context = {
     serviceName: 'test-service',
     handlerName: 'test-handler',
@@ -30,6 +29,8 @@ vi.mock('@/lib/shared/context', () => {
     logger: mockedLogger,
   };
   return {
+    // @ts-ignore
+    ...actual,
     buildServiceContext: vi.fn().mockReturnValue(context),
     buildHandlerContext: vi.fn().mockReturnValue(context),
   };

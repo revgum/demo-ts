@@ -2,3 +2,5 @@
 build
 coverage
 openapi.yaml
+**/.terraform
+README.md

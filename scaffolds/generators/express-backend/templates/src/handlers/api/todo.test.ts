@@ -1,6 +1,4 @@
-import { buildServiceContext } from '@/lib/shared/context';
-import * as Metrics from '@/lib/shared/metrics';
-import type { Context, ContextConfig } from '@/lib/shared/types';
+import * as todoHandlers from '@/handlers/api/todo';
 import { buildPaginatedTodos } from '@/lib/test/models/todo';
 import { expectApiDataResponse, expectApiError, getAuthHeader } from '@/lib/test/utils';
 import {
@@ -12,17 +10,15 @@ import {
 } from '@/services/todo';
 import * as UserService from '@/services/user';
 import type { ContextKind, Todo } from '@/types';
+import { buildServiceContext, type Context, type ContextConfig } from '@sos/sdk';
 import { testEndpoint } from 'express-zod-api';
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
-import * as todoHandlers from './todo';
 
 vi.mock('@/services/todo');
 vi.mock('@/services/user');
 
-// Mocked in vitest.setup.ts
 const mockedUserService = UserService as Mocked<typeof UserService>;
-const mockedMetrics = Metrics as Mocked<typeof Metrics>;
 
 describe('Todo Handlers', () => {
   const mockUser = {
@@ -39,8 +35,6 @@ describe('Todo Handlers', () => {
   ];
 
   let mockedContext: Mocked<Context<ContextKind>>;
-  let mockedCounter: Mocked<ReturnType<typeof mockedMetrics.createCounter>>;
-  let mockedTimer: Mocked<ReturnType<typeof mockedMetrics.createTimer>>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -51,14 +45,6 @@ describe('Todo Handlers', () => {
     mockedContext.api.kind = 'todo';
 
     mockedUserService.getUser.mockResolvedValue({ user: { id: mockUser.id } });
-    mockedMetrics.createCounter.mockReturnValue({ add: vi.fn() });
-    mockedMetrics.createTimer.mockReturnValue({ record: vi.fn() });
-    mockedCounter = mockedMetrics.createCounter(mockedContext) as Mocked<
-      ReturnType<typeof mockedMetrics.createCounter>
-    >;
-    mockedTimer = mockedMetrics.createTimer(mockedContext) as Mocked<
-      ReturnType<typeof mockedMetrics.createTimer>
-    >;
   });
 
   describe('getAllTodo', () => {
@@ -86,14 +72,6 @@ describe('Todo Handlers', () => {
       expectApiDataResponse(responseMock, paginatedTodos);
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
-      });
     });
 
     it('responds with an API error response', async () => {
@@ -103,14 +81,6 @@ describe('Todo Handlers', () => {
       expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: false,
-      });
     });
   });
 
@@ -138,14 +108,6 @@ describe('Todo Handlers', () => {
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
-      });
     });
 
     it('responds with an API error response', async () => {
@@ -155,14 +117,6 @@ describe('Todo Handlers', () => {
       expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: false,
-      });
     });
   });
 
@@ -193,14 +147,6 @@ describe('Todo Handlers', () => {
         expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
         expect(loggerMock._getLogs().error).toHaveLength(0);
         expect(responseMock._getStatusCode()).toBe(200);
-        expect(mockedMetrics.createCounter).toHaveBeenCalled();
-        expect(mockedMetrics.createTimer).toHaveBeenCalled();
-        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-          success: true,
-        });
-        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-          success: true,
-        });
       });
 
       it('responds with an API error response', async () => {
@@ -210,14 +156,6 @@ describe('Todo Handlers', () => {
         expectApiError(responseMock);
         expect(loggerMock._getLogs().error).toHaveLength(1);
         expect(responseMock._getStatusCode()).toBe(500);
-        expect(mockedMetrics.createCounter).toHaveBeenCalled();
-        expect(mockedMetrics.createTimer).toHaveBeenCalled();
-        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-          success: false,
-        });
-        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-          success: false,
-        });
       });
     });
 
@@ -229,14 +167,6 @@ describe('Todo Handlers', () => {
         expectApiDataResponse(responseMock, { ...mockTodos[0], completed: false });
         expect(loggerMock._getLogs().error).toHaveLength(0);
         expect(responseMock._getStatusCode()).toBe(200);
-        expect(mockedMetrics.createCounter).toHaveBeenCalled();
-        expect(mockedMetrics.createTimer).toHaveBeenCalled();
-        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-          success: true,
-        });
-        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-          success: true,
-        });
       });
 
       it('responds with an API error response', async () => {
@@ -246,14 +176,6 @@ describe('Todo Handlers', () => {
         expectApiError(responseMock);
         expect(loggerMock._getLogs().error).toHaveLength(1);
         expect(responseMock._getStatusCode()).toBe(500);
-        expect(mockedMetrics.createCounter).toHaveBeenCalled();
-        expect(mockedMetrics.createTimer).toHaveBeenCalled();
-        expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-          success: false,
-        });
-        expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-          success: false,
-        });
       });
     });
   });
@@ -280,14 +202,6 @@ describe('Todo Handlers', () => {
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
-      });
     });
 
     it('responds with an API error response', async () => {
@@ -297,14 +211,6 @@ describe('Todo Handlers', () => {
       expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: false,
-      });
     });
   });
 
@@ -330,14 +236,6 @@ describe('Todo Handlers', () => {
       expectApiDataResponse(responseMock, { ...mockTodos[0] });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: true,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: true,
-      });
     });
 
     it('responds with an API error response', async () => {
@@ -347,14 +245,6 @@ describe('Todo Handlers', () => {
       expectApiError(responseMock);
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(mockedMetrics.createCounter).toHaveBeenCalled();
-      expect(mockedMetrics.createTimer).toHaveBeenCalled();
-      expect(mockedCounter.add).toHaveBeenCalledWith(1, {
-        success: false,
-      });
-      expect(mockedTimer.record).toHaveBeenCalledWith(expect.any(Number), {
-        success: false,
-      });
     });
   });
 });

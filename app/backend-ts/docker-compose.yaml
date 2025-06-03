@@ -11,7 +11,7 @@ services:
       dockerfile: ./Dockerfile.dev
     ports:
       - '3500:3500'
-    command: npm run dev
+    command: npm run dev -w app/backend-ts
     environment:
       SERVICE_NAME: backend-ts
       NODE_ENV: development
@@ -26,13 +26,15 @@ services:
       SERVER_PORT: 3001
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: postgres-ts
+      DB_NAME: postgres
+      DB_SCHEMA: backend_ts
       OTLP_ENDPOINT: http://grafana-otel:4318
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
     volumes:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
       - ./src:/app/src
+      - ./package.json:/app/package.json
     depends_on:
       - redis
       - placement

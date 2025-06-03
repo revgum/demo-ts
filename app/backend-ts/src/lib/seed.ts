@@ -1,6 +1,6 @@
-import type { Context } from '@/lib/shared/types';
 import { create } from '@/models/todo';
 import type { ContextKind } from '@/types';
+import type { Context } from '@sos/sdk';
 
 export const loadSeedData = async (context: Context<ContextKind>) => {
   const { db, logger } = context;

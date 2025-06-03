@@ -1,9 +1,9 @@
-import type { Context } from '@/lib/shared/types';
 import { mockedLogger } from '@/lib/test/utils';
+import { getUser } from '@/services/user';
 import type { ContextKind } from '@/types';
+import type { Context } from '@sos/sdk';
 import type { JwtPayload } from 'jsonwebtoken';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getUser } from './user';
 
 describe('User Service', () => {
   const mockContext = {

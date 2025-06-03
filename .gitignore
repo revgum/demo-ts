@@ -27,25 +27,7 @@ logs
 .env.*
 !.env.example
 
-# dotnet files
-[Oo]bj/
-[Bb]in/
-.nuget/
-_ReSharper.*
-packages/
-artifacts/
-*.user
-*.suo
-*.userprefs
-*DS_Store
-*.sln.ide
-
 vite.config.ts.timestamp-*
-
-# python files
-__pycache__
-.venv
-
 
 openapi.yaml
 coverage
@@ -54,3 +36,5 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform/
 *.tfvars
+
+*.tsbuildinfo

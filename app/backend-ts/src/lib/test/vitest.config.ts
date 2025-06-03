@@ -7,13 +7,15 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./src/lib/test/vitest.setup.ts'],
+    include: ['**/*.test.{ts,tsx}'],
+    exclude: ['**/*.integration.test.*', '**/node_modules'],
     coverage: {
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         '**/instrumentation.ts',
         '**/openapi.ts',
         '**/seed.ts',
-        '**/vitest.config.ts',
+        '**/vitest.*.ts',
         '**/db/**',
         '**/*.d.ts',
       ],

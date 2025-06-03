@@ -1,5 +1,3 @@
-import { createDataSchema } from '@/lib/shared/api';
-import { ContextKinds } from '@/types';
 import { ez } from 'express-zod-api';
 import { z } from 'zod';
 
@@ -46,5 +44,3 @@ export const TodoCreateSchema = TodoSchema.pick({
   .strict();
 
 export const TodoUpdateSchema = TodoCreateSchema;
-
-export const TodoApiDataSchema = createDataSchema(TodoSchema, [ContextKinds.TODO]);

@@ -1,0 +1,8 @@
+{
+  "name": "demo-ts",
+  "private": true,
+  "workspaces": ["packages/@sos/*", "app/*"],
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

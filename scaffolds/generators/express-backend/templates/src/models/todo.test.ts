@@ -1,9 +1,8 @@
-import { buildServiceContext } from '@/lib/shared/context';
-import type { Context, ContextConfig } from '@/lib/shared/types';
 import { buildMockDbChain } from '@/lib/test/db';
 import { buildTodos } from '@/lib/test/models/todo';
 import { create, deleteById, getAll, getById, updateById } from '@/models/todo';
 import { type ContextKind, type Todo, type TodoDb } from '@/types';
+import { buildServiceContext, type Context, type ContextConfig } from '@sos/sdk';
 import type { Knex } from 'knex';
 import { randomUUID } from 'node:crypto';
 import { afterEach } from 'node:test';

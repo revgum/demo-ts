@@ -13,7 +13,7 @@ services:
     # ie. ('LOCAL_PORT:REMOTE_PORT') => '3501:3500'
     #ports:
     #  - '3500:3500'
-    command: npm run dev
+    command: npm run dev -w app/<%= name %>
     environment:
       SERVICE_NAME: <%= name %>
       NODE_ENV: development
@@ -28,7 +28,8 @@ services:
       SERVER_PORT: 3001
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: postgres-ts
+      DB_NAME: postgres
+      DB_SCHEMA: <%= schema %>
       OTLP_ENDPOINT: http://grafana-otel:4318
       # DB_DEBUG: 1
       # DB_SSL: postgres # Production
