@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import reactLogo from "./assets/react.svg";
+import { api } from "./config";
 import viteLogo from "/vite.svg";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React here and here</h1>
+      <span>{api.baseUrl}</span>
       <div className="card">
         <button
           type="button"

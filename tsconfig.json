@@ -3,6 +3,7 @@
   "references": [
     { "path": "packages/@sos/sdk" },
     { "path": "app/backend-ts" },
+    { "path": "app/api-gateway" },
     { "path": "app/web-react" }
   ]
 }

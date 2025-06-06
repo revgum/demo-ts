@@ -1,0 +1,88 @@
+name: demo-ts
+
+services:
+  ############################
+  # backend app + Dapr sidecar
+  ############################
+  api-gateway:
+    labels:
+      - 'sos.service-type=microservice'
+    build:
+      dockerfile: ./Dockerfile.dev
+    # Uncomment and set a non-conflicting LOCAL_PORT to map this containers Dapr sidecar for direct access
+    # ie. ('LOCAL_PORT:REMOTE_PORT') => '3501:3500'
+    #ports:
+    #  - '3500:3500'
+    ports:
+      - '3001:3001'
+    command: npm run dev -w app/api-gateway
+    environment:
+      SERVICE_NAME: api-gateway
+      NODE_ENV: development
+      JWT_SECRET_KEY: secret
+      SECRETS_KEY: serviceSecrets
+      SECRETS_STORE_NAME: local-secretstore
+      # SEED_DATA: true # Load seed data on start
+      CHOKIDAR_USEPOLLING: true # Supports "tsx watch" for live reloading
+      DAPR_HOST: 0.0.0.0
+      DAPR_PORT: 3500
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_SCHEMA: api_gateway
+      OTLP_ENDPOINT: http://grafana-otel:4318
+      # DB_DEBUG: 1
+      # DB_SSL: postgres # Production
+    volumes:
+      - /workspace/app/api-gateway/node_modules # Persist docker containers modules so that localhost are not used
+      - ./src:/workspace/app/api-gateway/src
+    depends_on:
+      - redis
+      - placement
+      - zipkin
+      - postgres
+    restart: on-failure
+    networks:
+      - dapr-net
+  api-gateway-dapr:
+    labels:
+      - 'sos.service-type=microservice'
+      - 'dapr.io/enabled=true' # Enable Dapr for this service
+      - 'dapr.io/config=configstore'
+    image: 'docker.io/daprio/daprd:edge'
+    command:
+      [
+        './daprd',
+        '--app-id',
+        'api-gateway',
+        '--app-port',
+        '3001',
+        '--config',
+        '/configuration/config.yaml',
+        '--dapr-http-port',
+        '3500',
+        '--enable-api-logging',
+        '--enable-profiling',
+        '--log-as-json',
+        'true',
+        '--placement-host-address',
+        'placement:50005',
+        '--profile-port',
+        '7777',
+        '--resources-path',
+        '/components',
+      ]
+    volumes:
+      # Volume mounts are relative from the root directory where dapr-net-compose is run from
+      - './dapr/components/:/components'
+      - './dapr/config/:/configuration'
+      - ./dapr/config/dev-secrets.json:/dev-secrets.json
+    depends_on:
+      - api-gateway
+    network_mode: 'service:api-gateway'
+
+networks:
+  dapr-net: # here we set the network name
+    driver: bridge

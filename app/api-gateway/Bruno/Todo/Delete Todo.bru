@@ -1,0 +1,20 @@
+meta {
+  name: Delete Todo
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/todos/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: f4f19652-2989-421b-b9f5-1a8a8a2d8794
+}
+
+headers {
+  dapr-app-id: api-gateway
+  authorization: Bearer PUT-JWT-HERE
+}

@@ -6,6 +6,7 @@ include:
   - shared/db/docker-compose.yaml
   - app/web-react/docker-compose.yaml
   - app/backend-ts/docker-compose.yaml
+  - app/api-gateway/docker-compose.yaml
 
 services:
 

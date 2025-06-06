@@ -1,0 +1,36 @@
+import { ez } from 'express-zod-api';
+import { z } from 'zod';
+
+export const TodoQueryFields = [
+  'due_at',
+  'title',
+  'completed',
+  'created_at',
+  'updated_at',
+] as const;
+
+export const TodoSchema = z.object({
+  id: z.string().uuid(),
+  kind: z.literal('todo'),
+  title: z.string().min(1).trim(),
+  completed: z.boolean().default(false).nullish(),
+  createdAt: z.string().datetime(),
+  dueAt: z.string().datetime().nullish(),
+  deletedAt: z.string().datetime().nullish(),
+  updatedAt: z.string().datetime().nullish(),
+});
+
+// Has data object with fields appropriate for creating a new Todo. ({ data }).
+// dueAt can be a date or datetime string (ie. 2025-01-01, 2025-01-01T12:00:00.000Z)
+export const TodoCreateSchema = TodoSchema.pick({
+  title: true,
+  completed: true,
+})
+  .merge(
+    z.object({
+      dueAt: z.union([ez.dateIn(), z.string().datetime()]).nullish(),
+    }),
+  )
+  .strict();
+
+export const TodoUpdateSchema = TodoCreateSchema;
