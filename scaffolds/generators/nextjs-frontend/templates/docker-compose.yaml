@@ -18,8 +18,8 @@ services:
       OTLP_ENDPOINT: http://grafana-otel:4318
       JWT_SECRET_KEY: secret
     volumes:
-      - /app/node_modules # Persist docker containers modules so that localhost are not used
-      - ./src:/app/src
+      - /workspace/app/<%= name %>/node_modules # Persist docker containers modules so that localhost are not used
+      - ./src:/workspace/app/<%= name %>/src
     depends_on:
       - redis
       - placement
