@@ -12,6 +12,8 @@ services:
     ports:
       - "3000:3000"
     command: npm run dev
+    environment:
+      VITE_API_GATEWAY_BASE_URL: http://localhost:3001
     volumes:
       - /app/node_modules # Persist docker containers modules so that localhost are not used
       - ./src:/app/src
