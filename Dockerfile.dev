@@ -2,7 +2,7 @@ FROM localhost/microservice-build
 ENV NODE_ENV=development
 WORKDIR /workspace
 COPY /packages/@sos/sdk ./packages/@sos/sdk
-COPY package.json package-lock.json tsconfig.json .
+COPY package.json package-lock.json tsconfig.json ./
 RUN npm install
 RUN npm run compile -w @sos/sdk
 

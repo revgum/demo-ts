@@ -4,7 +4,7 @@ name: demo-ts
 include:
   - shared/dapr/docker-compose.yaml
   - shared/db/docker-compose.yaml
-  - app/web-nextjs/docker-compose.yaml
+  - app/web-react/docker-compose.yaml
   - app/backend-ts/docker-compose.yaml
 
 services:

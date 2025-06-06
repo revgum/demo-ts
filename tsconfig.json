@@ -3,6 +3,6 @@
   "references": [
     { "path": "packages/@sos/sdk" },
     { "path": "app/backend-ts" },
-    { "path": "app/web-nextjs" }
+    { "path": "app/web-react" }
   ]
 }
