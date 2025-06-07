@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import tanstackQuery from "@tanstack/eslint-plugin-query";
 import reactDom from "eslint-plugin-react-dom";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -29,11 +30,13 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       "react-x": reactX,
       "react-dom": reactDom,
+      "@tanstack/query": tanstackQuery,
     },
     rules: {
       ...reactX.configs["recommended-typescript"].rules,
       ...reactDom.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      ...tanstackQuery.configs["flat/recommended"],
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },

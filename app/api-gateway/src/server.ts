@@ -22,7 +22,10 @@ const serverConfig = (context: Context<ContextKind>) =>
       // Dynamic socket listener, application port is managed by daprServer
       listen: `/tmp/express-${randomUUID()}.sock`,
     },
-    cors: true,
+    cors: ({ defaultHeaders }) => ({
+      ...defaultHeaders,
+      'Access-Control-Allow-Headers': 'authorization,content-type',
+    }),
     compression: true,
     logger: context.logger,
     errorHandler: Api.defaultErrorHandler,
